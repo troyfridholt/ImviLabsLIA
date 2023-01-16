@@ -1,18 +1,10 @@
 import React from 'react';
+import './Footer.css';
 
-
-//Redigera så att det matcher ImviLabs hemsida senare.
-
-const footerStyle = {
-    backgroundColor: 'black',
-    color: 'white',
-    textAlign: 'center',
-    padding: '1rem'
-}
-
+//Lägg till mer info senare
 export default function Footer ()  {
     return (
-        <footer style={footerStyle}>
+        <footer className='footer'>
             <p>Lägg till länkar/information senare</p>
         </footer>
     );
