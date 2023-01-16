@@ -1,7 +1,17 @@
 import React from "react";
+import "./Header.css";
 
 function Header() {
-  return <section>Hello!</section>;
+  return (
+    <Header className="header">
+      <ul>
+        <li>Link 1</li>
+        <li>Link 2</li>
+        <li>Link 3</li>
+        <li>Link 4</li>
+      </ul>
+    </Header>
+  );
 }
 
 export default Header;
