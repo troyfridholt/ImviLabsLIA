@@ -5,11 +5,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-<<<<<<< Updated upstream
-      <Footer/>
-      
-=======
->>>>>>> Stashed changes
+      <Footer />
     </div>
   );
 }
