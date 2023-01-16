@@ -3,7 +3,7 @@ import "./Header.css";
 
 function Header() {
   return (
-    <Header className="header">
+    <header className="header">
       <img
         className="header--img"
         src="./Images/imvi-logo.png"
@@ -15,7 +15,7 @@ function Header() {
         <li>Link 3</li>
         <li>Link 4</li>
       </ul>
-    </Header>
+    </header>
   );
 }
 
