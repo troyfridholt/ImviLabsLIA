@@ -84,7 +84,7 @@ function Content() {
             <p>{question.prompt}</p>
             {question.options.map((option, i) => (
               <div key={i} className="questionsRadioAndLabel">
-                <input type="radio" id={`option-${i}`} name={`question-${index}`} value={option} />
+                <input required type="radio" id={`option-${i}`} name={`question-${index}`} value={option} />
                 <label for={`option-${i}`}>{option}</label>
               </div>
             ))}
