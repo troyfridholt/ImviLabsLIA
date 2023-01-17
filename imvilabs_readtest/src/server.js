@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 
-//Requests only from specific origins.
+//Gör så att servern endast kan få "requests" från localhost3000 domänen.
 const corsOptions = {
   origin: 'http://localhost:3000',
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -12,8 +12,10 @@ app.use(cors(corsOptions));
 
 
 app.get('/text', (req, res) => {
-  //const level = req.query.level;
+
+  //Tar parametern level ifrån requesten
   const level = req.query.level;
+
   let text;
   let questions;
   switch (level) {
@@ -81,6 +83,8 @@ app.get('/text', (req, res) => {
         ];
         break;
     }
+
+    //Skickar tbx ett json med text och frågor. (frågorna och texterna är hårdkodade nu vi behöver lägga till en databas klass eller en riktig databas (MongoDB Atlas eller firebase))
     res.json({ text, questions });
   });
 
