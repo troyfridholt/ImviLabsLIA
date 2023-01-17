@@ -1,0 +1,24 @@
+.profile-container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.results-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.result-item {
+    width: 20%;
+    margin: 16px;
+    text-align: left;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+h1, h2 {
+    margin: 0;
+}
