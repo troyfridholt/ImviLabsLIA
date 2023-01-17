@@ -6,7 +6,7 @@ function Header() {
     <header className="header">
       <img
         className="header--img"
-        src="./Images/imvi-logo.png"
+        src="../Images/imvi-logo.png"
         alt="Logo"
       ></img>
       <ul>

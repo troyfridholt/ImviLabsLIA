@@ -19,8 +19,44 @@ function Content() {
   //Används för att när man klickar på startknappen så ändaras det till en stoppknapp.
   const [isStarted, setIsStarted] = useState(false);
 
+  //State för att ändra antalrätt på frågor
+  const [amountOfRightQuestions, setAmountOfRightQuestions] = useState(0);
+
   //Används för att rendera frågor ifall isStopped = true och text ifall isStopped = false
   const [isStopped, setIsStopped] = useState(false);
+
+  //State för att se ifall användaren har submitat vårat question form
+  const [hasSubmitedQuestions, SethasSubmitedQuestions] = (false);
+
+  const handleFormSubmit = async event => {
+    event.preventDefault();
+    const answers = {};
+    const questionsElements = event.target.elements;
+    for (let i = 0; i < questionsElements.length; i++) {
+        const question = questionsElements[i];
+        if (question.checked) {
+            answers[question.name] = question.value;
+        }
+    }
+    try {
+        await axios.post('http://localhost:3001/submitQuestions', { level: level, answers })
+            .then(response => {
+              const result = response.data.result;
+              let amountOfQuestions = Object.keys(result).length;
+              let amountCorrect = 0;
+              for (const key of Object.keys(result)) {
+                if (result[key] === true) {
+                  amountCorrect++;
+                }
+              }
+              let percentageCorrect = (amountCorrect / amountOfQuestions) * 100;
+              //Sätter staten antal rätt frågor till uträkningen av antal rätt frågor i %
+              setAmountOfRightQuestions(percentageCorrect);
+            });
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 
   //Hanterar när man ändrar level så kan level parametern skickas till servern
@@ -43,7 +79,7 @@ function Content() {
     }
   };
 
-  //Sätter statsen isStopper till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
+  //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
   //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
   //Sätter endTime till new Date så att vi kan räkna ut wpm med start och endTime. Sedan sätter vi variablen wpm med SetWpm till användaren wpm
   const handleStopClick = () => {
@@ -78,7 +114,7 @@ function Content() {
 
 
       {isStopped ? (
-        <form className='reading-box'>
+        <form className='reading-box' onSubmit={handleFormSubmit}>
         {questions.map((question, index) => (
           <div key={index} className="questions">
             <p>{question.prompt}</p>
