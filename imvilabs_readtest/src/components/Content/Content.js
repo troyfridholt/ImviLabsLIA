@@ -10,9 +10,9 @@ function Content() {
   const [text, setText] = useState('');
 
   //States för start och sluttid samt "WPM" för att kunna räkna ut wpm.
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
   const [wpm, setWpm] = useState(0);
+
+
 
   //State för frågor där det skall komma in frågor som en array
   const [questions, setQuestions] = useState([]);
@@ -26,8 +26,65 @@ function Content() {
   const [isStopped, setIsStopped] = useState(false);
 
   //State för att se ifall användaren har submitat vårat question form
-  const [hasSubmitedQuestions, SethasSubmitedQuestions] = (false);
+  const [hasSubmitedQuestions, setHasSubmitedQuestions] = useState(false);
 
+  //State för att reseta allting ifall användaren vill börja om testet
+  const handleRestartClick = () => {
+    //Gör så att man kan klicka på startknappen igen när man klickat på starta om test
+    document.querySelector(".start-button").disabled = false
+    setIsStarted(false);
+    setHasSubmitedQuestions(false);
+    setWpm(0);
+    setAmountOfRightQuestions(0);
+  }
+
+//skickar request till severn som startar tiden
+const handleStartTimer = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/start-timer');
+      console.log(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  //skickar request till servern som stoppar tiden och räknar ut wpm samt return wpm
+  const handleStopTimer = async () => {
+    try {
+        const response = await axios.get(`http://localhost:3001/stop-timer?level=${level}`);
+        console.log(response.data)
+        setWpm(response.data.wpm);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+    //När man klickar start knappen skickas en request till servern med "level" som parameter och sätter text och questions statesen från vad som hämats från servern/databasen.
+    const handleStartClick = async () => {
+        setIsStopped(false);
+        setIsStarted(true);
+        handleStartTimer();
+        try {
+          const response = await axios.get(`http://localhost:3001/text?level=${level}`);
+          setText(response.data.text);
+          setQuestions(response.data.questions);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+    
+      //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
+      //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
+      //Sätter endTime till new Date så att vi kan räkna ut wpm med start och endTime. Sedan sätter vi variablen wpm med SetWpm till användaren wpm
+      const handleStopClick = async () => {
+        setIsStopped(true);
+        setIsStarted(false);
+        handleStopTimer();
+      };
+
+
+  //Metod för att hantera när användaren svarar på frågorna i formuläret den sparar ner svaren från användaren i en array sedan skickar den en post till servern som hämtar rättsvar
+  //från databasen med "Level parametern" sedan returnerar servern de rätta svaren och vi jämnför användarens svar med de rätta svaren och räknar ut hur många % rätt användaren hade.  
   const handleFormSubmit = async event => {
     event.preventDefault();
     const answers = {};
@@ -38,7 +95,7 @@ function Content() {
             answers[question.name] = question.value;
         }
     }
-    try {
+        try {
         await axios.post('http://localhost:3001/submitQuestions', { level: level, answers })
             .then(response => {
               const result = response.data.result;
@@ -50,13 +107,19 @@ function Content() {
                 }
               }
               let percentageCorrect = (amountCorrect / amountOfQuestions) * 100;
+              //Gör så att man inte kan klicka på startknappen igen när man gjort färdigt testet
+              document.querySelector(".start-button").disabled = true
               //Sätter staten antal rätt frågor till uträkningen av antal rätt frågor i %
               setAmountOfRightQuestions(percentageCorrect);
+              //Sätter isStopped till false för att kunna visa wpm/antal rätt frågor i min reading-box div
+              setIsStopped(false);
+              //Sätter has submitted questions till true för att visa min div med wpm etc..
+              setHasSubmitedQuestions(true)
             });
-    } catch (error) {
-        console.log(error);
-    }
-};
+        }   catch (error) {
+            console.log(error);
+        }
+    };
 
 
   //Hanterar när man ändrar level så kan level parametern skickas till servern
@@ -65,30 +128,7 @@ function Content() {
   };
 
 
-  //När man klickar start knappen skickas en request till servern med "level" som parameter och sätter text och questions statesen från vad som hämats från servern/databasen.
-  const handleStartClick = async () => {
-    setIsStopped(false);
-    setIsStarted(true);
-    setStartTime(new Date());
-    try {
-      const response = await axios.get(`http://localhost:3001/text?level=${level}`);
-      setText(response.data.text);
-      setQuestions(response.data.questions);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
-  //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
-  //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
-  //Sätter endTime till new Date så att vi kan räkna ut wpm med start och endTime. Sedan sätter vi variablen wpm med SetWpm till användaren wpm
-  const handleStopClick = () => {
-    setIsStopped(true);
-    setIsStarted(false);
-    setEndTime(new Date());
-    const minutes = (endTime - startTime) / 60000;
-    setWpm((text.split(' ').length / minutes).toFixed(2));
-  };
 
   return (
 
@@ -129,8 +169,7 @@ function Content() {
         <button className='submitQuestions' type="submit">Submit</button>
       </form>
       ) 
-      
-      : 
+      :
       <div className='reading-box'>
 
       {isStarted ? (
@@ -142,11 +181,21 @@ function Content() {
       : (
         <p>Click start to begin the reading test</p>
       )}
+    {hasSubmitedQuestions ? (
+                <div className='reading-box'>
+                    <p>Ord per minut: {wpm}</p>
+                    <p>Noggranhet på frågor: {amountOfRightQuestions}%</p>
+                    <button className='restart-button' onClick={handleRestartClick}>Restart Test</button>
+                </div>
+            ) : null}
     </div>
       }
     </div>
- );
+    );
   }
 
+    
+  
+ 
 
 export default Content;

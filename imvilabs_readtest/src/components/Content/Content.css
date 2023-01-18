@@ -35,25 +35,26 @@ select {
   border-radius: 10px;
   padding: 30px;
   box-shadow: rgb(236 242 248 / 0%) 0px 0px 0px;
+  min-height: 300px;
+  min-width: 400px;
 }
 
 .questions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   margin-bottom: 5%;
   
 }
 
-.questionsRadioAndLabel label {
-  margin-left: 5%;
-  
+.reading-box {
+  background-color: rgb(236, 242, 248);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: rgb(236 242 248 / 0%) 0px 0px 0px;
+  min-height: 300px;
+  min-width: 400px;
 }
 
-.questionsRadioAndLabel{
-  margin-top: 5%;
-}
 
-.submitQuestions{
 
-}

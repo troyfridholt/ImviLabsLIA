@@ -21,7 +21,7 @@ class Database {
                 ];
                 break;
             case 2:
-                text = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.";
+                text = "The quick green fox jumps over the fence.";
                 questions = [
                     {
                         prompt: "What color is the fox?",
@@ -36,8 +36,8 @@ class Database {
                         options: ["wall", "lazy dog", "fence"]
                     },
                     {
-                        prompt: "What is the subject of the sentence?",
-                        options: ["fox", "dog", "quick"]
+                        prompt: "What matches about the fox?",
+                        options: ["slow", "dog", "quick"]
                     }
                 ];
                 break;
@@ -75,10 +75,10 @@ class Database {
             break;
             case 2:
             correctAnswers = {
-            'question-0': 'brown',
+            'question-0': 'green',
             'question-1': 'jumping',
-            'question-2': 'lazy dog',
-            'question-3': 'fox'
+            'question-2': 'fence',
+            'question-3': 'quick'
             };
             break;
             default:
