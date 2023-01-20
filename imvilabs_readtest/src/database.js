@@ -6,7 +6,7 @@ class Database {
         level = parseInt(level)
         switch (level) {
             case 1:
-                text = "En dag gick en snabb och smidig brun räv genom skogen. Räven var alltid på jakt efter något att äta och denna dag var ingen annorlunda. Plötsligt såg han en lat hund som låg och sov vid en bäck. Räven kände genast att han ville ha hunden till lunch. Han började smyga sig närmare och närmare tills han var bara några meter bort. Men precis när han skulle hoppa på hunden, så vaknade hunden och började skälla högt. Räven ryckte till och började springa så fort han kunde, hoppade över bäcken och fortsatte att springa tills han var utom synhåll av hunden. Han var glad över att ha undkommit fara, men besviken på att hans plan hade misslyckats.";
+                text = "En dag gick en snabb och smidig brun räv genom skogen. Räven var alltid på jakt efter något att äta och denna dag var inget annorlunda. Plötsligt såg han en hund som låg och sov vid en bäck. Räven kände genast att han ville ha hunden till lunch. Han började smyga sig närmare och närmare tills han bara var några meter bort. Men precis när han skulle hoppa på hunden, så vaknade hunden och började skälla högt. Räven ryckte till och började springa så fort han kunde, hoppade över bäcken och fortsatte att springa tills han var utom synhåll av hunden. Han var glad över att ha undkommit fara, men besviken på att hans plan hade misslyckats.";
                 questions = [{
                     prompt: "Vad var rävens syfte?",                
                     options: ["Att hitta mat", "Att sova", "Att promenera"]
