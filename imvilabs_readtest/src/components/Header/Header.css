@@ -6,9 +6,11 @@
 
 .header {
   width: 100%;
-  height: 10vh;
+  height: 15vh;
   background-color: #fff;
+  border: 1px solid black;
   display: flex;
   justify-content: space-around;
   align-items: center;
+  box-shadow: 0 -15px black;
 }

@@ -1,5 +1,13 @@
-.navbar {
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, Poppins;
+}
+.nav-items {
   display: flex;
-  justify-content: center;
   align-items: center;
+  list-style-type: none;
+}
+.nav-item {
+  margin-left: 10px;
 }

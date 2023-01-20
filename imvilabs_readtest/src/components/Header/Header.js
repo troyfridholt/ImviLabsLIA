@@ -5,11 +5,6 @@ import "./Header.css";
 function Header() {
   return (
     <header className="header">
-      <img
-        className="header--img"
-        src="../../Images/imvi-logo.png"
-        alt="Logo"
-      ></img>
       <Navbar />
     </header>
   );
