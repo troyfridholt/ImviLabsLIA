@@ -2,17 +2,14 @@ import React from "react";
 import Link from "../Link/Link";
 import { navItems } from "./NavItems.js";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
+import logo from "../../Images/imvi-logo.png";
 import "./Navbar.css";
 
 function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav--logo-container">
-        <img
-          className="nav--logo"
-          src="imvilabs_readtest/src/Images/imvi-logo.png"
-          alt="Logo"
-        ></img>
+        <img className="nav--logo" src={logo} alt="Logo"></img>
       </div>
       <div className="nav--items-container">
         <div className="nav--links-container">
@@ -28,14 +25,15 @@ function Navbar() {
                 </li>
               );
             })}
+            <div className="nav--btn-container">
+              <button className="nav--btn" type="button">
+                Testa dig gratis
+              </button>
+            </div>
           </ul>
         </div>
         <div className="nav--cart-icon"></div>
-        <div className="nav--btn-container">
-          <button className="nav--btn" type="button">
-            Testa dig gratis
-          </button>
-        </div>
+
         <div className="nav--lang-icon"></div>
       </div>
     </nav>

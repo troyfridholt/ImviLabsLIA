@@ -1,7 +1,12 @@
 import React from "react";
+import "./Link.css";
 
 function Link({ linkText, url }) {
-  return <a href={url}>{linkText}</a>;
+  return (
+    <a className="link" href={url}>
+      {linkText}
+    </a>
+  );
 }
 
 export default Link;
