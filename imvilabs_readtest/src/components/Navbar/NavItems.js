@@ -1,7 +1,7 @@
 export const navItems = [
   {
     id: 1,
-    title: "Personer vi hjälp",
+    title: "Personer vi hjälpt",
     path: "https://imvilabs.com/sv/nojda-kunder/",
     className: "nav-item",
   },

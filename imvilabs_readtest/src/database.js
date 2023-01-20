@@ -168,4 +168,7 @@ class Database {
 
 }    
 
+
+//Skapa ny metod som tar ålder som parameter och returnera genomsnitt på ord för åldern
+
 module.exports = Database;
