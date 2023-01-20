@@ -39,12 +39,16 @@ const Profile = () => {
             return a.age - b.age;
         }
     });
+    const handleFilter = () => {
+        setResults(results.filter(result => result.level === selectedFuture));
+    }
+    
 
     return (
         <div className="profile-container">
             <h1>Dina resultat</h1>
             <div className="filter-container">
-                <label>Välj alternativ:</label>
+                <label>Välj nivå:</label>
                 <select value={selectedFuture} onChange={handleFutureChange}>
                     <option value="">Alla</option>
                     <option value="level1">Level 1</option>
@@ -53,12 +57,15 @@ const Profile = () => {
                     <option value="level4">Level 4</option>
                     <option value="level5">Level 5</option>
                 </select>
+            
                 <label>Sortera efter:</label>
                 <select value={sortBy} onChange={handleSortChange}>
                     <option value="level">Nivå</option>
-                    <option value="age">Ålder</option>
                 </select>
+                <button onClick={handleFilter}>Sök</button>
             </div>
+            
+
             <div className="results-container">
                 {results.length === 0 ? <p>Inga resultat att visa</p> :
                   sortedResults.map((result, index) => (
