@@ -5,7 +5,6 @@
 }
 .navbar {
   display: flex;
-  justify-content: center;
   align-items: center;
 }
 .nav-items {
@@ -17,6 +16,9 @@
   margin-left: 10px;
 }
 
+.nav--btn-container {
+  margin-left: 10px;
+}
 .nav--btn {
   background-color: #4379b8;
   color: #fff;

@@ -9,7 +9,9 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav--logo-container">
-        <img className="nav--logo" src={logo} alt="Logo"></img>
+        <a href="https://imvilabs.com/sv/">
+          <img className="nav--logo" src={logo} alt="Logo"></img>
+        </a>
       </div>
       <div className="nav--items-container">
         <div className="nav--links-container">
