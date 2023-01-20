@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser')
 
-const timer = require('timer');
+
 
 let startTime = 0;
 
