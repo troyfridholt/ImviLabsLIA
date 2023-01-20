@@ -33,7 +33,6 @@ app.get('/text', (req, res) => {
 
   //Tar parametern level ifrån requesten
   const level = req.query.level;
-  console.log(level)
   //Hämtar text och frågor från databas med level som parameter
   const { text, questions } = Database.getTextAndQuestions(level);
 

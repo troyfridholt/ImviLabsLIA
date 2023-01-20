@@ -1,7 +1,9 @@
 class Database {
+
     static getTextAndQuestions(level) {
         let text;
         let questions;
+        level = parseInt(level)
         switch (level) {
             case 1:
                 text = "The quick brown fox jumps over the lazy dog.";
@@ -65,6 +67,7 @@ class Database {
 
         static getCorrectAnswers(level) {
             let correctAnswers;
+            level = parseInt(level)
             switch (level) {
             case 1:
             correctAnswers = {
@@ -80,6 +83,7 @@ class Database {
             'question-2': 'fence',
             'question-3': 'quick'
             };
+            
             break;
             default:
                 correctAnswers = {
