@@ -8,9 +8,9 @@
   width: 100%;
   height: 15vh;
   background-color: #fff;
-  border: 1px solid black;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  box-shadow: 0 -15px black;
+  box-shadow: 0 1px 5px 0px lightgray;
+  margin-bottom: 5rem;
 }

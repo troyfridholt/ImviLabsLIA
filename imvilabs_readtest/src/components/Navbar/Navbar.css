@@ -6,6 +6,9 @@
 .navbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin: 0 8rem;
+  width: 100%;
 }
 .nav-items {
   display: flex;
@@ -19,6 +22,7 @@
 .nav--btn-container {
   margin-left: 10px;
 }
+
 .nav--btn {
   background-color: #4379b8;
   color: #fff;
@@ -26,6 +30,21 @@
   border-radius: 10px;
   border: none;
 }
+
 .nav--logo {
   width: 80px;
+}
+
+.nav--cartIcon {
+  width: 25px;
+}
+
+.nav--langIcon-container {
+  margin-left: 2rem;
+}
+.nav--flagIcon {
+  width: 20px;
+}
+.nav--cartIcon-container {
+  margin: 0 2rem;
 }
