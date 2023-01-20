@@ -3,15 +3,15 @@ import './Profile.css';
 
 const Profile = () => {
     const [results, setResults] = useState([]);
+    const [selectedFuture, setSelectedFuture] = useState('');
+    const [sortBy, setSortBy] = useState('level');
 
     useEffect(() => {
-        // hämta resultaten från datakällan
         fetchResults()
     }, []);
 
     const fetchResults = async () => {
         try {
-            // hämta resultaten från datakällan, får vi tillgång till deras firebase?
             const response = await fetch('https://your-api-url.com/results');
             const data = await response.json();
             setResults(data);
@@ -20,15 +20,52 @@ const Profile = () => {
         }
     }
 
+    const handleFutureChange = event => {
+        setSelectedFuture(event.target.value);
+    }
+
+    const handleSortChange = event => {
+        setSortBy(event.target.value);
+    }
+
+    const filteredResults = results.filter(result => {
+        return result.future === selectedFuture || selectedFuture === '';
+    });
+
+    const sortedResults = filteredResults.sort((a, b) => {
+        if (sortBy === 'level') {
+            return a.level - b.level;
+        } else {
+            return a.age - b.age;
+        }
+    });
+
     return (
         <div className="profile-container">
             <h1>Dina resultat</h1>
+            <div className="filter-container">
+                <label>Välj alternativ:</label>
+                <select value={selectedFuture} onChange={handleFutureChange}>
+                    <option value="">Alla</option>
+                    <option value="level1">Level 1</option>
+                    <option value="level2">Level 2</option>
+                    <option value="level3">Level 3</option>
+                    <option value="level4">Level 4</option>
+                    <option value="level5">Level 5</option>
+                </select>
+                <label>Sortera efter:</label>
+                <select value={sortBy} onChange={handleSortChange}>
+                    <option value="level">Nivå</option>
+                    <option value="age">Ålder</option>
+                </select>
+            </div>
             <div className="results-container">
                 {results.length === 0 ? <p>Inga resultat att visa</p> :
-                  results.map((result, index) => (
+                  sortedResults.map((result, index) => (
                     <div key={index} className="result-item">
                         <h2>{result.name}</h2>
-                        <p>{result.score}</p>
+                        <p>Nivå: {result.level}</p>
+                        
                     </div>
                 ))}
             </div>
