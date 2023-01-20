@@ -9,7 +9,7 @@ function Navbar() {
     <nav className="navbar">
       <ul className="nav-items">
         {navItems.map((item) => {
-          <li key={item.id} className={item.className}>
+         return <li key={item.id} className={item.className}>
             <Link linkText={item.title} url={item.path} />
           </li>;
         })}
