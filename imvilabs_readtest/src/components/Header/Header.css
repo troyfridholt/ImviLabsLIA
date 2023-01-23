@@ -9,7 +9,7 @@
   height: 15vh;
   background-color: #fff;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   box-shadow: 0 1px 5px 0px lightgray;
   margin-bottom: 5rem;

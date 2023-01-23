@@ -16,6 +16,7 @@ function Navbar() {
         </a>
       </div>
       <div className="nav--items-container">
+        <DropdownMenu />
         <div className="nav--links-container">
           <ul className="nav-items">
             {navItems.map((item) => {

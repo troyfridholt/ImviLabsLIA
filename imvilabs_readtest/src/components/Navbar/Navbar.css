@@ -13,10 +13,15 @@
 .nav-items {
   display: flex;
   align-items: center;
-  list-style-type: none;
 }
 .nav-item {
   margin-left: 10px;
+}
+.nav-item a {
+  transition: color 0.5s;
+}
+.nav-item a:hover {
+  color: #4379b8;
 }
 
 .nav--btn-container {
