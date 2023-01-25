@@ -5,15 +5,26 @@
 }
 .navbar {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: space-between;
+  margin: 0 8rem;
+  width: 100%;
 }
 .nav-items {
   display: flex;
   align-items: center;
-  list-style-type: none;
 }
 .nav-item {
+  margin-left: 10px;
+}
+.nav-item a {
+  transition: color 0.5s;
+}
+.nav-item a:hover {
+  color: #4379b8;
+}
+
+.nav--btn-container {
   margin-left: 10px;
 }
 
@@ -24,6 +35,21 @@
   border-radius: 10px;
   border: none;
 }
+
 .nav--logo {
   width: 80px;
+}
+
+.nav--cartIcon {
+  width: 25px;
+}
+
+.nav--langIcon-container {
+  margin-left: 2rem;
+}
+.nav--flagIcon {
+  width: 20px;
+}
+.nav--cartIcon-container {
+  margin: 0 2rem;
 }

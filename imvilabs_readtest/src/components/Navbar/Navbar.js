@@ -3,15 +3,20 @@ import Link from "../Link/Link";
 import { navItems } from "./NavItems.js";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
 import logo from "../../Images/imvi-logo.png";
+import flagIcon from "../../Images/sweden.png";
+import cartIcon from "../../Images/shopping-cart.png";
 import "./Navbar.css";
 
 function Navbar() {
   return (
     <nav className="navbar">
       <div className="nav--logo-container">
-        <img className="nav--logo" src={logo} alt="Logo"></img>
+        <a href="https://imvilabs.com/sv/">
+          <img className="nav--logo" src={logo} alt="Logo" />
+        </a>
       </div>
       <div className="nav--items-container">
+        <DropdownMenu />
         <div className="nav--links-container">
           <ul className="nav-items">
             {navItems.map((item) => {
@@ -25,16 +30,21 @@ function Navbar() {
                 </li>
               );
             })}
+            <div className="nav--cartIcon-container">
+              <a href="https://imvilabs.com/sv/varukorg/">
+                <img className="nav--cartIcon" src={cartIcon} alt="Cart" />
+              </a>
+            </div>
             <div className="nav--btn-container">
               <button className="nav--btn" type="button">
                 Testa dig gratis
               </button>
             </div>
+            <div className="nav--langIcon-container">
+              <img className="nav--flagIcon" src={flagIcon} alt="Flag" />
+            </div>
           </ul>
         </div>
-        <div className="nav--cart-icon"></div>
-
-        <div className="nav--lang-icon"></div>
       </div>
     </nav>
   );

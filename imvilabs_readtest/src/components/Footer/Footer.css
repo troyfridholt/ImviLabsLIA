@@ -1,12 +1,13 @@
-/*Lägga till bättre css sen så det matchar ImviLabs*/
 .footer {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: black;
-    color: black;
+    background-color: #6c757d; 
+    color: black; 
     text-align: center;
     padding: 1rem;
     height: 10vh;
+    font-size: 14px; 
+    font-family: 'Open Sans', sans-serif; 
 }

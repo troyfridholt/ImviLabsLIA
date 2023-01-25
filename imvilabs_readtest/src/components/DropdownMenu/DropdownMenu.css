@@ -1,0 +1,25 @@
+.dropdownArrow {
+  margin-left: 15px;
+  width: 10px;
+}
+.dropdownMenu-container {
+  position: absolute;
+  border: 1px solid black;
+}
+.dropdownMenu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: var(--speed) ease;
+}
+
+.dropdownMenu.inactive {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-20px);
+  transition: var(--speed) ease;
+}
+.dropdownTrigger {
+  display: flex;
+  border-radius: 50%;
+}
