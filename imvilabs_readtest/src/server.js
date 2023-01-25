@@ -51,6 +51,30 @@ app.get('/text', (req, res) => {
     res.json({text});
   });
 
+  //Endpoint som sparar ner användares resultat och namn, email i databas
+  app.post('/save-result', (req, res) => {
+    const { email, name, lastname, wpm, age, level, amountOfRightQuestions } = req.body;
+  
+    // Validate the input
+    if (!email || !name || !lastname) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+  
+    // Save the result to the "database" (in this case, an array)
+    const newResult = {
+      email,
+      name,
+      lastname,
+      wpm,
+      age,
+      level,
+      amountOfRightQuestions
+    };
+  
+    // Return a response to the client
+    res.json({ message: 'Result saved successfully', result: newResult });
+  });
+
 
   app.post('/submitQuestions', (req, res) => {
     //Sparar ner level parameterns som användaren skickar in
