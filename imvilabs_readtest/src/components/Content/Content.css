@@ -32,6 +32,8 @@
   min-height: 70%;
   max-height: 90%;
   font-size: 20px;
+
+  
   }
 
   .reading-box div{
@@ -49,6 +51,38 @@
 
 
 
+
+/* CSS FÖR TIMERN */
+.countdown-child3{
+  background-color: rgb(236, 242, 248);
+  font-size: 8rem;
+  font-weight: 700;
+  transform: translate(-50%, -50%);
+  animation: fadeIn infinite 3s;
+  animation-delay: 0s;
+  color: black;
+}
+.countdown-child2{
+  background-color: rgb(236, 242, 248);
+  font-size: 8rem;
+  font-weight: 700;
+  transform: translate(-50%, -50%);
+  animation: fadeIn infinite 3s;
+  animation-delay: 1s;
+  color: black;
+}
+.countdown-child1{
+  background-color: rgb(236, 242, 248);
+  font-size: 8rem;
+  font-weight: 700;
+  transform: translate(-50%, -50%);
+  animation: fadeIn infinite 3s;
+  animation-delay: 0s;
+  color: black;
+}
+
+
+
  /* CSS FÖR TEXT RUTAN SAMT STOPPKNAPPEN VID START AV TEST */
 
   .readingTextDiv {
@@ -59,6 +93,8 @@
     flex-wrap: wrap;
     min-height:80%;
     min-width:50%;
+    animation: zoomIn; 
+    animation-duration: .5s; 
   }
 
   .readingText {
@@ -68,7 +104,7 @@
     font-size: 22px;
     text-shadow:0 0 1px transparent;
     line-height: 1.4em;
-    overflow:scroll
+    overflow:scroll;
   }
 
   .readingTextDiv .stop-button {
@@ -86,6 +122,9 @@
     min-width: 50%;
     max-width: 50%;
     min-height: 50%;
+    animation:  zoomIn; 
+    animation-duration: .5s;  
+    
   }
   
   .level-selector div {
@@ -154,6 +193,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation:  zoomIn; 
+  animation-duration: 1s; 
 }
 
 .intro-questions label{
@@ -230,7 +271,8 @@
   min-height:80%;
   min-width:50%;
   overflow: scroll;
-
+  animation:  zoomIn; 
+  animation-duration: .5s; 
 }
 
 .question-form .questions {
@@ -279,6 +321,8 @@
   padding: 20px;
   background-color: rgb(236, 242, 248);
   border-radius: 10px;
+  animation:  zoomIn; 
+  animation-duration: .5s; 
 }
 
 .statisticsContent {
@@ -288,6 +332,7 @@
   margin-top: 20px;
   background-color: rgb(236, 242, 248);
 }
+
 
 .statisticsRow {
   display: flex;
@@ -366,6 +411,9 @@
   cursor: pointer;
   transition: all 0.5s ease-in-out;
   margin-top: 5%;
+  animation: rollIn; 
+  animation-duration: .7s; 
+  
 }
 
 .restart-button:hover {
@@ -487,20 +535,20 @@ input::placeholder {
 
 .reading-box{
     display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
 
 
 .readingTextDiv {
-  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
-  flex-wrap: wrap;
+  align-items: center;
   min-height:80%;
   min-width:50%;
+  animation: zoomIn; 
+  animation-duration: .5s; 
 }
 
 .readingText {
@@ -511,16 +559,16 @@ input::placeholder {
   text-shadow:0 0 1px transparent;
   line-height: 1.4em;
   overflow:scroll;
-  width: 100%; /* Add this */
+  width: 100%; 
+  animation:  zoomIn; 
+  animation-duration: .5s; 
 }
 
 .readingTextDiv .stop-button {
-  position: absolute; /* Add this */
-  bottom: 0; /* Add this */
-  left: 0; /* Add this */
-  margin: auto; /* Add this */
+  margin: auto; 
   width: 10%;
   font-size: 16px;
+  box-shadow: 0px 0px 0px 10px rgb(236, 242, 248);
 }
 
 

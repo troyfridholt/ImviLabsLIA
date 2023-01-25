@@ -1,8 +1,8 @@
 // Content.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Content.css';
-//import 'animate.css/animate.min.css';
+import 'animate.css';
 
 function Content() {
 
@@ -43,6 +43,10 @@ function Content() {
   //State för average wpm
   const [averageWpm, setAverageWpm] = useState("");
 
+  //State för att ha en counter innan testet börjar
+  const [countdown, setCountdown] = useState(3);
+  const [resetTimer, setResetTimer] = useState(true);
+
 
 
   //State för att reseta allting ifall användaren vill börja om testet
@@ -52,6 +56,7 @@ function Content() {
     setWpm(0);
     setAmountOfRightQuestions(0);
     setIntroQuestionsDone(false)
+    setResetTimer(true);
   }
 
 //skickar request till severn som startar tiden
@@ -67,7 +72,7 @@ const handleStartTimer = async () => {
   //skickar request till servern som stoppar tiden och räknar ut wpm samt return wpm
   const handleStopTimer = async () => {
     try {
-        const response = await axios.get(`http://localhost:3001/stop-timer?level=${level}&age${age}`);
+        const response = await axios.get(`http://localhost:3001/stop-timer?level=${level}&age=${age}`);
         console.log(response.data)
         setWpm(response.data.wpm);
     } catch (error) {
@@ -81,17 +86,30 @@ const handleStartTimer = async () => {
         alert("Please enter both level and age before starting.");
         return;
     }
+    try {
+      const response = await axios.get(`http://localhost:3001/text?level=${level}&age=${age}`);
+      setText(response.data.text);
+      setQuestions(response.data.questions);
+    } catch (error) {
+      console.log(error);
+    }
         setIsStopped(false);
         setIsStarted(true);
-        handleStartTimer();
-        try {
-          const response = await axios.get(`http://localhost:3001/text?level=${level}&age=${age}`);
-          setText(response.data.text);
-          setQuestions(response.data.questions);
-        } catch (error) {
-          console.log(error);
-        }
+        
       };
+
+      useEffect(() => {
+        if(isStarted && countdown > 0 && resetTimer){
+          let interval = setInterval(() => {
+            setCountdown(prevCountdown => prevCountdown - 1);
+          }, 1000);
+          return () => clearInterval(interval);
+        }
+        if(countdown === 0){
+          handleStartTimer();
+          setResetTimer(false);
+        }
+      }, [isStarted, countdown]);
 
 
       //
@@ -239,15 +257,19 @@ return (
 
     </div>
           }
-          
-          { isStarted && !isStopped && !hasSubmitedQuestions &&
-              <>
-              <div className='readingTextDiv'>
-                <p className='readingText'>{text}</p>
-                <button className='stop-button' onClick={handleStopClick}>STOPP</button>
-              </div>
-              </>
-}
+             
+      { isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions && countdown > 0 ? (
+        <div className='reading-box'>
+            <h2 className={`countdown-child${countdown}`}>{countdown}</h2>
+        </div>
+      ) : isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions && countdown === 0 ? (
+        <>
+          <div className='readingTextDiv'>
+            <p className='readingText'>{text}</p>
+            <button className='stop-button' onClick={handleStopClick}>STOPP</button>
+          </div>
+        </>
+      ) : null }
        { isStopped && !hasSubmitedQuestions &&
                 <form className='question-form' onSubmit={handleFormSubmit}>
                     {questions.map((question, index) => (
