@@ -687,11 +687,58 @@ class Database {
           return correctAnswers;
     }    
 
-}    
 
 
-    
-}  
+    static getstatisticsInfo(age, wpm){
+        let text = [];
+        let ordIText;
+        let timmarAttLäsaFärdigt;
+
+        age = parseInt(age);
+        wpm = parseInt(wpm)
+
+        switch(true){
+            case(age > 0 && age <= 12):
+                ordIText = 76944;
+                timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
+                text.push("Genomsnitt ord per minut för din ålder är 100-130.");
+                text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. 
+                Ifall du läser ${wpm} ord per minut Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`)
+                    break;
+
+            case(age > 12 && age < 15):
+                ordIText = 99750;
+                timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
+                text.push("Genomsnitt ord per minut för din ålder är 130-150.");
+                text.push(`Boken Hunger Games: Catching Fire innehåller 99,750 ord. 
+                Ifall du läser ${wpm} ord per minut. Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`)               
+                    break; 
+
+            case(age >= 15 && age <= 18):
+            let gymnasiumBooks = 12;
+            let gymnasiumTimetable = Math.round((gymnasiumBooks * 100000) / wpm);
+            text.push("Genomsnitt ord per minut för din ålder är 150-180.");
+            text.push(`Att genomföra en gymnasial utbildning kräver ungefär 4500 studie timmar.
+            Ifall du läser ${wpm} ord per minut, så skulle det ta dig ${gymnasiumTimetable} timmar att läsa ${gymnasiumBooks} läroböcker relaterade till en gymnasial utbildning`)
+                break;  
+
+            case(age > 18):
+            let studyHoursPerBook = 150;
+            let medSchoolBooks = medSchoolHours/studyHoursPerBook; 
+            let medSchoolTimetable = Math.round((medSchoolBooks * 120000) / wpm);
+            text.push("Genomsnitt ord per minut för din ålder är 200-300.");
+            text.push(`Att genomföra en medicinsk utbildning kräver ungefär 12000 studie timmar.
+            Ifall du läser ${wpm} ord per minut, så skulle det ta dig ${medSchoolTimetable} timmar att läsa 80 läroböcker relaterade till en medicinsk utbildning`)
+                break;
+            
+            default:
+                text.push("Genomsnitt ord per minut för din ålder är 100-130.");
+                text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. 
+                Ifall du läser ${wpm} ord per minut Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`)
+                 break;
+        }
+        return text;
+    }
 
 
     
