@@ -2,6 +2,10 @@
   font-family: Helvetica, sans-serif;
 }
 
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
 
 .container {
   display: grid;
@@ -26,7 +30,7 @@
   min-width: 50%;
   max-width: 50%;
   min-height: 70%;
-  overflow: auto;
+  max-height: 90%;
   font-size: 20px;
   }
 
@@ -53,8 +57,8 @@
     justify-content: center; /* center items horizontally */
     flex-direction: column;
     flex-wrap: wrap;
-    overflow: hidden;
-    
+    min-height:80%;
+    min-width:50%;
   }
 
   .readingText {
@@ -64,7 +68,9 @@
     font-size: 22px;
     text-shadow:0 0 1px transparent;
     line-height: 1.4em;
+    overflow:scroll
   }
+
   .readingTextDiv .stop-button {
     margin-top: 2%;
     width: 10%;
@@ -219,9 +225,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 50%;
   padding: 2%;
   border-radius: 5px;
+  min-height:80%;
+  min-width:50%;
+  overflow: scroll;
 
 }
 
@@ -265,7 +273,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 50%;
+  min-height:80%;
+  min-width:50%;
+  overflow: scroll;
   padding: 20px;
   background-color: rgb(236, 242, 248);
   border-radius: 10px;
@@ -380,6 +390,141 @@
   transform: scale(1.1);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* RESPONSIVE CSS */
+
+@media only screen and (max-width: 600px) {
+
+
+
+
+/* CSS FÖR LEVEL / AGE SELECTOR */
+  .start-button {
+    width: 30vw;
+    margin: auto;
+    text-align: center;
+    margin-left: -10px; /* move button to the left by 10px */
+}
+
+  .level-selector {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+  }
+
+
+  .info-tooltip {
+      visibility: hidden;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 0;
+      position: absolute;
+      bottom: 77%;
+      height: 5%;
+      left: 10%;
+      transition: opacity 0.3s;
+  }
+
+.level-selector div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  
+}
+
+.age-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+  .age-container:hover .info-tooltip {
+      visibility: visible;
+      color: black;
+      opacity: 1;
+  }
+  .info-tooltip::after {
+      content: "";
+      position: absolute;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #4379b8 transparent transparent transparent;
+  }
+
+
+.level-selector div input{
+  width: 30vw;
+  height: 8vh;
+  font-size: 1em;
+  padding: 1rem;
+}
+
+
+input::placeholder {
+  font-size: 14px;
+  color: #4379b8;
+}
+
+
+.reading-box{
+    display: flex;
+    align-items: center;
+}
+
+
+
+.readingTextDiv {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  min-height:80%;
+  min-width:50%;
+}
+
+.readingText {
+  background-color: rgb(236, 242, 248);
+  width: 65%;
+  border-radius: 0.5rem;
+  font-size: 22px;
+  text-shadow:0 0 1px transparent;
+  line-height: 1.4em;
+  overflow:scroll;
+  width: 100%; /* Add this */
+}
+
+.readingTextDiv .stop-button {
+  position: absolute; /* Add this */
+  bottom: 0; /* Add this */
+  left: 0; /* Add this */
+  margin: auto; /* Add this */
+  width: 10%;
+  font-size: 16px;
+}
+
+
+}
 
 
 
