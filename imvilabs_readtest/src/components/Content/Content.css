@@ -1,7 +1,6 @@
 *{
   font-family: Helvetica, sans-serif;
 }
-
 ::-webkit-scrollbar {
   width: 0px;
   height: 0px;
@@ -15,7 +14,6 @@
 }
 
 /* CSS FÖR "LÄSRUTAN" DÄR ALL TEXT,FRÅGOR VISAS */
-
 .reading-box {
   position: relative;
   background-color: rgb(236, 242, 248);
@@ -32,8 +30,6 @@
   min-height: 70%;
   max-height: 90%;
   font-size: 20px;
-
-  
   }
 
   .reading-box div{
@@ -48,9 +44,6 @@
   .reading-box .button {
     background-color: rgb(236, 242, 248);
   }
-
-
-
 
 /* CSS FÖR TIMERN */
 .countdown-child3{
@@ -81,10 +74,7 @@
   color: black;
 }
 
-
-
  /* CSS FÖR TEXT RUTAN SAMT STOPPKNAPPEN VID START AV TEST */
-
   .readingTextDiv {
     display: flex; 
     align-items: center; 
@@ -124,7 +114,6 @@
     min-height: 50%;
     animation:  zoomIn; 
     animation-duration: .5s;  
-    
   }
   
   .level-selector div {
@@ -185,10 +174,7 @@
     border-color: #4379b8 transparent transparent transparent;
   }
 
-
-
 /* CSS FÖR FRÅGOR VID START AV PROGRAM */
-
 .intro-questions {
   display: flex;
   flex-direction: column;
@@ -199,9 +185,7 @@
 
 .intro-questions label{
   margin-top: 15%;
-
 }
-
 
 .intro-questions .panel {
   display: flex;
@@ -217,8 +201,6 @@
   font-style: normal;
 }
 
-
-
 .panel p {
   display: block;
   width: 100%;
@@ -228,7 +210,6 @@
   border-radius: 1rem;
   color: #4379B8;
   box-sizing: border-box;
-
 }
 
 .panel p:hover {
@@ -257,9 +238,7 @@
   text-align: center;
 }
 
-
 /* CSS FÖR FRÅGOR FORMULÄRET FRÅN TEXTEN */
-
 .question-form {
   background-color: rgb(236, 242, 248);
   display: flex;
@@ -305,11 +284,7 @@
   font-size: 16px;
 }
 
-
-
-
 /* CSS FÖR STATISTIK RUTAN VID SLUTET AV TESTET */
-
 .statisticsDiv {
   display: flex;
   flex-direction: column;
@@ -332,7 +307,6 @@
   background-color: rgb(236, 242, 248);
 }
 
-
 .statisticsRow {
   display: flex;
   justify-content: space-between;
@@ -345,10 +319,7 @@
   background-color: rgb(236, 242, 248);
 }
 
-
-
 /* CSS FÖR KNAPPAR */
-
 .start-button {
   background-color: #4379b8;
   background-image: linear-gradient(-180deg, #37AEE2 0%, #4379b8 100%);
@@ -442,13 +413,11 @@
   background-color: #46ec30;
 }
 
-
 .SaveOrRestartButtonsDiv{
   width: 100%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-
 }
 
 .save-result-button {
@@ -460,7 +429,6 @@
   border: 0;
   cursor: pointer;
   transition: all 0.5s ease-in-out;
-
 }
 
 .first-button {
@@ -484,7 +452,6 @@
 .second-button:hover {
   background-color: #46ec30;
 }
-
 
 /* CSS FÖR SPARA DITT RESULTAT FORMULÄRET */
 .form-container {
@@ -562,6 +529,15 @@
 
 .CANCEL-FORM-BUTTON:hover {
   background-color: #46ec30;
+}
+
+.form-submitted-message {
+  font-size: 18px;
+  color: green;
+  background-color: rgb(236, 242, 248);
+  text-align: center;
+  padding: 10px;
+  margin-top: 20px;
 }
 
 
@@ -680,6 +656,10 @@ input::placeholder {
   width: 10%;
   font-size: 16px;
   box-shadow: 0px 0px 0px 10px rgb(236, 242, 248);
+}
+
+.form-submitted-message {
+  font-size: 14px;
 }
 
 

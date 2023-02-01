@@ -3,17 +3,21 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Content.css';
 import 'animate.css';
+import Firebase from '../../firebase/Firebase';
+import Server from '../../server';
 
 function Content() {
-
+  const firebase = new Firebase();
+  const server = new Server();
   //State för att se ifall vi kan fråga efter kundens kontakt uppgifter (Ifall kunden är över 16 år)
   const [validToSaveContactInfo, setValidToSaveContactInfo] = useState(false);
   //State för att visa ett formulär ifall användaren vill spara sitt resultat
   const [showForm, setShowForm] = useState(false);
 
   //States för level och text.
-  const [level, setLevel] = useState(0);
+  const [level, setLevel] = useState("");
   const [age, setAge] = useState(0);
+  const [ageRange, setAgeRange] = useState("");
   const [text, setText] = useState('');
 
   //States för start och sluttid samt "WPM" för att kunna räkna ut wpm.
@@ -29,6 +33,8 @@ function Content() {
 
   //State för frågor där det skall komma in frågor som en array
   const [questions, setQuestions] = useState([]);
+  //State för de rätta svaren
+  const [correctAnswers, setCorrectAnswers] = useState([]);
 
   //Används för att när man klickar på startknappen så ändaras det till en stoppknapp.
   const [isStarted, setIsStarted] = useState(false);
@@ -60,17 +66,23 @@ function Content() {
   const [countdown, setCountdown] = useState(3);
   const [resetTimer, setResetTimer] = useState(true);
 
+  //State för att visa en text om att användarens resultat har sparats!
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
+  //State för att generera ett random nummer för att slumpa text mellan 1-5
+  const [randomNr, setRandomNr] = useState(1);
 
   //State för att reseta allting ifall användaren vill börja om testet
   const handleRestartClick = () => {
     setIsStarted(false);
     setHasSubmitedQuestions(false);
     setWpm(0);
-    setLevel(0)
+    setLevel(level)
     setAverageWpm("");
     setFunStatistics("");
+    setAgeRange(ageRange);
     setQuestions([]);
+    setCorrectAnswers([]);
     setAmountOfRightQuestions(0);
     setIntroQuestionsDone(true)
     setValidToSaveContactInfo(false);
@@ -78,96 +90,90 @@ function Content() {
     setResetTimer(true);
   }
 
-//skickar request till severn som startar tiden
-const handleStartTimer = async () => {
-    try {
-      const response = await axios.get('http://localhost:3001/start-timer');
-      console.log(response.data)
-    } catch (error) {
-      console.error(error);
+    //skickar request till severn som startar tiden
+    const handleStartTimer = () => {
+      server.startTimer();
     }
-  };
-  
-  //skickar request till servern som stoppar tiden och räknar ut wpm samt return wpm
-  const handleStopTimer = async () => {
-    try {
-        const response = await axios.get(`http://localhost:3001/stop-timer?level=${level}&age=${age}`);
-        console.log(response.data)
-        console.log("age  istop timer" + age)
-        setWpm(response.data.wpm);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    
+    //skickar request till servern som stoppar tiden och räknar ut wpm samt return wpm
+    const handleStopTimer = () => {
+      setWpm(server.stopTimer(level,ageRange))
+    };
 
-    //När man klickar start knappen skickas en request till servern med "level" som parameter och sätter text och questions statesen från vad som hämats från servern/databasen.
+    const generateRandomNumber = (callback) => {
+      const randomNumber = Math.floor(Math.random() * 5) + 1;
+      callback(randomNumber);
+    };
+
     const handleStartClick = async () => {
       if (level === null || level === 0 || age === null || age === 0) {
         alert("Please enter both level and age before starting.");
         return;
-    }
-    try {
-      const response = await axios.get(`http://localhost:3001/text?level=${level}&age=${age}`);
-      setText(response.data.text);
-      setQuestions(response.data.questions);
-    } catch (error) {
-      console.log(error);
-    }
-        setIsStopped(false);
-        setIsStarted(true);
-        
-      };
-
-
-      //Till för tidtagaren som räknar ner från 3
-      useEffect(() => {
-        if(isStarted && countdown > 0 && resetTimer){
-          let interval = setInterval(() => {
-            setCountdown(prevCountdown => prevCountdown - 1);
-          }, 1000);
-          return () => clearInterval(interval);
-        }
-        if(countdown === 0){
-          handleStartTimer();
-          setResetTimer(false);
-        }
-      }, [isStarted, countdown]);
-
-
-      //
-      const handleIntroAnswerClick = (e) => {
-        if (!selectedAnswer) {
-          alert("Please select an answer before proceeding.");
-          return;
-        }
-        setSelectedAnswer(e.target.innerText);
-        setIntroQuestionsDone(true)
+      } 
+    
+      await generateRandomNumber(randomNr => {
+        setRandomNr(randomNr); 
+      });
+      
+      const text = await firebase.getText(level, ageRange, ""+randomNr);
+      const [answerValues] = [Object.values(await firebase.getCorrectAnswers(level, ageRange, ""+randomNr))];
+      const [questionsValues] = [Object.values(await firebase.getQuestions(level, ageRange, ""+randomNr))];
+      setText(text);
+      setQuestions(questionsValues);
+      setCorrectAnswers(answerValues)
+      console.log("Correct answers - " + answerValues)
+      if(parseInt(age) >= 16){
+        setValidToSaveContactInfo(true)
       }
+      setIsStopped(false);
+      setIsStarted(true);
+
+    };
+    
+
+    
+
+  //Till för tidtagaren som räknar ner från 3
+  useEffect(() => {
+    if(isStarted && countdown > 0 && resetTimer){
+      let interval = setInterval(() => {
+        setCountdown(prevCountdown => prevCountdown - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+    if(countdown === 0 && isStarted){
+      handleStartTimer();
+      setResetTimer(false);
+    }
+  }, [isStarted, countdown]);
 
 
-      //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
-      //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
-      //Sätter endTime till new Date så att vi kan räkna ut wpm med start och endTime. Sedan sätter vi variablen wpm med SetWpm till användaren wpm
-      const handleStopClick = async () => {
-        setIsStopped(true);
-        setIsStarted(false);
-        handleStopTimer();
-      };
+  //
+  const handleIntroAnswerClick = (e) => {
+    if (!selectedAnswer) {
+      alert("Please select an answer before proceeding.");
+      return;
+    }
+    setSelectedAnswer(e.target.innerText);
+    setIntroQuestionsDone(true)
+  }
 
-      //Metod för att visa rolig statistik beroende på ålder
-      const displayStatistics = async () => {
+  //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
+  //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
+  //Sätter endTime till new Date så att vi kan räkna ut wpm med start och endTime. Sedan sätter vi variablen wpm med SetWpm till användaren wpm
+  const handleStopClick = async () => {
+    setIsStopped(true);
+    setIsStarted(false);
+    handleStopTimer();
+  };
 
-        try {
-          await axios.post('http://localhost:3001/statistics', { wpm: wpm, age: age })
-              .then(response => {
-                setFunStatistics(response.data.text[1])
-                setAverageWpm(response.data.text[0])
-              });
-          }   catch (error) {
-              console.log(error);
-          }
-      };
+  //Metod för att visa rolig statistik beroende på ålder
+  const displayStatistics = async () => {
 
+    const response = server.statistics(wpm,age)
+      setFunStatistics(response[1])
+      setAverageWpm(response[0])
+  };
 
   //Metod för att hantera när användaren svarar på frågorna i formuläret den sparar ner svaren från användaren i en array sedan skickar den en post till servern som hämtar rättsvar
   //från databasen med "Level parametern" sedan returnerar servern de rätta svaren och vi jämnför användarens svar med de rätta svaren och räknar ut hur många % rätt användaren hade.  
@@ -176,62 +182,40 @@ const handleStartTimer = async () => {
     const answers = {};
     const questionsElements = event.target.elements;
     for (let i = 0; i < questionsElements.length; i++) {
-        const question = questionsElements[i];
-        if (question.checked) {
-            answers[question.name] = question.value;
-        }
+      const question = questionsElements[i];
+      if (question.checked) {
+          answers[question.name] = question.value;
+      }
+  }
+  
+    let amountOfQuestions = Object.keys(correctAnswers).length;
+    let amountCorrect = 0;
+    for (let i = 0; i < amountOfQuestions; i++) {
+      if (answers[`question-${i}`] === correctAnswers[i]) {
+          amountCorrect++;
+      }
     }
-        try {
-        await axios.post('http://localhost:3001/submitQuestions', { level: level, answers, age: age })
-            .then(response => {
-              const result = response.data.result;
-              let amountOfQuestions = Object.keys(result).length;
-              let amountCorrect = 0;
-              for (const key of Object.keys(result)) {
-                if (result[key] === true) {
-                  amountCorrect++;
-                }
-              }
-              let percentageCorrect = (amountCorrect / amountOfQuestions) * 100;
-              //Sätter staten antal rätt frågor till uträkningen av antal rätt frågor i %
-              setwpmComprehended(wpm * (percentageCorrect / 100));
-              setAmountOfRightQuestions(Math.round(percentageCorrect));
-            
-              //Sätter isStopped till false för att kunna visa wpm/antal rätt frågor i min reading-box div
-              setIsStopped(false);
-              //Sätter has submitted questions till true för att visa min div med wpm etc..
-              setHasSubmitedQuestions(true)
-              displayStatistics();
-            });
-        }   catch (error) {
-            console.log(error);
-        }
-    };
+    let percentageCorrect = (amountCorrect / amountOfQuestions) * 100;
+    setwpmComprehended(wpm * (percentageCorrect / 100));
+    setAmountOfRightQuestions(Math.round(percentageCorrect));
+    setIsStopped(false);
+    setHasSubmitedQuestions(true)
+    displayStatistics();
+  };
 
     //Funktion som sparar ner email, namn, efternamn. sedan skickar den med namn,efternamn,email,ålder,wpm,antalrättfrågor,nivå till våran backend som sedan ska kunna hantera detta
     //När vi fixat en databas.
-    function handleSaveInfoFormSubmit(e) {
-      e.preventDefault();
-      const data = {
-        email: email,
-        name: name,
-        lastname: lastname,
-        wpm: wpm,
-        age: age,
-        level: level,
-        amountOfRightQuestions: amountOfRightQuestions
-      }
-    
-      try{
-        axios.post('http://localhost:3001/save-result', data)
-        .then(res => {
-            console.log(res.data.result)
-            handleRestartClick()
-        });
-    }   catch (error) {
-        console.log(error);
-    }
-};
+      function handleSaveInfoFormSubmit(e) {
+        e.preventDefault();
+        firebase.saveResult(email, name, lastname, wpm, age, level, amountOfRightQuestions);
+        setFormSubmitted(true)
+        handleRestartClick();
+        //call database to save result
+        //logic later
+      };
+
+
+
 
       //Hanterar när man ändrar level så kan level parametern skickas till servern
       const infoChange = event => {
@@ -246,7 +230,6 @@ const handleStartTimer = async () => {
         }
       };
 
-
   //Hanterar när man ändrar level så kan level parametern skickas till servern
   const handleLevelChange = event => {
     const min = event.target.min;
@@ -258,29 +241,49 @@ const handleStartTimer = async () => {
       event.target.value = max;
     }
     value = parseInt(event.target.value);
-    setLevel(value);
+    setFormSubmitted(false);
+    setLevel(`level${value}`);
   };
 
   const handleAgeChange = event => {
     const min = event.target.min;
     const max = event.target.max;
-    let value1 = parseInt(event.target.value);
-    if (value1 < min) {
+    let value = parseInt(event.target.value);
+    if (value < min) {
       event.target.value = min;
-    } else if (value1 > max) {
+    } else if (value > max) {
       event.target.value = max;
     }
-    value1 = parseInt(event.target.value);
-    setAge(value1);
-    if(parseInt(value1) >= 16){
-      setValidToSaveContactInfo(true)
-    }else{
-      setValidToSaveContactInfo(false)
+    value = parseInt(event.target.value);
+    if (value >= 16) {
+      setValidToSaveContactInfo(true);
+    } else {
+      setValidToSaveContactInfo(false);
     }
+  
+    let ageRange;
+    switch (true) {
+      case value >= 0 && value <= 12:
+        ageRange = "7-12";
+        break;
+      case value >= 13 && value <= 16:
+        ageRange = "13-16";
+        break;
+      case value >= 17 && value <= 21:
+        ageRange = "17-21";
+        break;
+      case value >= 22:
+        ageRange = "22+";
+        break;
+      default:
+        ageRange = "Unknown";
+        break;
+    }
+  
+    setAgeRange(ageRange);
+    setAge(value);
   };
-
-
-
+  
 return (
   <div className="container">
         <div className='reading-box'>
@@ -296,6 +299,7 @@ return (
           }
           {!isStarted && !isStopped && !hasSubmitedQuestions && introQuestionsDone && 
           <div className="level-selector">
+            {formSubmitted && <p className='form-submitted-message'>Dina resultat har sparats</p>}
             <div> 
             <input type="number" className='level' min="1" max="5" placeholder="Välj en nivå mellan 1-5" pattern="[0-9]*" required onChange={handleLevelChange}/>
             </div>
@@ -339,19 +343,25 @@ return (
       ) : null }
        { isStopped && !hasSubmitedQuestions &&
                 <form className='question-form' onSubmit={handleFormSubmit}>
-                    {questions.map((question, index) => (
-                        <div key={index} className="questions">
-                            <p>{question.prompt}</p>
-                            {question.options.map((option, i) => (
-                                <div key={i} className="questionsRadioAndLabel">
-                                    <input required type="radio" id={`option-${i}`} name={`question-${index}`} value={option} />
-                                    <label htmlFor={`option-${i}`}>{option}</label>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                    <button className='submitQuestions' type="submit">SVARA</button>
-                </form>
+                {questions.map((question, index) => (
+                  <div key={index} className="questions">
+                    <p>{question.question_text}</p>
+                    <div className="questionsRadioAndLabel">
+                      <input required type="radio" id={`option-a`} name={`question-${index}`} value={question.a} />
+                      <label htmlFor={`option-a`}>{question.a}</label>
+                    </div>
+                    <div className="questionsRadioAndLabel">
+                      <input required type="radio" id={`option-b`} name={`question-${index}`} value={question.b} />
+                      <label htmlFor={`option-b`}>{question.b}</label>
+                    </div>
+                    <div className="questionsRadioAndLabel">
+                      <input required type="radio" id={`option-c`} name={`question-${index}`} value={question.c} />
+                      <label htmlFor={`option-c`}>{question.c}</label>
+                    </div>
+                  </div>
+                ))}
+                <button className='submitQuestions' type="submit">SVARA</button>
+              </form>
             }
             { hasSubmitedQuestions && !validToSaveContactInfo &&
           <div className='statisticsDiv'>
@@ -413,6 +423,4 @@ return (
                     
   
   }
-
-
 export default Content;

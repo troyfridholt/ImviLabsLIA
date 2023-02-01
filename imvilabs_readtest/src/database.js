@@ -715,8 +715,8 @@ class Database {
                     break; 
 
             case(age >= 15 && age <= 18):
-            let gymnasiumBooks = 4500/studyHoursPerBook1;
             let studyHoursPerBook1 = 150;
+            let gymnasiumBooks = 4500/studyHoursPerBook1;
             let gymnasiumTimetable = Math.round((gymnasiumBooks * 100000) / wpm);
             text.push("Genomsnitt ord per minut för din ålder är 150-180.");
             text.push(`Att genomföra en gymnasial utbildning kräver ungefär 4500 studie timmar.
@@ -742,43 +742,6 @@ class Database {
         return text;
     }
 
-
-
- 
-
-
-
-
-                    static getUsers(name,lastname,age){
-                    const {usersResults} = userDataBase(name,lastname,age)
-                    return {userResults}
-                    }
-
-                    static addUsersAndResult(name,age,email,lastname,level,percentageCorrect,wpm){
-                        this.userDataBase.add(name,age,email,lastname,level,percentageCorrect,wpm)
-                        return
-                    }
-
-                    
-                    
-                    
-                    
-                    static userDataBase(name,age,email,lastname,level,percentageCorrect,wpm){
-                    //Here some logic so you can both add users and retrive users result from the database array (users)
-                            var a = 0;
-                    const users =  
-                            [
-                            {
-                                
-                            }
-                        ];
-                        return users;
-                    }
-
-
-
-
-    
 }  
 
 module.exports = Database;
