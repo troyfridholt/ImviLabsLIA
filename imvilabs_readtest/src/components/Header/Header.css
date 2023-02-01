@@ -12,4 +12,5 @@
   justify-content: center;
   align-items: center;
   box-shadow: 0 1px 5px 0px lightgray;
+  border-bottom: solid 3px rgb(231, 231, 231);
 }

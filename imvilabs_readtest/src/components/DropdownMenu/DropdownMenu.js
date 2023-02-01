@@ -7,8 +7,20 @@ import "./DropdownMenu.css";
 function DropdownMenu() {
   const [open, setOpen] = useState(false);
 
+
+  const activateDropDownMenue = (e) => {
+      setOpen(true);
+ 
+  }
+
+  const deActivateDropDownMenue = (e) => {
+      setOpen(false);
+  }
+
   return (
-    <div className="dropdownMenu-container">
+    <div className="dropdownMenu-container"
+      onMouseOver={activateDropDownMenue}
+      onMouseOut={deActivateDropDownMenue}>
       <div
         className="dropdownTrigger"
         onClick={() => {
