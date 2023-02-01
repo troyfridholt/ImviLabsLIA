@@ -1,4 +1,4 @@
-import { getDatabase, ref, onValue, set, push, get, update } from "firebase/database";
+import { getDatabase, ref, onValue, set, push, get, update, runTransaction  } from "firebase/database";
 import { initializeApp } from "firebase/app";
 
 class Firebase {
@@ -82,32 +82,34 @@ class Firebase {
         }
       });
     } else {
-      const testRef = ref(this.db, `users/${userId}/results`);
-      let existingResults = await get(testRef);
-      let testCount = Object.keys(existingResults).filter(key => key.startsWith("test")).length;
+      const resultsRef = ref(this.db, `users/${userId}/results`);
+      const resultsSnapshot = await get(resultsRef);
+      const existingResults = resultsSnapshot.val();
+      let testCount = 0;
+      for (const key in existingResults) {
+        if (key.startsWith("test")) {
+          testCount++;
+        }
+      }
       let newTestKey = `test${testCount + 1}`;
-      await update(testRef, {
+      await update(resultsRef, {
         [newTestKey]: result
       });
     }
   }
   
   async getUserId(email) {
-    return new Promise((resolve) => {
-      onValue(ref(this.db, `users`), (snapshot) => {
-        const users = snapshot.val();
-        let userId = null;
-        for (const id in users) {
-          if (users[id].email === email) {
-            userId = id;
-            break;
-          }
-        }
-        resolve(userId);
-      }, {
-        onlyOnce: true
-      });
-    });
+    const usersRef = ref(this.db, `users`);
+    const snapshot = await get(usersRef);
+    const users = snapshot.val();
+    let userId = null;
+    for (const id in users) {
+      if (users[id].email === email) {
+        userId = id;
+        break;
+      }
+    }
+    return userId;
   }
 
 
