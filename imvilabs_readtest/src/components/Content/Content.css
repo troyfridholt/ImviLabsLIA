@@ -28,7 +28,7 @@
   background-color: rgb(236, 242, 248);
   box-sizing: border-box;
   border-radius: 15px;
-  box-shadow: rgba(27, 27, 44, 0) 1px 1px 1px;
+  box-shadow: rgba(236, 236, 248, 0) 1px 1px 1px;
   display: flex;
   box-shadow: 0px 0px 15px 0px rgb(0, 0, 0);
   flex-wrap: wrap;
@@ -321,37 +321,39 @@
 
 /* CSS FÖR STATISTIK RUTAN VID SLUTET AV TESTET */
 .statisticsDiv {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height:80%;
-  min-width:50%;
-  overflow: scroll;
-  padding: 20px;
-  background-color: rgb(236, 242, 248);
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 3fr 1fr;
+  margin-top: 5%;
+  background: rgb(236, 242, 248);
   border-radius: 10px;
-  animation:  zoomIn; 
-  animation-duration: .5s; 
+  padding: 30px;
+}
+
+.statisticsDiv p {
+  background: rgb(236, 242, 248);
 }
 
 .statisticsContent {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   width: 100%;
-  margin-top: 20px;
-  background-color: rgb(236, 242, 248);
 }
 
 .statisticsRow {
+  margin-bottom: 20px;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  background-color: rgb(236, 242, 248);
+  justify-content: center;
+  align-items: center;
 }
 
 .statisticsValue {
+  font-size: 18px;
   font-weight: bold;
-  background-color: rgb(236, 242, 248);
+  color: #333;
 }
 
 /* CSS FÖR KNAPPAR */
@@ -507,9 +509,13 @@
 }
 
 .form {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 4fr 1fr;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background: #edf1f3 center/cover;
   margin: 2% 0;
   padding: 2%;
@@ -525,20 +531,10 @@
   border-radius: 5px;
   border: none;
   font-size: 18px;
-  width: 80%;
-}
-
-.form input::placeholder {
-  font-size: 18px;
-}
-
-.CANCEL-FORM-BUTTON {
-  align-self: flex-end;
-  margin-top: 10px;
+  width: 100%;
 }
 
 .form button {
-  background-color: #46ec30;
   color: #FFFFFF;
   padding: 10px 20px;
   border-radius: 5px;
@@ -549,8 +545,12 @@
   margin-right: 10px;
 }
 
-.form button:hover {
-  background-color: #4379b8;
+.form input::placeholder {
+  font-size: 18px;
+}
+
+.form button:hover{
+  transform: scale(105%);
 }
 
 .CANCEL-FORM-BUTTON {
@@ -562,11 +562,14 @@
   font-size: 18px;
   cursor: pointer;
   transition: all 0.5s ease-in-out;
+  align-self: flex-end;
+  margin-top: 10px;
 }
 
-.CANCEL-FORM-BUTTON:hover {
+.SAVE-RESULT-BUTTON{
   background-color: #46ec30;
 }
+
 
 .form-submitted-message {
   font-size: 18px;

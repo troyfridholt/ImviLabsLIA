@@ -384,7 +384,7 @@ return (
                         <p className='statisticsValue'>Antal ord per minut: {wpm}</p>
                       </div>
                       <div className='statisticsRow'>
-                        <p className='statisticsValue'>{averageWpm}</p>
+                      <p className='statisticsValue'>{averageWpm}</p>
                       </div>
                       <div className='statisticsRow'>
                         <p className='statisticsValue'>{`Du hade ${Math.round(amountOfRightQuestions)}% rätt på kontrollfrågorna vilket betyder att om du läser ${wpm} ord så förstår du ${Math.round(wpmComprehended)} av de orden`}</p>
@@ -403,12 +403,17 @@ return (
                 {hasSubmitedQuestions && validToSaveContactInfo && showForm &&
                 <div className='form-container'>
                   <form className='form' onSubmit={handleSaveInfoFormSubmit}>
-                  <input type="email" onChange={infoChange} placeholder="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
-                  <input type="text" onChange={infoChange} placeholder="Förnamn" pattern="[a-zA-Z]+" required />
-                  <input type="text" onChange={infoChange} placeholder="Efternamn" pattern="[a-zA-Z]+" required />
-                    <button type="submit">SPARA</button>
-                  </form>
+                    <div>
+                    <input type="email" onChange={infoChange} placeholder="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                    <input type="text" onChange={infoChange} placeholder="Förnamn" pattern="[a-zA-Z]+" required />
+                    <input type="text" onChange={infoChange} placeholder="Efternamn" pattern="[a-zA-Z]+" required />
+                    </div>
+                  <div>
+                  <button className='SAVE-RESULT-BUTTON'type="submit">SPARA</button>
                   <button className='CANCEL-FORM-BUTTON' onClick={handleRestartClick}>AVBRYT</button>
+                  </div>
+                  </form>
+                  
                   </div>
                 }
                 </div>   
