@@ -5,12 +5,21 @@
   width: 0px;
   height: 0px;
 }
+:root {
+  --primary-light-hsl: 200, 100%, 91%;
+  --primary-hsl: 200, 100%, 50%;
+  --primary-dark-hsl: 200, 100%, 6%;
+  --success-hsl: 100, 60%, 50%;
+  --error-hsl: 0, 60%, 50%;
+}
+
 
 .container {
   display: grid;
   height: 75vh;
   width: 100vw;
-  place-items:  center;
+  place-items:  center;  
+  backdrop-filter: blur(10px); 
 }
 
 /* CSS FÖR "LÄSRUTAN" DÄR ALL TEXT,FRÅGOR VISAS */
@@ -18,18 +27,20 @@
   position: relative;
   background-color: rgb(236, 242, 248);
   box-sizing: border-box;
-  border-radius: 10px;
-  box-shadow: rgb(236 242 248 / 0%) 0px 0px 0px;
+  border-radius: 15px;
+  box-shadow: rgba(27, 27, 44, 0) 1px 1px 1px;
   display: flex;
+  box-shadow: 0px 0px 15px 0px rgb(0, 0, 0);
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  min-width: 50%;
-  max-width: 50%;
-  min-height: 70%;
+  min-width: 60%;
+  max-width: 60%;
+  min-height: 80%;
   max-height: 90%;
   font-size: 20px;
+
   }
 
   .reading-box div{
@@ -46,62 +57,77 @@
   }
 
 /* CSS FÖR TIMERN */
+
+.countdown-child{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.2);
+  color: black;
+}
+
 .countdown-child3{
   background-color: rgb(236, 242, 248);
-  font-size: 8rem;
+  font-size: 4rem;
   font-weight: 700;
-  transform: translate(-50%, -50%);
-  animation: fadeIn infinite 3s;
-  animation-delay: 0s;
-  color: black;
 }
+
 .countdown-child2{
   background-color: rgb(236, 242, 248);
-  font-size: 8rem;
+  font-size: 4rem;
   font-weight: 700;
-  transform: translate(-50%, -50%);
-  animation: fadeIn infinite 3s;
-  animation-delay: 1s;
-  color: black;
 }
+
 .countdown-child1{
   background-color: rgb(236, 242, 248);
-  font-size: 8rem;
+  font-size: 4rem;
   font-weight: 700;
-  transform: translate(-50%, -50%);
-  animation: fadeIn infinite 3s;
-  animation-delay: 0s;
-  color: black;
 }
 
+
+
+
  /* CSS FÖR TEXT RUTAN SAMT STOPPKNAPPEN VID START AV TEST */
-  .readingTextDiv {
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    flex-direction: column;
-    flex-wrap: wrap;
-    min-height:80%;
-    min-width:50%;
-    animation: zoomIn; 
-    animation-duration: .5s; 
-  }
+ .test{
+  display: 'grid';
+  grid-template-rows: 1fr 1fr;
+  overflow: 'auto';
+  height: '100%';
+  width: '100%';
+  animation: zoomIn; 
+  animation-duration: .5s; 
+  overflow: scroll;
+}
 
-  .readingText {
-    background-color: rgb(236, 242, 248);
-    width: 65%;
-    border-radius: 0.5rem;
-    font-size: 22px;
-    text-shadow:0 0 1px transparent;
-    line-height: 1.4em;
-    overflow:scroll;
-  }
+.readingTextDiv {
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  flex-direction: column;
+  flex-wrap: wrap;
+  min-height:80%;
+  min-width:50%;
+  margin-top: 3%;
+  animation: zoomIn; 
+  animation-duration: .5s; 
+}
 
-  .readingTextDiv .stop-button {
-    margin-top: 2%;
-    width: 10%;
-    font-size: 16px;
-  }
+.readingText {
+  background-color: rgb(236, 242, 248);
+  width: 65%;
+  border-radius: 0.5rem;
+  font-size: 1em;
+  text-shadow:0 0 1px transparent;
+  line-height: 1.7em;
+  overflow:scroll;
+}
+
 
  /* CSS FÖR VÄLJA NIVÅ SAMT ÅLDER FÖR TESTET */
   .level-selector {
@@ -132,6 +158,21 @@
     font-weight: 500;
   }
   
+  .level-selector div select{
+    background-color: rgb(236, 242, 248);
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    width: 100%;
+    border-radius: .5rem;
+    border: solid 1px #4379b8;
+    padding: 3rem 1.75rem;
+  }
+
+  .level-div{
+    margin-top: 8%;
+  }
+
   .level-selector div input{
     background-color: rgb(236, 242, 248);
     display: flex;
@@ -145,16 +186,15 @@
   
   .age-container {
     position: relative;
+    margin-bottom: 5%;
   }
   
   .info-tooltip {
     visibility: hidden;
     text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
     position: absolute;
     bottom: 77%;
-    height: 5%;
+    height: 10%;
     left: 10%;
     transition: opacity 0.3s;
   }
@@ -162,7 +202,7 @@
   .age-container:hover .info-tooltip {
     visibility: visible;
     color: black;
-    opacity: 1;
+    opacity: .8;
   }
   
   .info-tooltip::after {
@@ -179,12 +219,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 90%;
   animation:  zoomIn; 
   animation-duration: 1s; 
 }
 
-.intro-questions label{
-  margin-top: 15%;
+.intro-questions label {
+  margin-top: 10%;
+  margin-bottom: 10px;
+  color: #4379B8;
+  font-weight: 600;
+  font-size: 1.7em;
+  letter-spacing: 1px;
+  text-decoration: none;
+  text-align: center;
 }
 
 .intro-questions .panel {
@@ -205,7 +253,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  margin-bottom: 10%;
+  margin-bottom: 6%;
   cursor: pointer; 
   border-radius: 1rem;
   color: #4379B8;
@@ -213,30 +261,17 @@
 }
 
 .panel p:hover {
-  background-color: rgb(123, 173, 231);
-  color: white;
-}
-
-.panel p.selected {
-  background-color: rgb(123, 173, 231);
+  transition: .7s;
+  background-color: rgba(67,121,184,1);
   color: white;
 }
 
 .intro-questions .start-button {
   margin-top: 30px;
   width: 30%;
-  
 }
 
-.intro-questions label {
-  margin-bottom: 10px;
-  color: #4379B8;
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: 1px;
-  text-decoration: none;
-  text-align: center;
-}
+
 
 /* CSS FÖR FRÅGOR FORMULÄRET FRÅN TEXTEN */
 .question-form {
@@ -338,6 +373,7 @@
   -webkit-user-select: none;
   touch-action: manipulation;
   transition: all 0.5s ease-in-out;
+  margin-bottom: 5%;
 }
 
 .start-button:hover {
@@ -347,17 +383,18 @@
 
 .stop-button {
   background-color: #4379b8;
-  background-image: linear-gradient(-180deg, #f75151 0%, #b843439f 100%);
+  background-image: linear-gradient(-180deg, #37AEE2 0%, #4379b8 100%);
   border-radius: .5rem;
   box-sizing: border-box;
   color: #FFFFFF;
   display: flex;
-  font-size: 16px;
+  font-size: 12px;
   justify-content: center;
   padding: 1rem 1.75rem;
   text-decoration: none;
-  width: 100%;
+  width: 15%;
   border: 0;
+  margin: 5%;
   cursor: pointer;
 }
 
@@ -544,124 +581,198 @@
 
 /* RESPONSIVE CSS */
 
-@media only screen and (max-width: 600px) {
+@media only screen and (min-width:300px) and (max-width:800px) {
+
+    .container {
+      display: grid;
+      height: 75vh;
+      width: 100vw;
+      place-items:  center;  
+      backdrop-filter: blur(10px);
+      
+    }
+
+    .reading-box {
+      min-width: 100%;
+      max-width: 100%;
+      font-size: 16px;
+      position: relative;
+      background-color: rgb(236, 242, 248);
+      box-sizing: border-box;
+      border-radius: 10px;
+      box-shadow: rgb(236 242 248 / 0%) 0px 0px 0px;
+      display: flex;
+      box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+      transform: translateZ(10px);
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .readingText {
+      width: 95%;
+      font-size: 18px;
+    }
+
+    .readingTextDiv .stop-button {
+      width: 20%;
+      font-size: 14px;
+    }
 
 
-
-
-/* CSS FÖR LEVEL / AGE SELECTOR */
-  .start-button {
-    width: 30vw;
-    margin: auto;
+  .intro-questions label {
+    margin-bottom: 10px;
+    color: #4379B8;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-decoration: none;
     text-align: center;
-    margin-left: -10px; /* move button to the left by 10px */
-}
+  }
+  
+  /* CSS FOR THE QUESTION FORM FROM THE TEXT */
+  .question-form {
+    background-color: rgb(236, 242, 248);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2%;
+    border-radius: 5px;
+    min-height:80%;
+    min-width:50%;
+    overflow: scroll;
+    animation:  zoomIn; 
+    animation-duration: .5s; 
+  }
+  
+
+  .question-form {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  
+  .question-form .questions {
+    background: rgb(236, 242, 248) center/cover;
+    margin: 2% 0;
+    padding: 2%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 80%;
+  }
+  
+
+  .question-form .questions {
+    width: 100%;
+  }
+  
+  
+  .question-form .questions p {
+    background: rgb(236, 242, 248);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5%;
+  }
+  
+  .question-form .questions .questionsRadioAndLabel {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5%;
+  }
+  
+  .question-form .questions .questionsRadioAndLabel input[type="radio"] {
+    margin-right: 5%;
+  }
+  
+  .question-form .questions .questionsRadioAndLabel label {
+    font-size: 16px;
+  }
+
+  p{
+    font-size: 16px;
+  }
+  
+  /* CSS FOR THE STATISTICS BOX AT THE END OF THE TEST */
+  .statisticsDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height:80%;
+    min-width:50%;
+    overflow: scroll;
+    padding: 20px;
+    background-color: rgb(236, 242, 248);
+    border-radius: 10px;
+    animation:  zoomIn; 
+    animation-duration: .5s; 
+  }
+  
+
+  .statisticsDiv {
+    width: 100%;
+    min-width: unset;
+  }
+
+  
+  .statisticsContent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 20px;
+    background-color: rgb(236, 242, 248);
+  }
+  
+  .statisticsRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    background-color: rgb(236, 242, 248);
+  }
+
+
+  /* CSS FÖR LEVEL SELECTOR / AGE CONTAINER */
 
   .level-selector {
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-  }
-
-
-  .info-tooltip {
-      visibility: hidden;
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px 0;
-      position: absolute;
-      bottom: 77%;
-      height: 5%;
-      left: 10%;
-      transition: opacity 0.3s;
-  }
-
-.level-selector div{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    width: 100%;
+   
+  }
+
+  .level-selector .start-button{
+    margin-bottom: 5%;
+  }
   
-}
-
-.age-container{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-  .age-container:hover .info-tooltip {
-      visibility: visible;
-      color: black;
-      opacity: 1;
-  }
-  .info-tooltip::after {
-      content: "";
-      position: absolute;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #4379b8 transparent transparent transparent;
+  .level {
+    width: 80%;
+    padding: 10px;
+    margin-top: 15px;
+    font-size: 1.2em;
+    margin-right: 5%;
   }
 
-
-.level-selector div input{
-  width: 30vw;
-  height: 8vh;
-  font-size: 1em;
-  padding: 1rem;
-}
-
-
-input::placeholder {
-  font-size: 14px;
-  color: #4379b8;
-}
-
-
-.reading-box{
+  .age-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
+    width: 100%;
+  }
+  
+  input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px;
+    font-size: 1.2em;
+  }
 
-
-
-.readingTextDiv {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height:80%;
-  min-width:50%;
-  animation: zoomIn; 
-  animation-duration: .5s; 
-}
-
-.readingText {
-  background-color: rgb(236, 242, 248);
-  width: 65%;
-  border-radius: 0.5rem;
-  font-size: 22px;
-  text-shadow:0 0 1px transparent;
-  line-height: 1.4em;
-  overflow:scroll;
-  width: 100%; 
-  animation:  zoomIn; 
-  animation-duration: .5s; 
-}
-
-.readingTextDiv .stop-button {
-  margin: auto; 
-  width: 10%;
-  font-size: 16px;
-  box-shadow: 0px 0px 0px 10px rgb(236, 242, 248);
-}
-
-.form-submitted-message {
-  font-size: 14px;
-}
-
+  input[type="number"] {
+    width: 50%;
+  }
+  .start-button {
+    width: 50%;
+  }
 
 }
 

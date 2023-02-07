@@ -1,6 +1,5 @@
 // Content.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './Content.css';
 import 'animate.css';
 import Firebase from '../../firebase/Firebase';
@@ -15,7 +14,7 @@ function Content() {
   const [showForm, setShowForm] = useState(false);
 
   //States för level och text.
-  const [level, setLevel] = useState("");
+  const [level, setLevel] = useState("level1");
   const [age, setAge] = useState(0);
   const [ageRange, setAgeRange] = useState("");
   const [text, setText] = useState('');
@@ -27,6 +26,9 @@ function Content() {
   const [name, setName] = useState('');
   const [lastname, setLastName] = useState('');
   const [email, setEmail] = useState('');
+
+  //State för att se ifall man är kund.
+  const [customer, setCustomer] = useState(false);
 
   //Fråga användare svarar på vid start
   const [introQuestionsDone, setIntroQuestionsDone] = useState(false)
@@ -62,8 +64,6 @@ function Content() {
   //State för att visa hur många ord av det dem läser som de förstår
   const [wpmComprehended, setwpmComprehended] = useState("")
 
-  //State för att ha en counter innan testet börjar
-  const [countdown, setCountdown] = useState(3);
   const [resetTimer, setResetTimer] = useState(true);
 
   //State för att visa en text om att användarens resultat har sparats!
@@ -77,7 +77,7 @@ function Content() {
     setIsStarted(false);
     setHasSubmitedQuestions(false);
     setWpm(0);
-    setLevel(level)
+    setLevel("level1")
     setAverageWpm("");
     setFunStatistics("");
     setAgeRange(ageRange);
@@ -96,8 +96,9 @@ function Content() {
     }
     
     //skickar request till servern som stoppar tiden och räknar ut wpm samt return wpm
-    const handleStopTimer = () => {
-      setWpm(server.stopTimer(level,ageRange))
+    const handleStopTimer = async () => {
+      const wpm = await server.stopTimer(level, ageRange, randomNr);
+      setWpm(wpm);
     };
 
     const generateRandomNumber = (callback) => {
@@ -110,9 +111,15 @@ function Content() {
         alert("Please enter both level and age before starting.");
         return;
       } 
-    
+      handleStartTimer();
       await generateRandomNumber(randomNr => {
-        setRandomNr(randomNr); 
+        //Ifall en kund gör testet så slumpas text (Detblir varierad text) ifall inte kund gör test så blir det en och samma text.
+        if(customer){
+          setRandomNr(randomNr);
+        }else{
+          setRandomNr(1);
+        }
+         
       });
       
       const text = await firebase.getText(level, ageRange, ""+randomNr);
@@ -133,19 +140,7 @@ function Content() {
 
     
 
-  //Till för tidtagaren som räknar ner från 3
-  useEffect(() => {
-    if(isStarted && countdown > 0 && resetTimer){
-      let interval = setInterval(() => {
-        setCountdown(prevCountdown => prevCountdown - 1);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-    if(countdown === 0 && isStarted){
-      handleStartTimer();
-      setResetTimer(false);
-    }
-  }, [isStarted, countdown]);
+
 
 
   //
@@ -170,7 +165,7 @@ function Content() {
   //Metod för att visa rolig statistik beroende på ålder
   const displayStatistics = async () => {
 
-    const response = server.statistics(wpm,age)
+    const response = await server.statistics(wpm,age)
       setFunStatistics(response[1])
       setAverageWpm(response[0])
   };
@@ -210,8 +205,6 @@ function Content() {
         firebase.saveResult(email, name, lastname, wpm, age, level, amountOfRightQuestions);
         setFormSubmitted(true)
         handleRestartClick();
-        //call database to save result
-        //logic later
       };
 
 
@@ -230,20 +223,18 @@ function Content() {
         }
       };
 
-  //Hanterar när man ändrar level så kan level parametern skickas till servern
-  const handleLevelChange = event => {
-    const min = event.target.min;
-    const max = event.target.max;
-    let value = parseInt(event.target.value);
-    if (value < min) {
-      event.target.value = min;
-    } else if (value > max) {
-      event.target.value = max;
-    }
-    value = parseInt(event.target.value);
-    setFormSubmitted(false);
-    setLevel(`level${value}`);
-  };
+      const handleLevelChange = (event) => {
+        const value = parseInt(event.target.value);
+        console.log(value)
+        if (value === 1) {
+          setLevel("level1");
+        } else if (value === 2) {
+          setLevel("level2");
+        } else if (value === 3) {
+          setLevel("level3");
+        }
+        setFormSubmitted(false);
+      };
 
   const handleAgeChange = event => {
     const min = event.target.min;
@@ -276,7 +267,7 @@ function Content() {
         ageRange = "22+";
         break;
       default:
-        ageRange = "Unknown";
+        ageRange = "22+";
         break;
     }
   
@@ -292,16 +283,20 @@ return (
             <div className='intro-questions'>
             <label>Vem är det som gör testet?</label>
             <div class="panel" align="center">
-              <p onClick={handleIntroAnswerClick} className={selectedAnswer === 'JAG GÖR TESTET SJÄLV' ? 'selected':''}>JAG GÖR TESTET SJÄLV</p>
-              <p onClick={handleIntroAnswerClick} className={selectedAnswer === 'JAG GÖR TESTET TILLSAMMANS MED MITT BARN'? 'selected':''}>JAG GÖR TESTET TILLSAMMANS MED MITT BARN</p>
+              <p onClick={handleIntroAnswerClick} style={{padding: '.5em'}} className={selectedAnswer === 'JAG GÖR TESTET SJÄLV' ? 'selected':''}>JAG GÖR TESTET SJÄLV</p>
+              <p onClick={handleIntroAnswerClick} style={{padding: '.5em'}} className={selectedAnswer === 'JAG GÖR TESTET TILLSAMMANS MED MITT BARN'? 'selected':''}>JAG GÖR TESTET TILLSAMMANS MED MITT BARN</p>
             </div>
           </div>
           }
           {!isStarted && !isStopped && !hasSubmitedQuestions && introQuestionsDone && 
           <div className="level-selector">
             {formSubmitted && <p className='form-submitted-message'>Dina resultat har sparats</p>}
-            <div> 
-            <input type="number" className='level' min="1" max="5" placeholder="Välj en nivå mellan 1-5" pattern="[0-9]*" required onChange={handleLevelChange}/>
+            <div className='level-div'> 
+            <select className='level' onChange={handleLevelChange} required>
+              <option value="1">Lätt</option>
+              <option value="2">Medel</option>
+              <option value="3">Svår</option>
+            </select>
             </div>
 
             <div className="age-container">
@@ -320,7 +315,7 @@ return (
             />
             {showInfo && (
               <div className="info-tooltip">
-                <label>Vi behöver veta ålder för att kunna anpassa testet för dig.</label>
+                <label style={{fontSize: '1em'}}>Vi behöver veta ålder för att kunna anpassa testet för dig.</label>
               </div>
             )}
           </div>
@@ -329,16 +324,16 @@ return (
     </div>
           }
              
-      { isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions && countdown > 0 ? (
-        <div className='reading-box'>
-            <h2 className={`countdown-child${countdown}`}>{countdown}</h2>
-        </div>
-      ) : isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions && countdown === 0 ? (
+       {isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions ? (
         <>
-          <div className='readingTextDiv'>
+        <div className='test'>
+        <div className='readingTextDiv'>
             <p className='readingText'>{text}</p>
             <button className='stop-button' onClick={handleStopClick}>STOPP</button>
           </div>
+          
+        </div>
+
         </>
       ) : null }
        { isStopped && !hasSubmitedQuestions &&

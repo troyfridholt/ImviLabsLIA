@@ -1,5 +1,6 @@
 import Firebase from './firebase/Firebase';
 let startTime = 0;
+let elapsedTime = 0;
 const firebase = new Firebase();
 
 class Server {
@@ -8,24 +9,24 @@ startTimer() {
 startTime = Date.now();
 }
 
-stopTimer(level, age) {
-const elapsedTime = Date.now() - startTime;
-const wpm = this.calculateWPM(elapsedTime, level, age);
-return elapsedTime;
+async stopTimer(level, age, randomNr) {
+elapsedTime = Date.now() - startTime;
+const wpm = await this.calculateWPM(elapsedTime, level, age, randomNr);
+return wpm;
 }
 
 
-calculateWPM(elapsedTime, level, age) {
-  const text = firebase.getText(level, age);
+async calculateWPM(elapsedTime, level, age, randomNr) {
+  const text = await firebase.getText(level, age, ""+randomNr);
   const words = text.toString().split(' ').length;
   const minutes = elapsedTime / 60000;
   const wpm = Math.round(words / minutes);
   return wpm;
-  }
+}
 
   
-statistics(wpm, age) {
-const text = firebase.getstatisticsInfo(age, wpm);
+async statistics(wpm, age) {
+const text = await firebase.getstatisticsInfo(age, wpm);
 return text
 }
 

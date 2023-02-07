@@ -98,6 +98,7 @@ class Firebase {
     }
   }
   
+  //Metod som letar efter ifall en användare finns med i databasen med email som parameter.
   async getUserId(email) {
     const usersRef = ref(this.db, `users`);
     const snapshot = await get(usersRef);
@@ -109,8 +110,31 @@ class Firebase {
         break;
       }
     }
+    if(userId === null){
+      return "no user found."
+    }
     return userId;
   }
+
+  //Metod som hämtar användarens senaste 3 resultat.
+  async getUserLast3Results(email) {
+
+    const userId = this.getUserId(email)
+
+    return new Promise((resolve, reject) => {
+      onValue(ref(this.db, `users/${userId}/results`), (snapshot) => {
+        const results = Object.values(snapshot.val());
+        if (!results) {
+          resolve({Resultat: "Fanns inga resultat."});
+        }
+        const numberOfResults = Math.min(results.length, 3);
+        resolve({Resultat: results.slice(0, numberOfResults)});
+      }, {
+        onlyOnce: true
+      });
+    });
+  }
+   
 
 
 
@@ -168,6 +192,11 @@ class Firebase {
     return text;
 }
 
-  }
+
+}
+
+
+
+  
   
 export default Firebase;

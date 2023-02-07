@@ -3,11 +3,12 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: #6c757d; 
     color: black; 
     text-align: center;
     padding: 1rem;
     height: 10vh;
     font-size: 14px; 
     font-family: 'Open Sans', sans-serif; 
+    border-top: solid 5px rgb(231, 231, 231);;
 }
+
