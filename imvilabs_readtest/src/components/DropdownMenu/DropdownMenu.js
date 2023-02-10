@@ -13,7 +13,7 @@ function DropdownMenu() {
         className="DropdownMenu__button"
         onClick={() => setMenuOpen(!menuOpen)}
       >
-        vem kan träna?
+        Vem kan träna?
         <img className="btnIcon" src={arrowDown} />
       </a>
       {menuOpen && (

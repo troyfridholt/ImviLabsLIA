@@ -8,10 +8,9 @@ module.exports = {
     './src/components/Content/content.js', 
     './src/components/Header/header.js', 
     './src/components/Footer/footer.jsx', 
-    './src/components/Navbar/navbar.js', 
+    './src/components/NavbarR/NavbarR.js', 
     './src/components/Navbar/navItems.js', 
-    './src/components/Link/link.js', 
-    './src/components/DropdownMenu/dropdownitems.js', 
+    './src/components/Link/link.js',  
     './src/components/DropdownMenu/DropdownMenu.js', 
     './src/firebase/Firebase.js'],
     output: {
@@ -34,12 +33,17 @@ module.exports = {
     module: {
       rules: [
 
-        // First Rule
-        {
-          test: /\.(js)$/,
-          exclude: /node_modules/,
-          use: ['babel-loader']
-        },
+      // First Rule
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-react']
+          }
+        }
+      },
   
         // Second Rule
         {
@@ -49,11 +53,18 @@ module.exports = {
               loader: 'style-loader'
             },
             {
-              loader: 'css-loader',
+              loader: 'css-loader'
+            }
+          ]
+        },
+        {
+          test: /\.(png|jpg|jpeg|gif|svg)$/,
+          use: [
+            {
+              loader: 'file-loader',
               options: {
-                modules: true,
-                localsConvention: 'camelCase',
-                sourceMap: true
+                name: '[name].[ext]',
+                outputPath: 'images/'
               }
             }
           ]

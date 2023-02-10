@@ -26,23 +26,20 @@
   position: relative;
   background-color: rgb(236, 242, 248);
   box-sizing: border-box;
-  border-radius: 15px;
-  box-shadow: rgba(236, 236, 248, 0) 1px 1px 1px;
   display: flex;
-  box-shadow: 0px 0px 15px 0px rgb(0, 0, 0);
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  min-width: 70%;
+  min-width: 100%;
   max-width: 80%;
-  min-height: 80%;
+  min-height: 100%;
   max-height: 90%;
   font-size: 20px;
 }
 
 .reading-box div {
-  flex-grow: 1;
+  flex-grow: .3;
   background-color: rgb(236, 242, 248);
 }
 
@@ -115,7 +112,7 @@
   touch-action: manipulation;
   color: #ffffff;
   border-radius: 0.5rem;
-  padding: 3rem 1.75rem;
+  padding: 2rem 1.75rem;
   font-weight: 500;
 }
 
@@ -215,12 +212,13 @@
 
 .panel p {
   display: block;
-  width: 100%;
+  width: 80%;
   height: 100%;
   margin-bottom: 6%;
   cursor: pointer;
   border-radius: 1rem;
   color: #4379b8;
+  background-color: white;
   box-sizing: border-box;
   padding: 0.8%;
 }
@@ -314,7 +312,6 @@ h2 {
   min-height: 80%;
   min-width: 50%;
   overflow: scroll;
-  padding: 20px;
   background-color: rgb(236, 242, 248);
   border-radius: 10px;
   animation: zoomIn;
@@ -334,16 +331,15 @@ h2 {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0;
 }
 
 .statisticsValue {
   text-align: center;
+  
 }
 
 .statisticsInfo {
   text-align: center;
-  margin: 20px 0;
 }
 
 .statisticsFunFact {
@@ -570,7 +566,8 @@ h2 {
 }
 
 .SAVE-RESULT-BUTTON {
-  background-color: #46ec30;
+  background-color: #4379b8;
+  background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
 }
 
 .form-submitted-message {
@@ -1713,7 +1710,6 @@ h2 {
     border-color: #4379b8 transparent transparent transparent;
   }
 }
-<<<<<<< HEAD
 
 /*Landscape tablets devices */
 @media only screen and (min-width:768px) and (max-width:1100px){
@@ -2267,8 +2263,6 @@ input[type="number"] {
 
 }
 
-=======
->>>>>>> c48cc466024c0b555350cdaa737f1cd19cd60c1d
 /*Large devices laptops/desktops devices */
 
 @media only screen and (min-width: 992px) {
