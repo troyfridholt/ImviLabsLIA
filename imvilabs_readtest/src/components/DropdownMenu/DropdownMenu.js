@@ -5,45 +5,33 @@ import arrowDown from "../../Images/down-filled-triangular-arrow.png";
 import "./DropdownMenu.css";
 
 function DropdownMenu() {
-  const [open, setOpen] = useState(false);
-
-
-  const activateDropDownMenue = (e) => {
-      setOpen(true);
- 
-  }
-
-  const deActivateDropDownMenue = (e) => {
-      setOpen(false);
-  }
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="dropdownMenu-container"
-      onMouseOver={activateDropDownMenue}
-      onMouseOut={deActivateDropDownMenue}>
-      <div
-        className="dropdownTrigger"
-        onClick={() => {
-          setOpen(!open);
-        }}
+    <div className="DropdownMenu">
+      <a
+        className="DropdownMenu__button"
+        onClick={() => setMenuOpen(!menuOpen)}
       >
-        <p>Träning för alla</p>
-        <img className="dropdownArrow" src={arrowDown} alt="ArrowDown" />
-      </div>
-
-      <div className={`dropdownMenu ${open ? "active" : "inactive"}`}>
-        <ul className="dropdown--ul">
-          {dropdownItems.map((item) => (
-            <li key={item.id} className={item.className}>
-              <Link
-                className="dropdown--link"
-                linkText={item.title}
-                url={item.path}
-              />
-            </li>
-          ))}
+        vem kan träna?
+        <img className="btnIcon" src={arrowDown} />
+      </a>
+      {menuOpen && (
+        <ul className="DropdownMenu__list">
+          <li className="DropdownMenu__list-item">
+            <a href="#">Samsynsproblem</a>
+          </li>
+          <li className="DropdownMenu__list-item">
+            <a href="#">Dyslexi och läs- skrivsvårigheter</a>
+          </li>
+          <li className="DropdownMenu__list-item">
+            <a href="#">Koncentrationsproblem och adhd</a>
+          </li>
+          <li className="DropdownMenu__list-item">
+            <a href="#">Studier och läsning</a>
+          </li>
         </ul>
-      </div>
+      )}
     </div>
   );
 }
