@@ -16,13 +16,11 @@ function Navbar() {
         </a>
       </div>
       <div className="nav--items-container">
-      
         <div className="nav--links-container">
-
           <ul className="nav-items">
-          <li className="nav-item">
-          <DropdownMenu />
-          </li>
+            <li className="nav-item">
+              <DropdownMenu />
+            </li>
             {navItems.map((item) => {
               return (
                 <li key={item.id} className={item.className}>
