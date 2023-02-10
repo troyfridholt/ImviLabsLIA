@@ -117,15 +117,11 @@ function Content() {
         return;
       } 
       handleStartTimer();
-      await generateRandomNumber(randomNr => {
-        //Ifall en kund gör testet så slumpas text (Detblir varierad text) ifall inte kund gör test så blir det en och samma text.
-        if(customer){
-          setRandomNr(randomNr);
-        }else{
-          setRandomNr(1);
-        }
-         
-      });
+      const randomNr = await new Promise(resolve => generateRandomNumber(resolve));
+      //Ifall en kund gör testet så slumpas text (Det blir varierad text) ifall inte kund gör test så blir det en och samma text.
+      if (!customer) {
+        setRandomNr(randomNr);
+      }
       
       const text = await firebase.getText(level, ageRange, ""+randomNr);
       const [answerValues] = [Object.values(await firebase.getCorrectAnswers(level, ageRange, ""+randomNr))];
@@ -139,7 +135,6 @@ function Content() {
       }
       setIsStopped(false);
       setIsStarted(true);
-
     };
     
 

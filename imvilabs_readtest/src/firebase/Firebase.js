@@ -97,6 +97,7 @@ class Firebase {
         [newTestKey]: result
       });
     }
+    await this.updateAverageWPM(age, wpm);
   }
   
   //Metod som letar efter ifall en användare finns med i databasen med email som parameter.
@@ -117,25 +118,89 @@ class Firebase {
     return userId;
   }
 
-  //Metod som hämtar användarens senaste 3 resultat.
-  async getUserLast3Results(email) {
 
-    const userId = this.getUserId(email)
+  async addWpmAge(age,wpm){
+    const ageWpmRef = (`WpmStatistics/${age}`);
+    return ;
+  }
 
-    return new Promise((resolve, reject) => {
-      onValue(ref(this.db, `users/${userId}/results`), (snapshot) => {
-        const results = Object.values(snapshot.val());
-        if (!results) {
-          resolve({Resultat: "Fanns inga resultat."});
-        }
-        const numberOfResults = Math.min(results.length, 3);
-        resolve({Resultat: results.slice(0, numberOfResults)});
-      }, {
-        onlyOnce: true
-      });
+
+  //Metod för att hämta och räkna ut average wpm för åldersgrupperna med parametrar som age som parameter
+  async getAverageWPM(age) {
+    let sum = 0;
+    let count = 0;
+    let ageGroup;
+    if (age >= 7 && age <= 12) {
+      ageGroup = "7-12";
+    } else if (age >= 13 && age <= 16) {
+      ageGroup = "13-16";
+    } else if (age >= 17 && age <= 21) {
+      ageGroup = "17-21";
+    } else if (age >= 22) {
+      ageGroup = "22+";
+    } else {
+      return;
+    }
+    const averageWPMRef = (`AverageWPM/${ageGroup}`);
+    await onValue(ref(this.db, averageWPMRef)).then(function(snapshot) {
+      sum = snapshot.child("sum_wpm").val() || 0;
+      count = snapshot.child("count").val() || 0;
+    });
+    return count > 0 ? sum / count : 0;
+  };
+  
+  //Metod för att uppdatera averageWpm databasen
+  async updateAverageWPM(age, wpm) {
+    if (wpm > 600) {
+      return;
+    }
+    let ageGroup;
+    if (age >= 7 && age <= 12) {
+      ageGroup = "7-12";
+    } else if (age >= 13 && age <= 16) {
+      ageGroup = "13-16";
+    } else if (age >= 17 && age <= 21) {
+      ageGroup = "17-21";
+    } else if (age >= 22) {
+      ageGroup = "22+";
+    } else {
+      return;
+    }
+    const averageWPMRef = `AverageWPM/${ageGroup}`;
+    let currentCount = 0;
+    let currentSum = 0;
+    await onValue(ref(this.db, averageWPMRef)).then(function(snapshot) {
+      currentCount = snapshot.child("count").val() || 0;
+      currentSum = snapshot.child("sum_wpm").val() || 0;
+    });
+    currentCount += 1;
+    currentSum += wpm;
+    await set(ref(this.db, averageWPMRef), {
+      count: currentCount,
+      sum_wpm: currentSum
     });
   }
-   
+
+    //Metod som hämtar användarens senaste 3 resultat.
+    async getUserLast3Results(email) {
+
+      const userId = this.getUserId(email)
+  
+      return new Promise((resolve, reject) => {
+        onValue(ref(this.db, `users/${userId}/results`), (snapshot) => {
+          const results = Object.values(snapshot.val());
+          if (!results) {
+            resolve({Resultat: "Fanns inga resultat."});
+          }
+          const numberOfResults = Math.min(results.length, 3);
+          resolve({Resultat: results.slice(0, numberOfResults)});
+        }, {
+          onlyOnce: true
+        });
+      });
+    }
+
+
 
 
 
