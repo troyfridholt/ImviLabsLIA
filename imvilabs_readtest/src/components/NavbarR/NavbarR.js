@@ -4,6 +4,9 @@ import Link from "../Link/Link";
 import { useRef } from "react";
 import "./NavbarR.css";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
+import logo from "../../Images/imvi-logo.png";
+import flagIcon from "../../Images/sweden.png";
+import cartIcon from "../../Images/shopping-cart.png";
 
 function NavbarR() {
   const navRef = useRef();
@@ -14,7 +17,7 @@ function NavbarR() {
 
   return (
     <header>
-      <img></img>
+      <img className="headerLogo" src={logo} />
       <nav ref={navRef}>
         <DropdownMenu />
         <a className="link" href="#">
@@ -32,10 +35,17 @@ function NavbarR() {
         <a className="link" href="#">
           Webbshop
         </a>
+        <a href="https://imvilabs.com/sv/varukorg/">
+          <img className="nav--cartIcon" src={cartIcon} alt="Cart" />
+        </a>
+        <button className="nav--btn" type="button">
+          Testa dig gratis
+        </button>
         <button className="nav-btn nav-close-btn" onClick={showNavbar}>
           <FaTimes />
         </button>
       </nav>
+      <img className="nav--flagIcon" src={flagIcon} alt="Flag" />
       <button className="nav-btn" onClick={showNavbar}>
         <FaBars />
       </button>

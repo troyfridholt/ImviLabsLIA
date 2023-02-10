@@ -5,20 +5,40 @@
 }
 
 :root {
-  --mainColor: #29335c;
+  --mainColor: white;
   --mainColorLight: #5767aa;
-  --secondaryColor: #db2b39;
-  --textColor: #eee;
+  --secondaryColor: #abb7f0;
+  --textColor: black;
+}
+.headerLogo {
+  width: 80px;
+  margin-left: 1.2rem;
 }
 
+.nav--cartIcon {
+  width: 20px;
+}
+
+.nav--flagIcon {
+  width: 20px;
+}
+
+.nav--btn {
+  background-color: #4379b8;
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 80px;
+  height: 110px;
   padding: 0 2rem;
   background-color: var(--mainColor);
   color: var(--textColor);
+  box-shadow: 0 0.3px 0.03px 0.01px black;
 }
 
 nav a {
