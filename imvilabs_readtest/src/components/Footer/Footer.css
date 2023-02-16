@@ -1,13 +1,42 @@
 .footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    color: black; 
-    text-align: center;
-    padding: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: baseline;
+    padding: 20px;
+    font-size: 16px;
     height: 10vh;
-    font-size: 14px; 
-    font-family: 'Open Sans', sans-serif; 
-}
+  }
+  
+  .footer p {
+    margin: 0;
+  }
+  
+  .footer a.fa {
+    color: #4379B8;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  
+  .footer a.fa:hover {
+    color: #e6e6e6;
+  }
+  
+  .footer a.fa-facebook {
+    font-size: 2.5rem;
+    margin-right: 10px;
+    padding: 5px;
+  }
+  
+  .footer a.fa-linkedin {
+    font-size: 2.5rem;
+    padding: 10px;
+  }
+  
+  .footer a.fa:hover {
+    color: #e6e6e6;
+    background-color: #666;
+    border-radius: 5px;
+  }
+
 

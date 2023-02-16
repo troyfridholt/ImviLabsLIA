@@ -30,18 +30,6 @@ const text = await firebase.getstatisticsInfo(age, wpm);
 return text
 }
 
-submitQuestions(level, age, answers) {
-  const correctAnswers = firebase.getCorrectAnswers(level, age);
-  const result = {};
-  let correctAnswerCount = 0;
-  for (const key of Object.keys(answers)) {
-      result[key] = Object.is(answers[key], correctAnswers[key]);
-      if (result[key]) {
-          correctAnswerCount++;
-      }
-  }
-  return correctAnswerCount;
-}
 
 }
 

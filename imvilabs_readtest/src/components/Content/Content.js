@@ -95,6 +95,10 @@ function Content() {
     return {__html: funStatistics.replace(/\n+/g, "<br/>")};
   };
 
+  const createMarkupText = () => {
+    return { __html: text.replace(/</g, "<br/> <br/>") };
+  };
+
     //skickar request till severn som startar tiden
     const handleStartTimer = () => {
       server.startTimer();
@@ -129,7 +133,6 @@ function Content() {
       setText(text);
       setQuestions(questionsValues);
       setCorrectAnswers(answerValues)
-      console.log("Correct answers - " + answerValues)
       if(parseInt(age) >= 16){
         setValidToSaveContactInfo(true)
       }
@@ -174,20 +177,20 @@ function Content() {
   //från databasen med "Level parametern" sedan returnerar servern de rätta svaren och vi jämnför användarens svar med de rätta svaren och räknar ut hur många % rätt användaren hade.  
   const handleFormSubmit = async event => {
     event.preventDefault();
-    const answers = {};
+    const answers = [];
     const questionsElements = event.target.elements;
     for (let i = 0; i < questionsElements.length; i++) {
       const question = questionsElements[i];
       if (question.checked) {
-          answers[question.name] = question.value;
+          answers.push(question.value);
       }
-  }
-  
+    }
     let amountOfQuestions = Object.keys(correctAnswers).length;
     let amountCorrect = 0;
     for (let i = 0; i < amountOfQuestions; i++) {
-      if (answers[`question-${i}`] === correctAnswers[i]) {
+      if (correctAnswers.includes(answers[i])) {
           amountCorrect++;
+      } else {
       }
     }
     let percentageCorrect = (amountCorrect / amountOfQuestions) * 100;
@@ -196,7 +199,7 @@ function Content() {
     setIsStopped(false);
     setHasSubmitedQuestions(true)
     displayStatistics();
-  };
+};
 
     //Funktion som sparar ner email, namn, efternamn. sedan skickar den med namn,efternamn,email,ålder,wpm,antalrättfrågor,nivå till våran backend som sedan ska kunna hantera detta
     //När vi fixat en databas.
@@ -328,7 +331,7 @@ return (
         <>
         <div className='test'>
         <div className='readingTextDiv'>
-            <p className='readingText'>{text}</p>
+            <p className='readingText' dangerouslySetInnerHTML={createMarkupText()} />
             <button className='stop-button' onClick={handleStopClick}>STOPP</button>
           </div>
           
@@ -368,9 +371,9 @@ return (
                         <h2>ORD PER MINUT</h2>
                       </div>
                       <div className='statisticsRow'>
-                        <h2>NOGGRANHET</h2>
+                        <h2>LÄSFÖRSTÅELSE</h2>
                         <p className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</p>
-                        <h2>RÄTT PÅ KONTROLLFRÅGORNA</h2>
+                        <h2>RÄTT PÅ FRÅGORNA</h2>
                       </div>
                       </div>
                       <div className='testStatistics'> 
@@ -378,7 +381,7 @@ return (
                       <h2 className='statisticsValue'>{`Genomsnitt ord per minut`} <br/> {`för din ålder är ${averageWpm}`}</h2>
                       </div>
                       <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>{`Du hade ${Math.round(amountOfRightQuestions)}% rätt på kontrollfrågorna`} <br/> {`vilket betyder att om du läser ${wpm} ord`} <br/> {`så förstår du cirka ${Math.round(wpmComprehended)} av de orden`}</h2>
+                      <h2 className='statisticsValue'>{`Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`} <br/> {`Läser du ${wpm} ord`} <br/> {`så förstår du ${Math.round(wpmComprehended)} av de orden.`}</h2>
                       </div>
                       </div>
                       <div className='statisticsFunFact'>
@@ -395,12 +398,12 @@ return (
                       <div className='statisticsRow'>
                         <h2>LÄSHASTIGHET</h2>
                         <p className='statisticsValueWPM'>{wpm}</p>
-                        <h2>WPM</h2>
+                        <h2>ORD PER MINUT</h2>
                       </div>
                       <div className='statisticsRow'>
-                        <h2>NOGGRANHET</h2>
+                        <h2>LÄSFÖRSTÅELSE</h2>
                         <p className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</p>
-                        <h2>RÄTT PÅ KONTROLLFRÅGORNA</h2>
+                        <h2>RÄTT PÅ FRÅGORNA</h2>
                       </div>
                       </div>
                       <div className='testStatistics'> 
@@ -408,7 +411,7 @@ return (
                       <h2 className='statisticsValue'>{`Genomsnitt ord per minut`} <br/> {`för din ålder är ${averageWpm}`}</h2>
                       </div>
                       <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>{`Du hade ${Math.round(amountOfRightQuestions)}% rätt på kontrollfrågorna`} <br/> {`vilket betyder att om du läser ${wpm} ord`} <br/> {`så förstår du ${Math.round(wpmComprehended)} av dessa ord`}</h2>
+                      <h2 className='statisticsValue'>{`Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`} <br/> {`Läser du ${wpm} ord`} <br/> {`så förstår du ${Math.round(wpmComprehended)} av de orden.`}</h2>
                       </div>
                       </div>
                       <div className='statisticsFunFact'>

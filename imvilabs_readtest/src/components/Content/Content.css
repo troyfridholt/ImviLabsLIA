@@ -1,17 +1,15 @@
 * {
-  font-family: Helvetica, sans-serif;
+  font-family: sans-serif
+  
 }
 ::-webkit-scrollbar {
   width: 0px;
   height: 0px;
 }
-:root {
-  --primary-light-hsl: 200, 100%, 91%;
-  --primary-hsl: 200, 100%, 50%;
-  --primary-dark-hsl: 200, 100%, 6%;
-  --success-hsl: 100, 60%, 50%;
-  --error-hsl: 0, 60%, 50%;
+:root{
+  --color: rgb(236, 242, 248);
 }
+
 
 .container {
   display: grid;
@@ -24,7 +22,7 @@
 /* CSS FÖR "LÄSRUTAN" DÄR ALL TEXT,FRÅGOR VISAS */
 .reading-box {
   position: relative;
-  background-color: rgb(236, 242, 248);
+  background-color: var(--color);
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
@@ -40,15 +38,11 @@
 
 .reading-box div {
   flex-grow: .3;
-  background-color: rgb(236, 242, 248);
+  background-color: var(--color);
 }
 
-.reading-box label {
-  background-color: rgb(236, 242, 248);
-}
-
-.reading-box .button {
-  background-color: rgb(236, 242, 248);
+.reading-box label, .reading-box .button {
+  background-color: var(--color);
 }
 
 /* CSS FÖR TEXT RUTAN SAMT STOPPKNAPPEN VID START AV TEST */
@@ -81,9 +75,9 @@
   background-color: rgb(236, 242, 248);
   width: 65%;
   border-radius: 0.5rem;
-  font-size: 1em;
+  font-size: .9em;
   text-shadow: 0 0 1px transparent;
-  line-height: 1.7em;
+  line-height: 1.5em;
   overflow: scroll;
 }
 
@@ -225,7 +219,7 @@
 
 .panel p:hover {
   transition: 0.7s;
-  background-color: rgba(67, 121, 184, 1);
+  background-color: #4379b8;
   color: white;
 }
 
@@ -521,7 +515,6 @@ h2 {
   min-width: 80%;
   min-height: 80%;
   border-radius: 5px;
-  box-shadow: 0px 0px 10px #aaa;
 }
 
 .form input {
@@ -677,7 +670,7 @@ h2 {
 
   .panel p:hover {
     transition: 0.7s;
-    background-color: rgba(67, 121, 184, 1);
+    background-color: #37aee2;
     color: white;
   }
 

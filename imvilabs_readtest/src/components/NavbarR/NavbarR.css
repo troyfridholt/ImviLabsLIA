@@ -24,11 +24,12 @@
 }
 
 .nav--btn {
-  background-color: #4379b8;
+  color: #4379B8;
   color: #fff;
   padding: 10px;
   border-radius: 10px;
   border: none;
+  margin-left: 1.5rem;
 }
 header {
   display: flex;

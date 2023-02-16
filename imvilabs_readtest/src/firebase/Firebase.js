@@ -1,5 +1,6 @@
-import { getDatabase, ref, onValue, set, push, get, update, runTransaction  } from "firebase/database";
-import { initializeApp } from "firebase/app";
+import { initializeApp, } from "firebase/app";
+import {getFirestore, collection, query, where, getDoc, getDocs, addDoc, setDoc, doc, updateDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 class Firebase {
   constructor() {
@@ -15,194 +16,91 @@ class Firebase {
     };
 
     this.app = initializeApp(this.firebaseConfig);
-    this.db = getDatabase(this.app);
+    this.db = getFirestore(this.app);
+    this.auth = getAuth(this.app);
   }
 
 
   //Query för att hämta text från databas
   async getText(level, age, randomNr) {
-    return new Promise((resolve) => {
-      onValue(ref(this.db, `texts/age/${age}/${level}/text${randomNr}/text`), (snapshot) => {
-        
-        resolve(snapshot.val());
-      }, {
-        onlyOnce: true
-      });
-    });
-  }
+    const docRef = doc(this.db, "texts", age);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data().levels
+    return data[level]["text"+randomNr].text;
+ }
 
   //Query för att hämta svar från databas
   async getCorrectAnswers(level, age, randomNr) {
-    return new Promise((resolve) => {
-      onValue(ref(this.db, `texts/age/${age}/${level}/text${randomNr}/answers`), (snapshot) => {
-        const answers = snapshot.val();
-        if (!answers) {
-          resolve(null);
-        }
-        resolve(answers);
-      }, {
-        onlyOnce: true
-      });
-    });
+    const docRef = doc(this.db, "texts", age);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data().levels
+    const amountOfAnswers = Object.values(data[level]["text" + randomNr].answers).length
+    const correctAnswers = []
+    for(let i = 1; i<amountOfAnswers+1; i++){
+      correctAnswers.push(data[level]["text" + randomNr].answers["a"+i]);
+    }
+    return correctAnswers;
   }
 
   //Query för att hämta frågor från databas
   async getQuestions(level, age, randomNr) {
-    return new Promise((resolve) => {
-      onValue(ref(this.db, `texts/age/${age}/${level}/text${randomNr}/questions`), (snapshot) => {
-        const questions = snapshot.val();
-        if (!questions) {
-          resolve(null);
-        }
-        resolve(questions);
-      }, {
-        onlyOnce: true
-      });
-    });
+    const docRef = doc(this.db, "texts", age);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data().levels
+    return data[level]["text"+randomNr].questions;
   }
 
   //Sparar ner resultat i /users
   async saveResult(email, name, lastname, wpm, age, level, amountOfRightQuestions) {
+    signInWithEmailAndPassword(this.auth, "noahnemhed@hotmail.com", "asd123456.")
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      console.log(user)
+    })
     const date = new Date().toISOString().substring(0, 10);
     const result = {
       date,
       wpm,
+      level,
       amountOfRightQuestions,
-      level
     };
-    const userId = await this.getUserId(email);
-    if (!userId) {
-      const newUserId = push(ref(this.db, 'users')).key;
-      await set(ref(this.db, `users/${newUserId}`), {
-        email,
-        name,
-        lastname,
-        age,
-        results: {
-          ["test1"]: result
-        }
-      });
-    } else {
-      const resultsRef = ref(this.db, `users/${userId}/results`);
-      const resultsSnapshot = await get(resultsRef);
-      const existingResults = resultsSnapshot.val();
-      let testCount = 0;
-      for (const key in existingResults) {
-        if (key.startsWith("test")) {
-          testCount++;
-        }
-      }
-      let newTestKey = `test${testCount + 1}`;
-      await update(resultsRef, {
-        [newTestKey]: result
+
+    // Check if the user with the specified email already exists in the "users" collection
+    const q = query(collection(this.db, "users"), where('__name__', "==", email));
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+      setDoc(doc(this.db, 'users', email), {
+        userinfo:[
+          {
+            email: email
+          }  ,
+          {
+            name: name
+          },
+          {
+            lastname: lastname
+          }  ,  
+          {
+            age: age
+          }],
+        results: [{test1: result}]
       });
     }
-    await this.updateAverageWPM(age, wpm);
-  }
-  
-  //Metod som letar efter ifall en användare finns med i databasen med email som parameter.
-  async getUserId(email) {
-    const usersRef = ref(this.db, `users`);
-    const snapshot = await get(usersRef);
-    const users = snapshot.val();
-    let userId = null;
-    for (const id in users) {
-      if (users[id].email === email) {
-        userId = id;
-        break;
-      }
-    }
-    if(userId === null){
-      return "no user found."
-    }
-    return userId;
-  }
-
-
-  async addWpmAge(age,wpm){
-    const ageWpmRef = (`WpmStatistics/${age}`);
-    return ;
-  }
-
-
-  //Metod för att hämta och räkna ut average wpm för åldersgrupperna med parametrar som age som parameter
-  async getAverageWPM(age) {
-    let sum = 0;
-    let count = 0;
-    let ageGroup;
-    if (age >= 7 && age <= 12) {
-      ageGroup = "7-12";
-    } else if (age >= 13 && age <= 16) {
-      ageGroup = "13-16";
-    } else if (age >= 17 && age <= 21) {
-      ageGroup = "17-21";
-    } else if (age >= 22) {
-      ageGroup = "22+";
-    } else {
-      return;
-    }
-    const averageWPMRef = (`AverageWPM/${ageGroup}`);
-    await onValue(ref(this.db, averageWPMRef)).then(function(snapshot) {
-      sum = snapshot.child("sum_wpm").val() || 0;
-      count = snapshot.child("count").val() || 0;
-    });
-    return count > 0 ? sum / count : 0;
-  };
-  
-  //Metod för att uppdatera averageWpm databasen
-  async updateAverageWPM(age, wpm) {
-    if (wpm > 600) {
-      return;
-    }
-    let ageGroup;
-    if (age >= 7 && age <= 12) {
-      ageGroup = "7-12";
-    } else if (age >= 13 && age <= 16) {
-      ageGroup = "13-16";
-    } else if (age >= 17 && age <= 21) {
-      ageGroup = "17-21";
-    } else if (age >= 22) {
-      ageGroup = "22+";
-    } else {
-      return;
-    }
-    const averageWPMRef = `AverageWPM/${ageGroup}`;
-    let currentCount = 0;
-    let currentSum = 0;
-    await onValue(ref(this.db, averageWPMRef)).then(function(snapshot) {
-      currentCount = snapshot.child("count").val() || 0;
-      currentSum = snapshot.child("sum_wpm").val() || 0;
-    });
-    currentCount += 1;
-    currentSum += wpm;
-    await set(ref(this.db, averageWPMRef), {
-      count: currentCount,
-      sum_wpm: currentSum
-    });
-  }
-
-    //Metod som hämtar användarens senaste 3 resultat.
-    async getUserLast3Results(email) {
-
-      const userId = this.getUserId(email)
-  
-      return new Promise((resolve, reject) => {
-        onValue(ref(this.db, `users/${userId}/results`), (snapshot) => {
-          const results = Object.values(snapshot.val());
-          if (!results) {
-            resolve({Resultat: "Fanns inga resultat."});
-          }
-          const numberOfResults = Math.min(results.length, 3);
-          resolve({Resultat: results.slice(0, numberOfResults)});
-        }, {
-          onlyOnce: true
-        });
+    // If the user exists, append the result to their document
+    else {
+      const usereDoc = doc(this.db, 'users', email)
+      const resultSnap = await getDoc(usereDoc)
+      const amountOfTestsDone = resultSnap.data().results.length;
+      const newResults = [...resultSnap.data().results, { [`test${amountOfTestsDone + 1}`]: result }];
+      await updateDoc((usereDoc), {
+        results: newResults
       });
     }
-
-
-
-
+  }
+  
+  
 
   //Hårdkodat just nu skall implementeras i databas.
    getstatisticsInfo(age, wpm){
@@ -217,10 +115,10 @@ class Firebase {
         case(age > 0 && age <= 12):
             ordIText = 76944;
             timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
-            text.push("Genomsnitt ord per minut för din ålder är 100-130.");
+            text.push("100-130.");
             text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
-            Ifall du läser ${wpm} ord per minut. \n
-            Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`);
+            Med din läshastighet ${wpm} ord per minut. \n
+            Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
                 break;
 
         case(age > 12 && age < 15):
@@ -228,8 +126,8 @@ class Firebase {
             timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
             text.push("130-150.");
             text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
-            Ifall du läser ${wpm} ord per minut. \n
-            Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`);          
+            Med din läshastighet ${wpm} ord per minut. \n
+            Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);         
                 break; 
 
         case(age >= 15 && age <= 18):
@@ -237,8 +135,8 @@ class Firebase {
         timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
         text.push("170-210.");
         text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
-        Ifall du läser ${wpm} ord per minut. \n
-        Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`);
+          Med din läshastighet ${wpm} ord per minut. \n
+          Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
             break;  
 
         case(age > 18):
@@ -246,15 +144,15 @@ class Firebase {
         timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
         text.push("200-260.");
         text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
-        Ifall du läser ${wpm} ord per minut. \n
-        Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`);
+          Med din läshastighet ${wpm} ord per minut. \n
+          Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
             break;
         
         default:
             text.push("170-210.");
             text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
-            Ifall du läser ${wpm} ord per minut. \n
-            Så hade det tagit dig ${timmarAttLäsaFärdigt} timmar att läsa färdigt boken!`);
+            Med din läshastighet ${wpm} ord per minut. \n
+            Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
              break;
     }
     return text;

@@ -4,7 +4,7 @@ import Link from "../Link/Link";
 import { useRef } from "react";
 import "./NavbarR.css";
 import DropdownMenu from "../DropdownMenu/DropdownMenu";
-import logo from "../../Images/imvi-logo.png";
+import logo from "../../Images/IMVILOGOBLUE.png";
 import flagIcon from "../../Images/sweden.png";
 import cartIcon from "../../Images/shopping-cart.png";
 
