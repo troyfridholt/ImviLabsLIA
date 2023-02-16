@@ -1,5 +1,5 @@
 // Content.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Content.css';
 import 'animate.css';
 import Firebase from '../../firebase/Firebase';
@@ -13,7 +13,7 @@ function Content() {
   //State för att visa ett formulär ifall användaren vill spara sitt resultat
   const [showForm, setShowForm] = useState(false);
 
-  //States för level och text.
+  //States för level och text.s
   const [level, setLevel] = useState("level1");
   const [age, setAge] = useState(0);
   const [ageRange, setAgeRange] = useState("");

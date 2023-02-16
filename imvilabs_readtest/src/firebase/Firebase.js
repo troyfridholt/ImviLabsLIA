@@ -66,38 +66,33 @@ class Firebase {
       amountOfRightQuestions,
     };
 
-    // Check if the user with the specified email already exists in the "users" collection
-    const q = query(collection(this.db, "users"), where('__name__', "==", email));
-    const querySnapshot = await getDocs(q);
-    
-    if (querySnapshot.empty) {
-      setDoc(doc(this.db, 'users', email), {
-        userinfo:[
-          {
-            email: email
-          }  ,
-          {
-            name: name
-          },
-          {
-            lastname: lastname
-          }  ,  
-          {
-            age: age
-          }],
-        results: [{test1: result}]
-      });
-    }
+  // Create document for the user with the specified email
+  const userDocRef = doc(this.db, "users", email);
+
+  // Check if the user document already exists in the "users" collection
+  const userDocSnapshot = await getDoc(userDocRef);
+  if (!userDocSnapshot.exists()) {
+    // If user document does not exist, create a new document with email and userinfo subcollection
+    await setDoc(userDocRef, {});
+    const userinfoColRef = collection(userDocRef, "userinfo");
+    await setDoc(doc(userinfoColRef, "info"), {
+      email: email,
+      name: name,
+      lastname: lastname,
+      age: age
+    });
+        // Create a results subcollection and add first test document
+        const resultsColRef = collection(userDocRef, "results");
+        await setDoc(doc(resultsColRef, "test1"), result);
     // If the user exists, append the result to their document
-    else {
-      const usereDoc = doc(this.db, 'users', email)
-      const resultSnap = await getDoc(usereDoc)
-      const amountOfTestsDone = resultSnap.data().results.length;
-      const newResults = [...resultSnap.data().results, { [`test${amountOfTestsDone + 1}`]: result }];
-      await updateDoc((usereDoc), {
-        results: newResults
-      });
-    }
+  } else {
+    // If user document already exists, find the number of existing test documents
+    const resultsColRef = collection(userDocRef, "results");
+    const resultsSnapshot = await getDocs(resultsColRef);
+    const numTestDocs = resultsSnapshot.docs.length;
+    // Add a new test document with the next available number (e.g. test2 if test1 already exists)
+    await setDoc(doc(resultsColRef, `test${numTestDocs + 1}`), result);
+  }
   }
   
   
