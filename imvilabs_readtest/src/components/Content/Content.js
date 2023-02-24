@@ -1,9 +1,11 @@
 // Content.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Content.css';
 import 'animate.css';
 import Firebase from '../../firebase/Firebase';
 import Server from '../../server';
+import 'flag-icons/css/flag-icons.min.css';
+
 
 function Content() {
   const firebase = new Firebase();
@@ -13,7 +15,7 @@ function Content() {
   //State för att visa ett formulär ifall användaren vill spara sitt resultat
   const [showForm, setShowForm] = useState(false);
 
-  //States för level och text.s
+  //States för level,ålder,text
   const [level, setLevel] = useState("level1");
   const [age, setAge] = useState(0);
   const [ageRange, setAgeRange] = useState("");
@@ -22,16 +24,24 @@ function Content() {
   //States för start och sluttid samt "WPM" för att kunna räkna ut wpm.
   const [wpm, setWpm] = useState(0);
 
-  //State för namn,email,efternamn
+  //State för namn,email
   const [name, setName] = useState('');
-  const [lastname, setLastName] = useState('');
   const [email, setEmail] = useState('');
 
   //State för att se ifall man är kund.
   const [customer, setCustomer] = useState(false);
+  
+  //State för att se ifall användaren har blivit frågad om de vill bli kund
+  const [askToBecomeCustomer, setAskToBecomeCustomer] = useState(false);
+  
 
   //Fråga användare svarar på vid start
   const [introQuestionsDone, setIntroQuestionsDone] = useState(false)
+
+  //State för val av språk
+  const [language, setLanguage] = useState('SE');
+  //State för att se ifall användaren har valt ett språk
+  const [languageSelected, setLanguageSelected] = useState(false);
 
   //State för frågor där det skall komma in frågor som en array
   const [questions, setQuestions] = useState([]);
@@ -84,10 +94,14 @@ function Content() {
     setQuestions([]);
     setCorrectAnswers([]);
     setAmountOfRightQuestions(0);
-    setIntroQuestionsDone(true)
+    setIntroQuestionsDone(false)
     setValidToSaveContactInfo(false);
     setShowForm(false);
     setResetTimer(true);
+    setLanguageSelected(false);
+    if(!customer){
+      setAskToBecomeCustomer(false)
+    }
   }
 
   //Metod för att göra breaklines i funStatistics texten.
@@ -123,8 +137,10 @@ function Content() {
       handleStartTimer();
       const randomNr = await new Promise(resolve => generateRandomNumber(resolve));
       //Ifall en kund gör testet så slumpas text (Det blir varierad text) ifall inte kund gör test så blir det en och samma text.
-      if (!customer) {
+      if (customer) {
         setRandomNr(randomNr);
+      }else{
+        setRandomNr(1);
       }
       
       const text = await firebase.getText(level, ageRange, ""+randomNr);
@@ -141,12 +157,7 @@ function Content() {
     };
     
 
-    
-
-
-
-
-  //
+  
   const handleIntroAnswerClick = (e) => {
     if (!selectedAnswer) {
       alert("Please select an answer before proceeding.");
@@ -201,14 +212,21 @@ function Content() {
     displayStatistics();
 };
 
-    //Funktion som sparar ner email, namn, efternamn. sedan skickar den med namn,efternamn,email,ålder,wpm,antalrättfrågor,nivå till våran backend som sedan ska kunna hantera detta
+    //Funktion som sparar ner email, namn,  sedan skickar den med namn,email,ålder,wpm,antalrättfrågor,nivå till våran backend som sedan ska kunna hantera detta
     //När vi fixat en databas.
-      function handleSaveInfoFormSubmit(e) {
-        e.preventDefault();
-        firebase.saveResult(email, name, lastname, wpm, age, level, amountOfRightQuestions);
-        setFormSubmitted(true)
-        handleRestartClick();
-      };
+    function handleSaveInfoFormSubmit(e) {
+      e.preventDefault();
+      firebase.saveResult(email, name, wpm, age, level, amountOfRightQuestions);
+      const emailCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('email='));
+      if (!emailCookie) {
+        document.cookie = `email=${email}; max-age=86400; path=/`;
+      }
+      setCustomer(true)
+      setFormSubmitted(true);
+      handleRestartClick();
+    };
 
 
 
@@ -221,9 +239,7 @@ function Content() {
         if(event.target.placeholder === "Förnamn"){
           setName(event.target.value)
         }
-        if(event.target.placeholder === "Efternamn"){
-          setLastName(event.target.value) 
-        }
+
       };
 
       const handleLevelChange = (event) => {
@@ -277,39 +293,263 @@ function Content() {
     setAgeRange(ageRange);
     setAge(value);
   };
+
+  const handleLanguageClick = (language) => {
+    setLanguage(language);
+    setLanguageSelected(true)
+    console.log(language)
+  };
+
+
+  const handleVersionClick = (e) => {
+    const value = e.target.value;
+    if(value === 'guest'){
+      setCustomer(false)
+      setAskToBecomeCustomer(true)
+    }else {
+      setCustomer(true);
+    }  
+  }
+
+   const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    firebase.addUserToDB(email, name, age);
+    document.cookie = `email=${email}; max-age=86400; path=/`;
+    setAskToBecomeCustomer(true)
+  };
+
+//useEffect to check if the user is a customer and if their email exists in the database
+useEffect(() => {
+  const emailCookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('email='))
+  if (emailCookie) {
+    const email = emailCookie.split('=')[1];
+    setEmail(email);
+    setCustomer(true);
+    setAskToBecomeCustomer(true);
+
+    // Check if the email exists in the database
+    firebase.checkIfEmailIsInDB(email)
+      .then(exists => {
+        if (exists) {
+          // Email exists in the database
+          console.log(`User with email ${email} exists in the database.`);
+        } else {
+          // Email does not exist in the database
+          console.log(`User with email ${email} does not exist in the database.`);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+}, []);
+
+
+
   
 return (
   <div className="container">
         <div className='reading-box'>
+
+          {!languageSelected &&
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className='fi fi-se' style={{ fontSize: '4rem', marginRight: '10rem' }} onClick={() => handleLanguageClick('SE')}></span>
+              <span className='fi fi-gb' style={{ fontSize: '4rem' }} onClick={() => handleLanguageClick('GB')}></span>
+            </div>
+          </div>
+          }
+
+          {languageSelected && !askToBecomeCustomer &&
+
+          <div style={{   display: "flex", flexDirection: "column", alignitems: "center", overflow: "auto", maxWidth: "80%" }}>
+            <h1 style={{ fontSize: "1.5rem", marginBottom: "2rem", textAlign: "center" }}>{language === "GB" ? "imviLabs Reading & ReadingComprehension Test" : "imviLabs Läs & Läsförståelse Test" }</h1>
+            <p style={{ fontSize: "1.1rem", marginBottom: "2rem", textAlign: "center", lineHeight: "1.5em" }}>
+              {language === "GB" ?
+              "Welcome to our reading test! This test aims to evaluate your reading comprehension and speed in words per minute. " +
+              "You will be able to select a difficulty level ranging from Easy to Hard, followed by a passage that you will need to read. "+
+              "Once you have finished reading the text, you will be required to answer questions based on the passage."
+              : 
+              "Välkommen till vårat lästtest! Detta test kommer att utvärdera din läsförståelse och din mäta din läshastighet i antal ord per minut. " +
+              "Du kommer att kunna välja en svårighetsnivå som sträcker sig från Lätt till Svår, följt av ett textstycke som du behöver läsa. " +
+              "När du har läst klart texten kommer du att behöva svara på frågor baserade på stycket."
+              }
+
+            </p>
+            <p style={{ fontSize: "1.1rem", marginBottom: "2rem", textAlign: "center", lineHeight: "1.5em" }}>
+            {language === "GB" ?
+              "You have the option to take the test as a guest, but this will limit you to selecting only 'Easy' as the difficulty level" +
+              "and you will only be presented with a single text. Alternatively, you can sign up with your email to access the full version of the test,"+
+              "which includes a wide range of difficulty levels, multiple language options, and a variety of texts and questions." +
+              "Additionally, signing up will allow you to track your progress over time."
+              : 
+              "Du har möjlighet att göra testet som gäst, men detta begränsar dig till att endast välja 'Lätt' som svårighetsnivå " +
+              "och du kommer bara att ha tillgång till en enda text. Alternativt kan du registrera dig med din e-post för att få tillgång till våran fullständiga versionen av testet " +
+              "som inkluderar ett brett utbud av svårighetsgrader, flera språkalternativ och en mängd olika texter och frågor. " +
+              "Genom att registrera dig kan du dessutom följa dina framsteg över tiden."
+              }
+
+            </p>
+
+            {!customer ? (
+              <>
+                <button value='guest' style={{ 
+                  backgroundColor: "#4379b8",
+                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
+                  borderRadius: "0.5rem",
+                  boxSizing: "border-box",
+                  color: "#ffffff",
+                  fontSize: "1rem",
+                  justifyContent: "center",
+                  padding: "0.5rem 1.75rem",
+                  textDecoration: "none",
+                  border: "0",
+                  cursor: "pointer",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "manipulation",
+                  marginLeft: "4%",
+                  marginTop: "2%",  }} onClick={handleVersionClick}>{language === "ENG" ? "CONTINUE AS GUEST" : "FORTSÄTT SOM GÄST" }</button>
+
+                <button style={{
+                  backgroundColor: "#4379b8",
+                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
+                  borderRadius: "0.5rem",
+                  boxSizing: "border-box",
+                  color: "#ffffff",
+                  fontSize: "1.5rem",
+                  justifyContent: "center",
+                  padding: "0.5rem 1.75rem",
+                  textDecoration: "none",
+                  border: "0",
+                  cursor: "pointer",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "manipulation",
+                  marginLeft: "4%",
+                  marginTop: "2%",
+                }} value='customer' onClick={handleVersionClick}>{language === "ENG" ? "SIGN UP WITH EMAIL" : "REGISTRERA MED EMAIL" }</button>
+              </>
+            ) : (
+            <form onSubmit={handleEmailSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+              <input 
+                style={{
+                  width: "100%",
+                  height: "2rem",
+                  padding: "0.5rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid #ccc",
+                  margin: "1rem 0",
+                  fontSize: "1rem",
+                }} 
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
+                placeholder="Email" 
+                type="email" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+              />
+              <input 
+                style={{
+                  width: "100%",
+                  height: "2rem",
+                  padding: "0.5rem",
+                  borderRadius: "0.5rem",
+                  border: "1px solid #ccc",
+                  margin: "1rem 0",
+                  fontSize: "1rem",
+                }} 
+                pattern="[a-zA-Z]+" 
+                placeholder="Name" 
+                type="text" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                required 
+              />
+              <input 
+              style={{
+                width: "100%",
+                height: "2rem",
+                padding: "0.5rem",
+                borderRadius: "0.5rem",
+                border: "1px solid #ccc",
+                margin: "1rem 0",
+                fontSize: "1rem",
+              }} 
+              pattern="[0-9]*" 
+              min="1" 
+              max="99" 
+              placeholder="Age" 
+              type="number" 
+              value={age || ''}
+              onChange={(e) => setAge(e.target.value)} 
+              required 
+            />
+              <button 
+                type="submit" 
+                style={{
+                  width: "100%",
+                  height: "2.5rem",
+                  borderRadius: "0.5rem",
+                  border: "none",
+                  margin: "1rem 0",
+                  fontSize: "1rem",
+                  backgroundColor: "#4379b8",
+                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease-in-out",
+                }}
+              >
+                Submit
+              </button>
+            </form>
+            )}
+            </div>
           
-          {!introQuestionsDone &&
+           }
+
+          
+          {!introQuestionsDone && languageSelected && askToBecomeCustomer &&
             <div className='intro-questions'>
-            <label>Vem är det som gör testet?</label>
+            <label>{language === "GB" ? "Who is doing the test?" : "Vem är det som gör testet?"}</label>
             <div class="panel" align="center">
-              <p onClick={handleIntroAnswerClick}  className={selectedAnswer === 'JAG GÖR TESTET SJÄLV' ? 'selected':'notselected'}>JAG GÖR TESTET SJÄLV</p>
-              <p onClick={handleIntroAnswerClick}  className={selectedAnswer === 'JAG GÖR TESTET TILLSAMMANS MED MITT BARN'? 'selected':''}>JAG GÖR TESTET TILLSAMMANS MED MITT BARN</p>
+              <p onClick={handleIntroAnswerClick}  className={selectedAnswer === 'JAG GÖR TESTET SJÄLV' ? 'selected':'notselected'}>{language === "GB" ? "I DO THE TEST MYSELF" : "JAG GÖR TESTET SJÄLV"}</p>
+              <p onClick={handleIntroAnswerClick}  className={selectedAnswer === 'JAG GÖR TESTET TILLSAMMANS MED MITT BARN' ? 'selected':''}>{language === "GB" ?  "I DO THE TEST TOGETHER WITH MY CHILD" : "JAG GÖR TESTET TILLSAMMANS MED MITT BARN"}</p>
             </div>
           </div>
           }
           {!isStarted && !isStopped && !hasSubmitedQuestions && introQuestionsDone && 
           <div className="level-selector">
-            {formSubmitted && <p className='form-submitted-message'>Dina resultat har sparats</p>}
             <div className='level-div'> 
-            <select className='level' onChange={handleLevelChange} required>
-              <option value="1">Lätt</option>
-              <option value="2">Medel</option>
-              <option value="3">Svår</option>
+            {!customer ? <select className='level' onChange={handleLevelChange} required>
+            <option value="1">{language === "GB" ? "Easy" :"Lätt"}</option>
             </select>
+            :            
+            <select className='level' onChange={handleLevelChange} required>
+            <option value="1">{language === "GB" ? "Easy" :"Lätt"}</option>
+            <option value="2">{language === "GB" ? "Medium" :"Medel"}</option>
+            <option value="3">{language === "GB" ? "Hard" :"Svår"}</option>
+            </select>
+            }
+
             </div>
 
             <div className="age-container">
             <input 
               type="number" 
               className='age' 
-              value={age === 0 ? `` : age}
+              value={age}
               min="1" 
               max="99" 
-              placeholder={selectedAnswer === "JAG GÖR TESTET SJÄLV" ? "Ålder" : "Barns ålder"} 
+              placeholder={
+                selectedAnswer === (language === "GB" ? "I DO THE TEST MYSELF" : "JAG GÖR TESTET SJÄLV")
+                  ? (language === "GB" ? "Age" : "Ålder")
+                  : (language === "GB" ? "Childs Age" : "Barns Ålder")
+              } 
               required 
               pattern="[0-9]*" 
               onChange={handleAgeChange} 
@@ -318,11 +558,11 @@ return (
             />
             {showInfo && (
               <div className="info-tooltip">
-                <label >Vi behöver veta ålder för att kunna anpassa testet för dig.</label>
+                <label >{language === "GB" ? "We need to know your age to be able to customize the test for you." :"Vi behöver veta ålder för att kunna anpassa testet för dig."}</label>
               </div>
             )}
           </div>
-          <button className='start-button' onClick={handleStartClick}>TA TESTET</button>
+          <button className='start-button' onClick={handleStartClick}>{language === "GB" ? "TAKE THE TEST":"TA TESTET"}</button>
 
     </div>
           }
@@ -332,7 +572,7 @@ return (
         <div className='test'>
         <div className='readingTextDiv'>
             <p className='readingText' dangerouslySetInnerHTML={createMarkupText()} />
-            <button className='stop-button' onClick={handleStopClick}>STOPP</button>
+            <button className='stop-button' onClick={handleStopClick}>{language === "GB" ? "STOP":"STOPP" }</button>
           </div>
           
         </div>
@@ -358,7 +598,7 @@ return (
                     </div>
                   </div>
                 ))}
-                <button className='submitQuestions' type="submit">SVARA</button>
+                <button className='submitQuestions' type="submit">{language === "GB" ? "SUBMIT":"SVARA" }</button>
               </form>
             }
             { hasSubmitedQuestions && !validToSaveContactInfo &&
@@ -366,52 +606,77 @@ return (
                     <div className='statisticsContent'>
                       <div className='testStatistics'>
                       <div className='statisticsRow'>
-                        <h2>LÄSHASTIGHET</h2>
+                        <h2>{language === "GB" ? "READING SPEED":"LÄSHASTIGHET"}</h2>
                         <p className='statisticsValueWPM'>{wpm}</p>
-                        <h2>ORD PER MINUT</h2>
+                        <h2>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</h2>
                       </div>
                       <div className='statisticsRow'>
-                        <h2>LÄSFÖRSTÅELSE</h2>
+                        <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
                         <p className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</p>
-                        <h2>RÄTT PÅ FRÅGORNA</h2>
+                        <h2>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</h2>
                       </div>
                       </div>
                       <div className='testStatistics'> 
                       <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>{`Genomsnitt ord per minut`} <br/> {`för din ålder är ${averageWpm}`}</h2>
+                      <h2 className='statisticsValue'>
+                      {language === "GB"
+                        ? `Average words per minute` +  `for your age is ${averageWpm}`
+                        : `Genomsnitt ord per minut` +  `för din ålder är ${averageWpm}`}
+                    </h2>
                       </div>
                       <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>{`Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`} <br/> {`Läser du ${wpm} ord`} <br/> {`så förstår du ${Math.round(wpmComprehended)} av de orden.`}</h2>
+                      <h2 className='statisticsValue'>
+                      {language === "GB"
+                        ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
+                        : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
+                      <br />
+                      {language === "GB"
+                        ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
+                        : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
+                    </h2>
                       </div>
                       </div>
                       <div className='statisticsFunFact'>
                       <h2 className='statisticsValue' dangerouslySetInnerHTML={createMarkup()} />
                       </div>
                     </div>
-              <button className='restart-button' onClick={handleRestartClick}>STARTA OM TEST</button>
-        </div>
-            }
+                    
+                    <button className='restart-button' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM TEST"}</button>
+                    </div>
+                }
                 {hasSubmitedQuestions && validToSaveContactInfo && !showForm &&
                   <div className='statisticsDiv'>
                     <div className='statisticsContent'>
                       <div className='testStatistics'>
                       <div className='statisticsRow'>
-                        <h2>LÄSHASTIGHET</h2>
+                        <h2>{language === "GB" ? "READING SPEED":"LÄSHASTIGHET"}</h2>
                         <p className='statisticsValueWPM'>{wpm}</p>
-                        <h2>ORD PER MINUT</h2>
+                        <h2>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</h2>
                       </div>
                       <div className='statisticsRow'>
-                        <h2>LÄSFÖRSTÅELSE</h2>
+                        <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
                         <p className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</p>
-                        <h2>RÄTT PÅ FRÅGORNA</h2>
+                        <h2>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</h2>
                       </div>
                       </div>
                       <div className='testStatistics'> 
                       <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>{`Genomsnitt ord per minut`} <br/> {`för din ålder är ${averageWpm}`}</h2>
+                      <h2 className='statisticsValue'>
+                      {language === "GB"
+                        ? `Average words per minute` + `for your age is ${averageWpm}`
+                        : `Genomsnitt ord per minut` + `för din ålder är ${averageWpm}`}
+                    </h2>
                       </div>
                       <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>{`Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`} <br/> {`Läser du ${wpm} ord`} <br/> {`så förstår du ${Math.round(wpmComprehended)} av de orden.`}</h2>
+                      <h2 className='statisticsValue'>
+                      {language === "GB"
+                        ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
+                        : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
+                      <br />
+                      {language === "GB"
+                        ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
+                        : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
+                    </h2>
                       </div>
                       </div>
                       <div className='statisticsFunFact'>
@@ -419,25 +684,40 @@ return (
                       </div>
                     </div>
                     <div className='SaveOrRestartButtonsDiv'>
-                    <button className='save-result-button first-button' onClick={() => setShowForm(true)}>SPARA RESULTAT?</button>
-                    <button className='save-result-button second-button' onClick={handleRestartClick}>STARTA OM TEST</button>
+                    <div>
+                      <button className='save-result-button first-button' onClick={() => setShowForm(true)}>{language === "GB" ? "SAVE RESULT?" : "SPARA RESULTAT?" }</button>
+                      <button className='save-result-button second-button' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM TESTET" }</button>
+                    </div>  
                     </div>
                   </div>
                 }
 
                 {hasSubmitedQuestions && validToSaveContactInfo && showForm &&
                 <div className='form-container'>
+                  {!customer
+                  ?
                   <form className='form' onSubmit={handleSaveInfoFormSubmit}>
-                    <div>
-                    <input type="email" onChange={infoChange} placeholder="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
-                    <input type="text" onChange={infoChange} placeholder="Förnamn" pattern="[a-zA-Z]+" required />
-                    <input type="text" onChange={infoChange} placeholder="Efternamn" pattern="[a-zA-Z]+" required />
-                    </div>
                   <div>
-                  <button className='SAVE-RESULT-BUTTON'type="submit">SPARA</button>
-                  <button className='CANCEL-FORM-BUTTON' onClick={handleRestartClick}>AVBRYT</button>
+                  <input type="email" onChange={infoChange} placeholder="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                  <input type="text" onChange={infoChange} placeholder="Förnamn" pattern="[a-zA-Z]+" required />
                   </div>
-                  </form>
+                <div>
+                <button className='SAVE-RESULT-BUTTON'type="submit">{language === "GB" ?"SAVE" : "SPARA" }</button>
+                <button className='CANCEL-FORM-BUTTON' onClick={handleRestartClick}>{language === "GB" ?"CANCEL" : "AVBRYT" }</button>
+                </div>
+                </form>
+                  :
+                  <form className='form' onSubmit={handleSaveInfoFormSubmit}>
+                  <div>
+                  <input type="email" onChange={infoChange} placeholder="Email" value={email} pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
+                  </div>
+                <div>
+                <button className='SAVE-RESULT-BUTTON'type="submit">{language === "GB" ?"SAVE" : "SPARA" }</button>
+                <button className='CANCEL-FORM-BUTTON' onClick={handleRestartClick}>{language === "GB" ?"CANCEL" : "AVBRYT" }</button>
+                </div>
+                </form>
+                  }
+
                   
                   </div>
                 }

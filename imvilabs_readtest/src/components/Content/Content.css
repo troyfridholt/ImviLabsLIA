@@ -409,7 +409,7 @@ h2 {
   justify-content: center;
   padding: 1rem 1.75rem;
   text-decoration: none;
-  width: 100%;
+  width: fit-content;
   border: 0;
   cursor: pointer;
   user-select: none;
@@ -418,8 +418,8 @@ h2 {
   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
   cursor: pointer;
   transition: all 0.5s ease-in-out;
-  margin-top: 5%;
-}
+  margin: auto;
+  }
 
 .restart-button:hover {
   transform: scale(1.1);
@@ -448,12 +448,13 @@ h2 {
 .SaveOrRestartButtonsDiv {
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
+  margin-top: 2rem;
 }
 
 .save-result-button {
-  width: 100%;
+  width: 40%;
   border-radius: 0.5rem;
   box-sizing: border-box;
   color: #ffffff;
@@ -464,8 +465,6 @@ h2 {
 }
 
 .first-button {
-  width: 25%;
-  line-height: 80%;
   font-size: 14px;
   background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
 }
@@ -475,15 +474,13 @@ h2 {
 }
 
 .second-button {
-  width: 25%;
-  line-height: 80%;
+  margin-left: 10%;
   font-size: 14px;
   background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
 }
 
-.second-button:hover {
-  background-color: #46ec30;
-}
+
+
 
 /* CSS FÖR SPARA DITT RESULTAT FORMULÄRET */
 .form-container {
@@ -498,7 +495,7 @@ h2 {
   max-height: 80%;
   min-width: 75%;
   overflow: scroll;
-  padding: 0;
+  padding: 1;
 }
 
 .form {
@@ -800,19 +797,20 @@ h2 {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     margin-top: 30px;
+    
   }
 
-  .SaveOrRestartButtonsDiv button {
-    width: 50%;
-    margin: 2%;
-  }
 
   .SaveOrRestartButtonsDiv .first-button {
     font-size: 12px;
+    padding: 3%;
   }
 
   .SaveOrRestartButtonsDiv .second-button {
+    margin-left: 10%;
+    padding: 3%;
     font-size: 12px;
   }
 

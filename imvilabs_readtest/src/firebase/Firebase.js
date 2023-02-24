@@ -51,7 +51,7 @@ class Firebase {
   }
 
   //Sparar ner resultat i /users
-  async saveResult(email, name, lastname, wpm, age, level, amountOfRightQuestions) {
+  async saveResult(email, name, wpm, age, level, amountOfRightQuestions) {
     signInWithEmailAndPassword(this.auth, "noahnemhed@hotmail.com", "asd123456.")
     .then((userCredential) => {
       // Signed in 
@@ -78,7 +78,6 @@ class Firebase {
     await setDoc(doc(userinfoColRef, "info"), {
       email: email,
       name: name,
-      lastname: lastname,
       age: age
     });
         // Create a results subcollection and add first test document
@@ -93,6 +92,75 @@ class Firebase {
     // Add a new test document with the next available number (e.g. test2 if test1 already exists)
     await setDoc(doc(resultsColRef, `test${numTestDocs + 1}`), result);
   }
+  }
+  
+  //Save results to an already customer
+  async saveResultCustomer(email, level, wpm, amountOfRightQuestions){
+
+    signInWithEmailAndPassword(this.auth, "noahnemhed@hotmail.com", "asd123456.")
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      console.log(user)
+    })
+    const date = new Date().toISOString().substring(0, 10);
+    const result = {
+      date,
+      wpm,
+      level,
+      amountOfRightQuestions,
+    };
+      // Create document for the user with the specified email
+      const userDocRef = doc(this.db, "users", email);
+
+      // Check if the user document already exists in the "users" collection
+      const userDocSnapshot = await getDoc(userDocRef);
+      const resultsColRef = collection(userDocRef, "results");
+      const resultsSnapshot = await getDocs(resultsColRef);
+      const numTestDocs = resultsSnapshot.docs.length;
+      if(numTestDocs === 0){
+        const resultsColRef = collection(userDocRef, "results");
+        await setDoc(doc(resultsColRef, "test1"), result);
+      }else{
+        await setDoc(doc(resultsColRef, `test${numTestDocs + 1}`), result);
+      }
+  }
+
+
+
+  //Add a user to db with email, name, age
+  async addUserToDB(email, name, age){
+  // Create document for the user with the specified email
+  const userDocRef = doc(this.db, "users", email);
+
+  // Check if the user document already exists in the "users" collection
+  const userDocSnapshot = await getDoc(userDocRef);
+  if (!userDocSnapshot.exists()) {
+    // If user document does not exist, create a new document with email and userinfo subcollection
+    await setDoc(userDocRef, {});
+    const userinfoColRef = collection(userDocRef, "userinfo");
+    await setDoc(doc(userinfoColRef, "info"), {
+      email: email,
+      name: name,
+      age: age
+    });
+  }
+  }
+
+
+  //Check if a user is already in db by email
+    async checkIfEmailIsInDB(email) {
+    // Create reference to the user document with the specified email
+    const userDocRef = doc(this.db, "users", email);
+  
+    // Check if the user document already exists in the "users" collection
+    const userDocSnapshot = await getDoc(userDocRef);
+  
+    if (!userDocSnapshot.exists()) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
 
