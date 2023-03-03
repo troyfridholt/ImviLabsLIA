@@ -147,6 +147,20 @@ class Firebase {
   }
   }
 
+  async checkIfUserIsRegistered(email) {
+    const userDocRef = doc(this.db, "users", email);
+  
+    // Check if the user document already exists in the "users" collection
+    const userDocSnapshot = await getDoc(userDocRef);
+    if (userDocSnapshot.exists()) {
+      // If the user document exists, return true
+      return true;
+    } else {
+      // If the user document does not exist, return false
+      return false;
+    }
+  }
+
 
   //Check if a user is already in db by email
     async checkIfEmailIsInDB(email) {

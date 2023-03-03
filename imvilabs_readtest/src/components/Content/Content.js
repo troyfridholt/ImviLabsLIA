@@ -27,9 +27,12 @@ function Content() {
   //State för namn,email
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [isEmailRegistered, setIsEmailRegistered] = useState(true);
 
   //State för att se ifall man är kund.
   const [customer, setCustomer] = useState(false);
+  //State för att se ifall kunden vill Regstrirera sig, Logga in, Göra testet som gäst.
+  const [RegisterLogin, setRegisterLogin] = useState("Guest")
   
   //State för att se ifall användaren har blivit frågad om de vill bli kund
   const [askToBecomeCustomer, setAskToBecomeCustomer] = useState(false);
@@ -99,10 +102,19 @@ function Content() {
     setShowForm(false);
     setResetTimer(true);
     setLanguageSelected(false);
+    setIsEmailRegistered(true)
     if(!customer){
       setAskToBecomeCustomer(false)
     }
   }
+
+
+  const handleCancelRegisterFormClick = () =>{
+    console.log(email)
+    setIsEmailRegistered(true)
+    setCustomer(false)
+  }
+
 
   //Metod för att göra breaklines i funStatistics texten.
   const createMarkup = () => {
@@ -301,21 +313,39 @@ function Content() {
   };
 
 
+  //Cheeks if user chooses to continue as guest or to register
   const handleVersionClick = (e) => {
     const value = e.target.value;
-    if(value === 'guest'){
+    if(value === 'Guest'){
       setCustomer(false)
       setAskToBecomeCustomer(true)
-    }else {
-      setCustomer(true);
-    }  
+    }
+    if(value === "Register"){
+      setRegisterLogin("Register")
+      setCustomer(true)
+    } 
+    if(value === "Login"){
+      setRegisterLogin("Login")
+      setCustomer(true)
+    }
   }
 
-   const handleEmailSubmit = (e) => {
+  //If user chooses to continue with register it will add user to DB and create a cookie with users email.
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    firebase.addUserToDB(email, name, age);
-    document.cookie = `email=${email}; max-age=86400; path=/`;
-    setAskToBecomeCustomer(true)
+    if (RegisterLogin === "Login") {
+      const emailExists = await firebase.checkIfEmailIsInDB(email);
+      if (emailExists) {
+        document.cookie = `email=${email}; max-age=86400; path=/`;
+        setAskToBecomeCustomer(true);
+      } else {
+        setIsEmailRegistered(false);
+      }
+    } else {
+      firebase.addUserToDB(email, name, age);
+      document.cookie = `email=${email}; max-age=86400; path=/`;
+      setAskToBecomeCustomer(true);
+    }
   };
 
 //useEffect to check if the user is a customer and if their email exists in the database
@@ -326,18 +356,14 @@ useEffect(() => {
   if (emailCookie) {
     const email = emailCookie.split('=')[1];
     setEmail(email);
-    setCustomer(true);
-    setAskToBecomeCustomer(true);
 
     // Check if the email exists in the database
     firebase.checkIfEmailIsInDB(email)
       .then(exists => {
         if (exists) {
-          // Email exists in the database
-          console.log(`User with email ${email} exists in the database.`);
+          setCustomer(true);
+          setAskToBecomeCustomer(true);
         } else {
-          // Email does not exist in the database
-          console.log(`User with email ${email} does not exist in the database.`);
         }
       })
       .catch(error => {
@@ -395,31 +421,14 @@ return (
 
             {!customer ? (
               <>
-                <button value='guest' style={{ 
+              <div style={{flex: "flex", flexDirection: "row", justifyItems: "center", width: "100%"}}>
+              <button value='Guest' style={{ 
                   backgroundColor: "#4379b8",
                   backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
                   borderRadius: "0.5rem",
                   boxSizing: "border-box",
                   color: "#ffffff",
-                  fontSize: "1rem",
-                  justifyContent: "center",
-                  padding: "0.5rem 1.75rem",
-                  textDecoration: "none",
-                  border: "0",
-                  cursor: "pointer",
-                  userSelect: "none",
-                  WebkitUserSelect: "none",
-                  touchAction: "manipulation",
-                  marginLeft: "4%",
-                  marginTop: "2%",  }} onClick={handleVersionClick}>{language === "ENG" ? "CONTINUE AS GUEST" : "FORTSÄTT SOM GÄST" }</button>
-
-                <button style={{
-                  backgroundColor: "#4379b8",
-                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
-                  borderRadius: "0.5rem",
-                  boxSizing: "border-box",
-                  color: "#ffffff",
-                  fontSize: "1.5rem",
+                  fontSize: "1.2rem",
                   justifyContent: "center",
                   padding: "0.5rem 1.75rem",
                   textDecoration: "none",
@@ -430,45 +439,57 @@ return (
                   touchAction: "manipulation",
                   marginLeft: "4%",
                   marginTop: "2%",
-                }} value='customer' onClick={handleVersionClick}>{language === "ENG" ? "SIGN UP WITH EMAIL" : "REGISTRERA MED EMAIL" }</button>
+                  width: "26.66%",  }} onClick={handleVersionClick}>{language === "GB" ? "CONTINUE AS GUEST" : "FORTSÄTT SOM GÄST" }</button>
+
+                <button style={{
+                  backgroundColor: "#4379b8",
+                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
+                  borderRadius: "0.5rem",
+                  boxSizing: "border-box",
+                  color: "#ffffff",
+                  fontSize: "1.2rem",
+                  justifyContent: "center",
+                  padding: "0.5rem 1.75rem",
+                  textDecoration: "none",
+                  border: "0",
+                  cursor: "pointer",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "manipulation",
+                  marginLeft: "4%",
+                  marginTop: "2%",
+                  width: "26.66%",
+                }} value='Register' onClick={handleVersionClick}>{language === "GB" ? "SIGN UP WITH EMAIL" : "REGISTRERA MED EMAIL" }</button>
+
+                <button style={{
+                  backgroundColor: "#4379b8",
+                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
+                  borderRadius: "0.5rem",
+                  boxSizing: "border-box",
+                  color: "#ffffff",
+                  fontSize: "1.2rem",
+                  justifyContent: "center",
+                  padding: "0.5rem 1.75rem",
+                  textDecoration: "none",
+                  border: "0",
+                  cursor: "pointer",
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "manipulation",
+                  marginLeft: "4%",
+                  marginTop: "2%",
+                  width: "26.66%",
+                }} value='Login' onClick={handleVersionClick}>{language === "GB" ? "ALREADY CUSTOMER?" : "REDAN KUND?" }</button>
+              </div>
+                
               </>
-            ) : (
-            <form onSubmit={handleEmailSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-              <input 
-                style={{
-                  width: "100%",
-                  height: "2rem",
-                  padding: "0.5rem",
-                  borderRadius: "0.5rem",
-                  border: "1px solid #ccc",
-                  margin: "1rem 0",
-                  fontSize: "1rem",
-                }} 
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                placeholder="Email" 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                required 
-              />
-              <input 
-                style={{
-                  width: "100%",
-                  height: "2rem",
-                  padding: "0.5rem",
-                  borderRadius: "0.5rem",
-                  border: "1px solid #ccc",
-                  margin: "1rem 0",
-                  fontSize: "1rem",
-                }} 
-                pattern="[a-zA-Z]+" 
-                placeholder="Name" 
-                type="text" 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                required 
-              />
-              <input 
+            ) :
+             (
+          <form onSubmit={handleEmailSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <p className={isEmailRegistered ? "hidden" : ""} style={{ color: "red" }}>
+              Provided email is not registered
+            </p>
+            <input 
               style={{
                 width: "100%",
                 height: "2rem",
@@ -478,35 +499,94 @@ return (
                 margin: "1rem 0",
                 fontSize: "1rem",
               }} 
-              pattern="[0-9]*" 
-              min="1" 
-              max="99" 
-              placeholder="Age" 
-              type="number" 
-              value={age || ''}
-              onChange={(e) => setAge(e.target.value)} 
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
+              placeholder="Email" 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
               required 
             />
-              <button 
-                type="submit" 
-                style={{
-                  width: "100%",
-                  height: "2.5rem",
-                  borderRadius: "0.5rem",
-                  border: "none",
-                  margin: "1rem 0",
-                  fontSize: "1rem",
-                  backgroundColor: "#4379b8",
-                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease-in-out",
-                }}
-              >
-                Submit
-              </button>
-            </form>
+            {RegisterLogin === "Register" && (
+              <>
+                <input 
+                  style={{
+                    width: "100%",
+                    height: "2rem",
+                    padding: "0.5rem",
+                    borderRadius: "0.5rem",
+                    border: "1px solid #ccc",
+                    margin: "1rem 0",
+                    fontSize: "1rem",
+                  }} 
+                  pattern="[a-zA-Z]+" 
+                  placeholder="Name" 
+                  type="text" 
+                  value={name} 
+                  onChange={(e) => setName(e.target.value)} 
+                  required 
+                />
+                <input 
+                  style={{
+                    width: "100%",
+                    height: "2rem",
+                    padding: "0.5rem",
+                    borderRadius: "0.5rem",
+                    border: "1px solid #ccc",
+                    margin: "1rem 0",
+                    fontSize: "1rem",
+                  }} 
+                  pattern="[0-9]*" 
+                  min="1" 
+                  max="99" 
+                  placeholder="Age" 
+                  type="number" 
+                  value={age || ''}
+                  onChange={(e) => setAge(e.target.value)} 
+                  required 
+                />
+              </>
+            )}
+            <button 
+              type="submit" 
+              style={{
+                width: "100%",
+                height: "2.5rem",
+                borderRadius: "0.5rem",
+                border: "none",
+                margin: "1rem 0",
+                fontSize: "1rem",
+                backgroundColor: "#4379b8",
+                backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
+                color: "#fff",
+                fontWeight: "bold",
+                cursor: "pointer",
+                transition: "all 0.3s ease-in-out",
+              }}
+            >
+              Submit
+            </button>
+            <button 
+              type="submit" 
+              onClick={handleCancelRegisterFormClick}
+              style={{
+                width: "100%",
+                height: "2.5rem",
+                borderRadius: "0.5rem",
+                border: "none",
+                margin: "1rem 0",
+                fontSize: "1rem",
+                backgroundColor: "#4379b8",
+                backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
+                color: "#fff",
+                fontWeight: "bold",
+                cursor: "pointer",
+                transition: "all 0.3s ease-in-out",
+              }}
+            >
+              Cancel
+            </button>
+          </form>
+          
             )}
             </div>
           
