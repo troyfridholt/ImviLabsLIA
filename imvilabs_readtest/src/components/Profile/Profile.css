@@ -1,31 +1,43 @@
-.profile-container {
-    width: 80%;
-    margin: 0 auto;
-    text-align: center;
-    background-color: #f5f5f5;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    
-}
+/* Profile.css */
 
-.results-container {
+div {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: center;
-}
-
-.result-item {
-    width: 20%;
-    margin: 16px;
-    text-align: left;
-    padding: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f5f5f5;
-    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
-}
-
-h1, h2 {
-    margin: 0;
-}
-
+    align-items: center;
+    padding: 2rem;
+  }
+  
+  input[type='text'] {
+    padding: 0.5rem;
+    margin: 1rem;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    font-size: 1.2rem;
+    color: #555;
+    background-color: #f2f2f2;
+    border-radius: 4px;
+  }
+  
+  button {
+    padding: 0.5rem 1rem;
+    margin: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: blue;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: lightblue;
+  }
+  
+  p {
+    margin: 0.5rem;
+    font-size: 1.2rem;
+    color: #555;
+  }
+  
