@@ -33,12 +33,6 @@ module.exports = {
     },
     module: {
       rules: [
-
-        {
-          test: /\.css$/,
-          use: ['style-loader', 'css-loader', 'postcss-loader'],
-        },
-
       // First Rule
       {
         test: /\.(js|jsx)$/,
