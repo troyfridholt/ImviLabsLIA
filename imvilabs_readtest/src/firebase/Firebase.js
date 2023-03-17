@@ -147,20 +147,6 @@ class Firebase {
   }
   }
 
-  async checkIfUserIsRegistered(email) {
-    const userDocRef = doc(this.db, "users", email);
-  
-    // Check if the user document already exists in the "users" collection
-    const userDocSnapshot = await getDoc(userDocRef);
-    if (userDocSnapshot.exists()) {
-      // If the user document exists, return true
-      return true;
-    } else {
-      // If the user document does not exist, return false
-      return false;
-    }
-  }
-
 
   //Check if a user is already in db by email
     async checkIfEmailIsInDB(email) {
@@ -177,40 +163,6 @@ class Firebase {
     }
   }
 
-
-  async addSubscriberToDrip(email1,name1,age1){
-    const apiKey = '221168f29814a47812a2c1bdba8d6afc';
-    const accountId = 'YOUR_ACCOUNT_ID';
-    const campaignId = 'YOUR_CAMPAIGN_ID';
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'ReadingTest',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        subscribers: [
-          {
-            email: email1,
-            tags: ['ReadingTestSubmissions'],
-            custom_fields: {
-              name: name1,
-              age: age1,
-            },
-          },
-        ],
-      }),
-    };
-
-    // Send the request to add the subscriber to the campaign
-    fetch(`https://api.getdrip.com/v3/${accountId}/campaigns/${campaignId}/subscribers`, requestOptions)
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error(error));
-  }
-  
-  
 
   //Hårdkodat just nu skall implementeras i databas.
    getstatisticsInfo(age, wpm){

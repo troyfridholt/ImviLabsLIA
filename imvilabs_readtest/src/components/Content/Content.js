@@ -1,10 +1,13 @@
 // Content.js
 import React, { useState, useEffect } from 'react';
 import './Content.css';
-import 'animate.css';
 import Firebase from '../../firebase/Firebase';
 import Server from '../../server';
-import 'flag-icons/css/flag-icons.min.css';
+import SE from '../../Images/se.png'
+import GB from '../../Images/gb.png'
+import readingIcon from '../../Images/ReadingIMG.svg'
+import checkIcon from '../../Images/checkIcon.svg'
+import speakerIcon from '../../Images/speakerIcon.png'
 
 
 function Content() {
@@ -164,20 +167,16 @@ function Content() {
       if(parseInt(age) >= 16){
         setValidToSaveContactInfo(true)
       }
+      setIntroQuestionsDone(true)
       setIsStopped(false);
       setIsStarted(true);
     };
     
 
   
-  const handleIntroAnswerClick = (e) => {
-    if (!selectedAnswer) {
-      alert("Please select an answer before proceeding.");
-      return;
-    }
-    setSelectedAnswer(e.target.innerText);
-    setIntroQuestionsDone(true)
-  }
+    const handleIntroAnswerClick = (e) => {
+      setSelectedAnswer(e.target.value);
+    };
 
   //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
   //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
@@ -376,111 +375,78 @@ useEffect(() => {
 
   
 return (
-  <div className="container">
+  <div className='container'>
         <div className='reading-box'>
 
           {!languageSelected &&
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span className='fi fi-se' style={{ fontSize: '4rem', marginRight: '10rem' }} onClick={() => handleLanguageClick('SE')}></span>
-              <span className='fi fi-gb' style={{ fontSize: '4rem' }} onClick={() => handleLanguageClick('GB')}></span>
+            <div>
+            <img src={SE} alt="Swedish flag" style={{ marginRight: '10rem' }} onClick={() => handleLanguageClick('SE')} />
+            <img src={GB} alt="British flag" style={{ }} onClick={() => handleLanguageClick('GB')} />
             </div>
-          </div>
           }
 
           {languageSelected && !askToBecomeCustomer &&
 
-          <div style={{   display: "flex", flexDirection: "column", alignitems: "center", overflow: "auto", maxWidth: "80%" }}>
-            <h1 style={{ fontSize: "1.5rem", marginBottom: "2rem", textAlign: "center" }}>{language === "GB" ? "imviLabs Reading & ReadingComprehension Test" : "imviLabs Läs & Läsförståelse Test" }</h1>
-            <p style={{ fontSize: "1.1rem", marginBottom: "2rem", textAlign: "center", lineHeight: "1.5em" }}>
-              {language === "GB" ?
-              "Welcome to our reading test! This test aims to evaluate your reading comprehension and speed in words per minute. " +
-              "You will be able to select a difficulty level ranging from Easy to Hard, followed by a passage that you will need to read. "+
-              "Once you have finished reading the text, you will be required to answer questions based on the passage."
-              : 
-              "Välkommen till vårat lästtest! Detta test kommer att utvärdera din läsförståelse och din mäta din läshastighet i antal ord per minut. " +
-              "Du kommer att kunna välja en svårighetsnivå som sträcker sig från Lätt till Svår, följt av ett textstycke som du behöver läsa. " +
-              "När du har läst klart texten kommer du att behöva svara på frågor baserade på stycket."
-              }
+          <div className='welcomePageContainer'>
+            <img src={readingIcon}  className="readingImg" alt="" />
+            <div className='welcomePageDiv'>
+              <div>
+              <div className='welcomeTextHeader'>
+              <h1 className='welcomeText1'>Välkommen till imvis</h1>
+              <h1 className='welcomeText2'>Läshastighetstest</h1>
+            </div>
 
+            <div className='welcomePageDiv2'>
+            <p>
+              Testet utvärderar din läsförståelse och mäter din
+              lästhastighet i antal ord per minut. Du kommer att få
+              läsa en text och sen kommer du svara på frågor. Om
+              du testar gratis har du bara tillgång till den lätta nivån
+              </p>
+            <p >
+              Få den fullständiga testversionen som inkluderar:
             </p>
-            <p style={{ fontSize: "1.1rem", marginBottom: "2rem", textAlign: "center", lineHeight: "1.5em" }}>
-            {language === "GB" ?
-              "You have the option to take the test as a guest, but this will limit you to selecting only 'Easy' as the difficulty level" +
-              "and you will only be presented with a single text. Alternatively, you can sign up with your email to access the full version of the test,"+
-              "which includes a wide range of difficulty levels, multiple language options, and a variety of texts and questions." +
-              "Additionally, signing up will allow you to track your progress over time."
-              : 
-              "Du har möjlighet att göra testet som gäst, men detta begränsar dig till att endast välja 'Lätt' som svårighetsnivå " +
-              "och du kommer bara att ha tillgång till en enda text. Alternativt kan du registrera dig med din e-post för att få tillgång till våran fullständiga versionen av testet " +
-              "som inkluderar ett brett utbud av svårighetsgrader, flera språkalternativ och en mängd olika texter och frågor. " +
-              "Genom att registrera dig kan du dessutom följa dina framsteg över tiden."
-              }
+            </div>
+            <div className='checkBoxDiv'>
+              <div>
+              <img src={checkIcon} alt="" />
+              <p>Tre svårighetsgrader</p>
+              </div>
 
+              <div>
+              <img src={checkIcon} alt="" />
+              <p>Flera språkalternativ</p>
+              </div>
+
+              <div>
+              <img src={checkIcon} alt="" />
+              <p>Mängd olika läsinnehåll</p>
+              </div>
+            </div>
+            </div>
+              </div>
+            
+            <div className='welcomePageDiv3'>
+            <p>
+              Regisrera dig med din e-post och följ dina framsteg över tid!
             </p>
-
+            </div>
+            
             {!customer ? (
               <>
-              <div style={{flex: "flex", flexDirection: "row", justifyItems: "center", width: "100%"}}>
-              <button value='Guest' style={{ 
-                  backgroundColor: "#4379b8",
-                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
-                  borderRadius: "0.5rem",
-                  boxSizing: "border-box",
-                  color: "#ffffff",
-                  fontSize: "1.2rem",
-                  justifyContent: "center",
-                  padding: "0.5rem 1.75rem",
-                  textDecoration: "none",
-                  border: "0",
-                  cursor: "pointer",
-                  userSelect: "none",
-                  WebkitUserSelect: "none",
-                  touchAction: "manipulation",
-                  marginLeft: "4%",
-                  marginTop: "2%",
-                  width: "26.66%",  }} onClick={handleVersionClick}>{language === "GB" ? "CONTINUE AS GUEST" : "FORTSÄTT SOM GÄST" }</button>
-
-                <button style={{
-                  backgroundColor: "#4379b8",
-                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
-                  borderRadius: "0.5rem",
-                  boxSizing: "border-box",
-                  color: "#ffffff",
-                  fontSize: "1.2rem",
-                  justifyContent: "center",
-                  padding: "0.5rem 1.75rem",
-                  textDecoration: "none",
-                  border: "0",
-                  cursor: "pointer",
-                  userSelect: "none",
-                  WebkitUserSelect: "none",
-                  touchAction: "manipulation",
-                  marginLeft: "4%",
-                  marginTop: "2%",
-                  width: "26.66%",
-                }} value='Register' onClick={handleVersionClick}>{language === "GB" ? "SIGN UP WITH EMAIL" : "REGISTRERA MED EMAIL" }</button>
-
-                <button style={{
-                  backgroundColor: "#4379b8",
-                  backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
-                  borderRadius: "0.5rem",
-                  boxSizing: "border-box",
-                  color: "#ffffff",
-                  fontSize: "1.2rem",
-                  justifyContent: "center",
-                  padding: "0.5rem 1.75rem",
-                  textDecoration: "none",
-                  border: "0",
-                  cursor: "pointer",
-                  userSelect: "none",
-                  WebkitUserSelect: "none",
-                  touchAction: "manipulation",
-                  marginLeft: "4%",
-                  marginTop: "2%",
-                  width: "26.66%",
-                }} value='Login' onClick={handleVersionClick}>{language === "GB" ? "ALREADY CUSTOMER?" : "REDAN KUND?" }</button>
-              </div>
+              <div className='welcomePageButtonsDiv'>
+              <div className='RegisterGuestDiv'>
+                  <button onClick={handleVersionClick} className='registerButton' value="Register">
+                  Registrera
+                  </button>
+                  <button onClick={handleVersionClick} className='guestButton' value="Guest">
+                    Testa som gäst
+                    </button>
+                </div>
+              </div>     
+              <div className='AlreadyRegisterdDiv'>
+                <button onClick={handleVersionClick} class="alreadyRegisredButton" value="Login"><span style={{color: "#606060"}}>Redan Registrerad?</span> Logga in</button>
+                </div>  
                 
               </>
             ) :
@@ -592,75 +558,107 @@ return (
           
            }
 
-          
-          {!introQuestionsDone && languageSelected && askToBecomeCustomer &&
-            <div className='intro-questions'>
-            <label>{language === "GB" ? "Who is doing the test?" : "Vem är det som gör testet?"}</label>
-            <div class="panel" align="center">
-              <p onClick={handleIntroAnswerClick}  className={selectedAnswer === 'JAG GÖR TESTET SJÄLV' ? 'selected':'notselected'}>{language === "GB" ? "I DO THE TEST MYSELF" : "JAG GÖR TESTET SJÄLV"}</p>
-              <p onClick={handleIntroAnswerClick}  className={selectedAnswer === 'JAG GÖR TESTET TILLSAMMANS MED MITT BARN' ? 'selected':''}>{language === "GB" ?  "I DO THE TEST TOGETHER WITH MY CHILD" : "JAG GÖR TESTET TILLSAMMANS MED MITT BARN"}</p>
-            </div>
-          </div>
-          }
-          {!isStarted && !isStopped && !hasSubmitedQuestions && introQuestionsDone && 
-          <div className="level-selector">
-            <div className='level-div'> 
-            {!customer ? <select className='level' onChange={handleLevelChange} required>
-            <option value="1">{language === "GB" ? "Easy" :"Lätt"}</option>
-            </select>
-            :            
-            <select className='level' onChange={handleLevelChange} required>
-            <option value="1">{language === "GB" ? "Easy" :"Lätt"}</option>
-            <option value="2">{language === "GB" ? "Medium" :"Medel"}</option>
-            <option value="3">{language === "GB" ? "Hard" :"Svår"}</option>
-            </select>
-            }
-
-            </div>
-
-            <div className="age-container">
-            <input 
-              type="number" 
-              className='age' 
-              value={age}
-              min="1" 
-              max="99" 
-              placeholder={
-                selectedAnswer === (language === "GB" ? "I DO THE TEST MYSELF" : "JAG GÖR TESTET SJÄLV")
-                  ? (language === "GB" ? "Age" : "Ålder")
-                  : (language === "GB" ? "Childs Age" : "Barns Ålder")
-              } 
-              required 
-              pattern="[0-9]*" 
-              onChange={handleAgeChange} 
-              onMouseOver={() => setShowInfo(true)}
-              onMouseOut={() => setShowInfo(false)}
-            />
-            {showInfo && (
-              <div className="info-tooltip">
-                <label >{language === "GB" ? "We need to know your age to be able to customize the test for you." :"Vi behöver veta ålder för att kunna anpassa testet för dig."}</label>
+          {!isStarted && !isStopped && !hasSubmitedQuestions && !introQuestionsDone && languageSelected && askToBecomeCustomer &&
+            <div className="level-selector">
+            
+            <div className="panel">
+              <div className='panelLabelDiv'>
+              <label className='panelLabel'>Vem är det som gör testet?</label>
               </div>
-            )}
-          </div>
-          <button className='start-button' onClick={handleStartClick}>{language === "GB" ? "TAKE THE TEST":"TA TESTET"}</button>
+            
+              <div className='panel1'>
+              <input
+                  type="radio"
+                  name="introAnswer"
+                  value="JAG GÖR TESTET SJÄLV"
+                  checked={selectedAnswer === 'JAG GÖR TESTET SJÄLV'}
+                  onChange={handleIntroAnswerClick}
+                />
+              <label>
+                Jag gör testet själv
+              </label>
+              </div>
 
-    </div>
+              <div className='panel2'>
+              <input
+                  type="radio"
+                  name="introAnswer2"
+                  value="JAG GÖR TESTET TILLSAMMANS MED MITT BARN"
+                  checked={selectedAnswer === 'JAG GÖR TESTET TILLSAMMANS MED MITT BARN'}
+                  onChange={handleIntroAnswerClick}
+                />
+              <label>
+              Jag gör testet tillsammans med mitt barn
+              </label>
+              </div>
+
+            </div>
+
+
+
+              <div className='level-div'>
+              <div className="age-container">
+                <label>Testtagarens ålder <span>*</span></label>
+                <input
+                  type="number"
+                  className='age'
+                  value={age}
+                  min="1"
+                  max="99"
+                  required
+                  pattern="[0-9]*"
+                  onChange={handleAgeChange}
+                />
+              </div>
+              <div className='level-container'>
+              <label>Svårighetsgrad</label>
+              {!customer ? (
+                  <select className='level' onChange={handleLevelChange} required>
+                    <option value="1">{language === "GB" ? "Easy" : "Lätt"}</option>
+                  </select>
+                ) : (
+                  <select className='level' onChange={handleLevelChange} required>
+                    <option value="1">{language === "GB" ? "Easy" : "Lätt"}</option>
+                    <option value="2">{language === "GB" ? "Medium" : "Medel"}</option>
+                    <option value="3">{language === "GB" ? "Hard" : "Svår"}</option>
+                  </select>
+                )}
+              </div>
+
+              </div>
+              <div className="AgreeDiv">
+              <input
+                  type="checkbox"
+                  name="AgreeBox"
+                  value="Agree"
+                />
+              <label>
+              Jag samtycker till <a >Imvis vilkor</a>
+              </label>
+              </div>
+              <button className='start-button' onClick={handleStartClick}>Starta testet</button>
+            </div>
           }
              
-       {isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions ? (
-        <>
+       {isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions && 
         <div className='test'>
-        <div className='readingTextDiv'>
+        <div class="parent-container">
+          <div className='readingTextDiv'>
             <p className='readingText' dangerouslySetInnerHTML={createMarkupText()} />
-            <button className='stop-button' onClick={handleStopClick}>{language === "GB" ? "STOP":"STOPP" }</button>
           </div>
-          
+          <div className='stop-buttonDiv'>
+            <button className='stop-button' onClick={handleStopClick}>Stopp</button>
+          </div>
+          </div>
         </div>
-
-        </>
-      ) : null }
+       }
        { isStopped && !hasSubmitedQuestions &&
-                <form className='question-form' onSubmit={handleFormSubmit}>
+               <div className='questionsContainer'>
+                  <div className='questionsContainerHeader'>
+                    <h1>Frågor</h1>
+                    <p>Välj rätt svar på frågan.</p>
+                  </div>
+                  <form className='question-form' onSubmit={handleFormSubmit}>
                 {questions.map((question, index) => (
                   <div key={index} className="questions">
                     <p>{question.question_text}</p>
@@ -678,97 +676,142 @@ return (
                     </div>
                   </div>
                 ))}
-                <button className='submitQuestions' type="submit">{language === "GB" ? "SUBMIT":"SVARA" }</button>
+                <button className='submitQuestions' type="submit">Svara och se resultat</button>
               </form>
+               </div>
+                
             }
             { hasSubmitedQuestions && !validToSaveContactInfo &&
           <div className='statisticsDiv'>
                     <div className='statisticsContent'>
                       <div className='testStatistics'>
+
+
                       <div className='statisticsRow'>
+                        <div className='statisticsInfo1'>
                         <h2>{language === "GB" ? "READING SPEED":"LÄSHASTIGHET"}</h2>
-                        <p className='statisticsValueWPM'>{wpm}</p>
-                        <h2>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</h2>
+                        <h1 className='statisticsValueWPM'>{wpm}</h1>
+                        <p>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</p>
+                        </div>
+
+                        <div className='statisticsInfo2'>
+                          <p className='statisticsValue'>
+                          {language === "GB"
+                            ? `Average words per minute` +  ` for your age is ${averageWpm}`
+                            : `Genomsnitt ord per minut` +  ` för din ålder är ${averageWpm}`}
+                        </p>
                       </div>
+                      </div>
+
                       <div className='statisticsRow'>
-                        <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
-                        <p className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</p>
-                        <h2>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</h2>
+                        <div className='statisticsInfo1'>
+                          <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
+                          <h1 className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</h1>
+                          <p>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</p>
+                        </div>
+
+                        <div className='statisticsInfo2'>
+                        <p className='statisticsValue'>
+                        {language === "GB"
+                          ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
+                          : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
+                        <br />
+                        {language === "GB"
+                          ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
+                          : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
+                      </p>
+                        </div>
                       </div>
+                                        
                       </div>
-                      <div className='testStatistics'> 
-                      <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>
-                      {language === "GB"
-                        ? `Average words per minute` +  `for your age is ${averageWpm}`
-                        : `Genomsnitt ord per minut` +  `för din ålder är ${averageWpm}`}
-                    </h2>
+                      <div className='statisticsFunFactHeader'>
+                        <div>
+                        <img src={speakerIcon} className='SpeakerIcon' alt="" />
+                        <label >Visste du</label>
+                        </div>
                       </div>
-                      <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>
-                      {language === "GB"
-                        ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
-                        : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
-                      <br />
-                      {language === "GB"
-                        ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
-                        : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
-                    </h2>
-                      </div>
-                      </div>
+
                       <div className='statisticsFunFact'>
                       <h2 className='statisticsValue' dangerouslySetInnerHTML={createMarkup()} />
                       </div>
+
+
                     </div>
                     
-                    <button className='restart-button' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM TEST"}</button>
+                    <button className='restartTestButton' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM" }</button>
                     </div>
                 }
                 {hasSubmitedQuestions && validToSaveContactInfo && !showForm &&
                   <div className='statisticsDiv'>
-                    <div className='statisticsContent'>
+                      <div className='statisticsContent'>
                       <div className='testStatistics'>
+
+
                       <div className='statisticsRow'>
+                        <div className='statisticsInfo1'>
                         <h2>{language === "GB" ? "READING SPEED":"LÄSHASTIGHET"}</h2>
-                        <p className='statisticsValueWPM'>{wpm}</p>
-                        <h2>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</h2>
+                        <h1 className='statisticsValueWPM'>{wpm}</h1>
+                        <p>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</p>
+                        </div>
+
+                        <div className='statisticsInfo2'>
+                          <p className='statisticsValue'>
+                          {language === "GB"
+                            ? `Average words per minute` +  ` for your age is ${averageWpm}`
+                            : `Genomsnitt ord per minut` +  ` för din ålder är ${averageWpm}`}
+                        </p>
                       </div>
+                      </div>
+
                       <div className='statisticsRow'>
-                        <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
-                        <p className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</p>
-                        <h2>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</h2>
+                        <div className='statisticsInfo1'>
+                          <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
+                          <h1 className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</h1>
+                          <p>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</p>
+                        </div>
+
+                        <div className='statisticsInfo2'>
+                        <p className='statisticsValue'>
+                        {language === "GB"
+                          ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
+                          : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
+                        <br />
+                        {language === "GB"
+                          ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
+                          : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
+                      </p>
+                        </div>
                       </div>
+                                        
                       </div>
-                      <div className='testStatistics'> 
-                      <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>
-                      {language === "GB"
-                        ? `Average words per minute` + `for your age is ${averageWpm}`
-                        : `Genomsnitt ord per minut` + `för din ålder är ${averageWpm}`}
-                    </h2>
+                      <div className='statisticsFunFactHeader'>
+                        <div>
+                        <img src={speakerIcon} className='SpeakerIcon' alt="" />
+                        <label >Visste du</label>
+                        </div>
                       </div>
-                      <div className='statisticsInfo'>
-                      <h2 className='statisticsValue'>
-                      {language === "GB"
-                        ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
-                        : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
-                      <br />
-                      {language === "GB"
-                        ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
-                        : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
-                    </h2>
-                      </div>
-                      </div>
+
                       <div className='statisticsFunFact'>
                       <h2 className='statisticsValue' dangerouslySetInnerHTML={createMarkup()} />
                       </div>
+
+
+
+
                     </div>
-                    <div className='SaveOrRestartButtonsDiv'>
-                    <div>
-                      <button className='save-result-button first-button' onClick={() => setShowForm(true)}>{language === "GB" ? "SAVE RESULT?" : "SPARA RESULTAT?" }</button>
-                      <button className='save-result-button second-button' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM TESTET" }</button>
-                    </div>  
-                    </div>
+                      <div className='restartButtonDiv'>
+                      <button className='restartTestButton' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM" }</button>
+                      </div>
+                       
+                    
+                      <div className='registerButtonDiv'>
+                      <button className='RegisterButton' onClick={() => setShowForm(true)}>{language === "GB" ? "SAVE RESULT?" : "Registrera" } <span>dig för att få den fullständiga versionen</span></button>
+                      </div>
+
+                
+                       
+                    
+                    
                   </div>
                 }
 

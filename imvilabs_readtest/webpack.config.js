@@ -17,6 +17,7 @@ module.exports = {
       path: path.resolve(__dirname, 'build'),
       filename: 'bundle.js'
     },
+
     devtool: 'inline-source-map',
     plugins: [
       new HtmlWebpackPlugin({
@@ -33,6 +34,11 @@ module.exports = {
     module: {
       rules: [
 
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader', 'postcss-loader'],
+        },
+
       // First Rule
       {
         test: /\.(js|jsx)$/,
@@ -40,7 +46,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-react']
+            presets: ['@babel/preset-react'],
           }
         }
       },
@@ -50,10 +56,10 @@ module.exports = {
           test: /\.css$/,
           use: [
             {
-              loader: 'style-loader'
+              loader: 'style-loader',
             },
             {
-              loader: 'css-loader'
+              loader: 'css-loader',
             }
           ]
         },
@@ -68,7 +74,7 @@ module.exports = {
               }
             }
           ]
-        }
+        },
       ]
     },
   };

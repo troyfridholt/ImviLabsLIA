@@ -1,13 +1,27 @@
-* {
-  font-family: sans-serif
-  
+@font-face {
+  font-family: 'Avenir';
+  src: url('../../fonts/Avenir.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
+
+
 ::-webkit-scrollbar {
   width: 0px;
   height: 0px;
 }
+
 :root{
-  --color: rgb(236, 242, 248);
+  --imviBlue: #4679bc;
+  --navy: #1A3F71;
+  --lightestBlue: #ECF2FB;
+  --mainBlack: #1c1c1c;
+  --darkGrey: #707070;
+  --mutedBerry: #BC4679;
+  --green: #5A9D26;
+  --red: #D20000;
+  --lightGrey: #E8E8E8;
+  --offWhite: #F9F9F9;
 }
 
 .hidden {
@@ -21,12 +35,12 @@
   width: 100vw;
   place-items: center;
   backdrop-filter: blur(10px);
+  background: #F5F5F5;
 }
 
 /* CSS FÖR "LÄSRUTAN" DÄR ALL TEXT,FRÅGOR VISAS */
 .reading-box {
   position: relative;
-  background-color: var(--color);
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
@@ -34,231 +48,507 @@
   align-items: center;
   flex-direction: column;
   min-width: 100%;
-  max-width: 80%;
+  max-width: 100%;
   min-height: 100%;
   max-height: 90%;
   font-size: 20px;
+  background: #F5F5F5;
 }
 
-.reading-box div {
-  flex-grow: .3;
-  background-color: var(--color);
+
+/* CSS FÖR VÄLKOMST SIDAN */
+.welcomePageContainer{
+  position: absolute;
+  width: 90%;
+  height: 100%;
+  left: 400px;
+  top: 85px;
+  overflow: auto;
 }
 
-.reading-box label, .reading-box .button {
-  background-color: var(--color);
+.welcomeTextHeader{
+  width: 276px;
+  height: 85.33px;
 }
 
-/* CSS FÖR TEXT RUTAN SAMT STOPPKNAPPEN VID START AV TEST */
-.test {
-  display: "grid";
-  grid-template-rows: 1fr 1fr;
-  overflow: "auto";
-  height: "100%";
-  width: "100%";
-  animation: zoomIn;
-  animation-duration: 0.5s;
-  overflow: scroll;
+
+.welcomeText1 {
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: lighter;
+  font-size: 28px;
+  line-height: 41px;
+  color: #1C1C1C;
+  width: 276px;
+  height: 41px;
 }
 
-/* CSS FÖR TEXT RUTAN SAMT STOPPKNAPPEN VID START AV TEST */
-.readingTextDiv {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  flex-wrap: wrap;
-  min-height: 80%;
-  min-width: 50%;
+.welcomeText2{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: bold;
+  font-size: 32px;
+  line-height: 44px;
+  color: #1C1C1C;
+  width: 265px;
+  height: 44px;
+}
+
+.welcomePageDiv2{
+  margin-top: 2%;
+  width: 399px;
+  height: 139px;
+}
+
+
+.welcomePageDiv2 p{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #606060;
+  margin-top: 5%;
+}
+
+.checkBoxDiv{
   margin-top: 3%;
-  animation: zoomIn;
-  animation-duration: 0.5s;
+  width: 330px;
+  height: 116px;
 }
 
-.readingText {
-  background-color: rgb(236, 242, 248);
-  width: 65%;
-  border-radius: 0.5rem;
-  font-size: .9em;
-  text-shadow: 0 0 1px transparent;
-  line-height: 1.5em;
-  overflow: scroll;
-}
-
-/* CSS FÖR VÄLJA NIVÅ SAMT ÅLDER FÖR TESTET */
-.level-selector {
-  background-color: rgb(236, 242, 248);
+.checkBoxDiv div{
   display: flex;
-  flex-direction: column;
+  margin-top: 1%;
   align-items: center;
-  min-width: 50%;
-  max-width: 50%;
-  min-height: 50%;
-  animation: zoomIn;
-  animation-duration: 0.5s;
 }
 
-.level-selector div {
-  background-color: rgb(236, 242, 248);
+.checkBoxDiv div p{
+  margin-left: 1%;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 32px;
+  color:#486284;
+}
+
+
+.welcomePageDiv3{
+width: 405px;
+height: 40px;
+font-family: 'Avenir';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 18px;
+color: #606060;
+margin-top: 1%;
+}
+
+.welcomePageButtonsDiv{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 32px;
+  width: 412px;
+  height: 48px;
+}
+
+.RegisterGuestDiv{
+ display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 32px;
+}
+
+
+.readingImg{
+position: absolute;
+width: 508px;
+height: 470px;
+right: 500px;
+}
+
+
+.registerButton{
+padding: 12px 20px;
+gap: 10px;
+width: 190px;
+height: 48px;
+background: #4679BC;
+border: 1px solid #486284;
+border-radius: 50px;
+font-family: 'Avenir';
+font-style: normal;
+font-size: 16px;
+line-height: 24px;
+letter-spacing: 0.5px;
+color: #FFFFFF;
+}
+
+.guestButton{
+  padding: 12px 20px;
+  gap: 10px;
+  width: 190px;
+  height: 48px;
+  border: 1px solid #4679BC;
+  border-radius: 50px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  color: #4679BC;
+}
+
+.AlreadyRegisterdDiv{
+  width: 229px;
+  height: 25px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 25px;
+  color: rgba(28, 28, 28, 0.8);
+  margin-top: 2%;
+  
+}
+
+
+.AlreadyRegisterdDiv button{
+  color: #4679BC;
+  border: none;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 25px;
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  
+}
+
+.readingIcon{
+position: absolute;
+width: 508px;
+height: 470px;
+right: 100px;
+top: 100px;
+}
+
+
+
+
+
+/* --------------------------------------------------   */
+
+
+/* CSS FÖR LEVEL SELECTOR OCH VEM SOM GÖR TESTET   */
+
+.level-selector{
   display: flex;
   flex-direction: column;
-  font-size: 16px;
-  width: 80%;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  color: #ffffff;
-  border-radius: 0.5rem;
-  padding: 2rem 1.75rem;
-  font-weight: 500;
+  width: 394px;
+  height: 581.38px;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 40px;
 }
 
-.level-selector div select {
-  background-color: rgb(236, 242, 248);
+.panel {
+  width: 394px;
+  height: 148px;
   display: flex;
   flex-direction: column;
-  font-size: 16px;
-  width: 100%;
-  border-radius: 0.5rem;
-  border: solid 1px #4379b8;
-  padding: 3rem 1.75rem;
 }
 
-.level-div {
-  margin-top: 8%;
-}
-
-.level-selector div input {
-  background-color: rgb(236, 242, 248);
-  display: flex;
-  flex-direction: column;
-  font-size: 16px;
-  width: 100%;
-  border-radius: 0.5rem;
-  border: solid 1px #4379b8;
-  padding: 3rem 1.75rem;
-}
-
-.age-container {
-  position: relative;
+.panelLabelDiv{
   margin-bottom: 5%;
 }
 
-.info-tooltip {
-  visibility: hidden;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  bottom: 77%;
-  height: 10%;
-  left: 10%;
-  transition: opacity 0.3s;
+.panelLabel{
+font-family: 'Avenir';
+font-style: normal;
+font-weight: 900;
+font-size: 15px;
+line-height: 120%;
+color: #1C1C1C;
+
 }
 
-.age-container:hover .info-tooltip {
-  visibility: visible;
-  color: black;
-  opacity: 0.8;
+.panel input[type="radio"] {
+  width: 27.41px;
+  height: 27.41px;
 }
 
-.info-tooltip::after {
-  content: "";
-  position: absolute;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: #4379b8 transparent transparent transparent;
+.panel input[type="radio"]:checked {
+  accent-color: var(--imviBlue);
 }
 
-/* CSS FÖR FRÅGOR VID START AV PROGRAM */
-.intro-questions {
+.panel1, .panel2 {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 90%;
-  animation: zoomIn;
-  animation-duration: 1s;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 18.27px;
+  margin-bottom: 4%;
 }
 
-.intro-questions label {
-  margin-top: 5%;
-  margin-bottom: 10px;
-  color: #4379b8;
-  font-weight: 600;
-  font-size: 1.7em;
-  letter-spacing: 1px;
-  text-decoration: none;
-  text-align: center;
-}
-
-.intro-questions .panel {
-  margin-top: 5%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  font-family: Poppins;
-  font-weight: 300;
-  letter-spacing: 1px;
-  text-decoration: none;
+.panel1 label{
+  font-family: 'Avenir';
   font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 27px;
+  color: #666666;
 }
 
-.panel p {
-  display: block;
-  width: 80%;
-  height: 100%;
-  margin-bottom: 6%;
-  cursor: pointer;
-  border-radius: 1rem;
-  color: #4379b8;
-  background-color: white;
+.panel2 label{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 27px;
+  color: #666666;
+}
+
+
+.level-div .age-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 12.56px;
+  width: 393px;
+  height: 135px;
+  
+}
+
+.age-container input{
   box-sizing: border-box;
-  padding: 0.8%;
+  padding: 17.1314px 18.2735px 17.1314px 28.5524px;
+  width: 393px;
+  height: 49.11px;
+  background: rgba(255, 255, 255, 1e-05);
+  border: 1.14209px solid rgba(28, 28, 28, 0.25);
+  border-radius: 4.56838px;
 }
 
-.panel p:hover {
-  transition: 0.7s;
-  background-color: #4379b8;
-  color: white;
+.age-container label span{
+width: 9px;
+height: 19px;
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 15.9893px;
+line-height: 120%;
+color: #ED0000;
 }
 
-.intro-questions .start-button {
-  margin-top: 30px;
-  width: 30%;
+.level-div .level-container{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  width: 393px;
+  height: 135px;
+  
 }
+
+.level-container select{
+  box-sizing: border-box;
+  padding: 17.1314px 18.2735px 17.1314px 28.5524px;
+  width: 393px;
+  height: 49.11px;
+  background: rgba(255, 255, 255, 1e-05);
+  border: 1.14209px solid rgba(28, 28, 28, 0.25);
+  border-radius: 4.56838px;
+}
+
+
+.level-selector .start-button {
+  box-sizing: border-box;
+  padding: 13.7051px 22.8419px;
+  gap: 11.42px;
+  width: 393px;
+  height: 48px;
+  background: #4679BC;
+  border: 1.14209px solid #486284;
+  border-radius: 57.1047px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 20px;
+  color: #FFFFFF;
+}
+
+.AgreeDiv{
+  display: flex;
+  align-self: baseline;
+  padding: 0px;
+  gap: 18.27px;
+  width: 298.09px;
+  height: 22px;
+}
+.AgreeDiv label{
+  width: 210px;
+  height: 22px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 22px;
+  color: #000000;
+}
+.AgreeDiv label a{
+  color: #4679BC;
+  text-decoration: none;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  border-bottom: solid 1px #4679BC;
+}
+
+.AgreeDiv label a:link {
+  text-decoration: none;
+}
+
+.AgreeDiv label a:visited {
+  text-decoration: none;
+}
+
+.AgreeDiv input{
+  width: 19.42px;
+height: 19.42px;
+border: 1px solid #fff;
+padding: 0.5em;
+
+}
+
+input[type="checkbox"]:checked {
+  accent-color: var(--imviBlue);
+}
+
+
+
+/* --------------------------------------------------   */
+
+/* CSS FÖR TEXT RUTAN SAMT STOPPKNAPPEN VID START AV TEST */
+.test {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.readingTextDiv {
+  padding: 32px;
+  gap: 32px;
+  width: fit-content;
+  height: 100%;
+  margin-top: 1%;
+}
+
+.readingText {
+  width: 700px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: rgba(28, 28, 28, 0.8);
+}
+
+.stop-buttonDiv{
+  text-align: center;
+  margin-bottom: 5%;
+}
+
+.stop-button {
+  box-sizing: border-box;
+  padding: 12px 20px;
+  gap: 10px;
+  width: 513px;
+  height: 48px;
+  background: #4679BC;
+  border: 1px solid #486284;
+  border-radius: 50px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  color: #FFFFFF;
+}
+
+
 
 /* CSS FÖR FRÅGOR FORMULÄRET FRÅN TEXTEN */
+.questionsContainer{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  width: 770px;
+  height: 1031px;
+  overflow: scroll;
+}
+
+.questionsContainerHeader{
+  display: flex;
+  flex-direction: column;
+  padding: 0px 0px 20px;
+  gap: 8px;
+  text-align: left;
+  margin-top: 5%;
+}
+
+.questionsContainerHeader p{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: rgba(28, 28, 28, 0.8);
+}
+
+.questionsContainerHeader h1{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 36px;
+  color: #1C1C1C;
+}
+
 .question-form {
-  background-color: rgb(236, 242, 248);
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 5px;
-  min-height: 80%;
-  min-width: 50%;
-  overflow: scroll;
-  animation: zoomIn;
-  animation-duration: 0.5s;
 }
 
 .question-form .questions {
-  background: rgb(236, 242, 248) center/cover;
-  margin: 2% 0;
-  padding: 2%;
-  border: 1px solid #ccc;
+  padding: 4%;
+  margin-top: 2%;
   border-radius: 5px;
-  width: 80%;
+  width: 100%;
+  background: #E5EEFA;
 }
 
 .question-form .questions p {
-  background: rgb(236, 242, 248);
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 400;
   margin-bottom: 5%;
 }
 
@@ -276,31 +566,29 @@
   font-size: 16px;
 }
 
+.question-form .submitQuestions {
+  padding: 16px 113px;
+  width: 770px;
+  height: 48px;
+  background: #4679BC;
+  margin-top: 7%;
+  border-radius: 50px;
+  margin-bottom: 10%;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 20px;
+  border: none;
+  color: #FFFFFF;
+}
+
+
 /* CSS FÖR STATISTIK RUTAN VID SLUTET AV TESTET */
-.statisticsDiv p {
-  background: rgb(236, 242, 248);
-}
-h2 {
-  font-size: 20px;
-  font-weight: 400;
-  font-size: 1.2rem;
-  text-align: center;
-  background: rgb(236, 242, 248);
-}
 
 .statisticsDiv {
-  width: 100%;
-}
-
-.statisticsValueWPM {
-  font-weight: bold;
-  font-size: 1.4em;
-  margin: 1.5%;
-}
-
-.statisticsValueWPMCOMPREHENSION {
-  font-weight: bold;
-  font-size: 1.4em;
+  width: 564px;
+  height: 568px;
 }
 
 .statisticsContent {
@@ -310,180 +598,204 @@ h2 {
   min-height: 80%;
   min-width: 50%;
   overflow: scroll;
-  background-color: rgb(236, 242, 248);
   border-radius: 10px;
-  animation: zoomIn;
-  animation-duration: 0.5s;
 }
 
 .testStatistics {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  width: 80%;
-  margin: 2%;
+  gap: 5%;
+  width: 564px;
+  width: 100%;
+  margin-bottom: 2%;
+  
 }
 
 .statisticsRow {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
+  padding: 15.8796px 0px;
+  gap: 19.85px;
+  width: 272px;
+  height: 233px;
+  left: calc(50% - 272px/2 - 146px);
+  top: calc(50% - 233px/2 - 167.5px);
+  background: #FFFFFF;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  margin-bottom: 5%;
+
 }
 
-.statisticsValue {
-  text-align: center;
+.statisticsValueWPM {
+  padding: 8.73376px 9.52773px;
+  background: #E5EEFA;
+  border-radius: 31.7591px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 30px;
+  color: #222222;
+}
+
+.statisticsValueWPMCOMPREHENSION {
+  padding: 8.73376px 9.52773px;
+  background: #E5EEFA;
+  border-radius: 31.7591px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 30px;
+  color: #222222;
+}
+
+.statisticsRow div{
+  gap: 19.85px;
+  margin-left: 5%;
   
 }
 
-.statisticsInfo {
+.statisticsRow .statisticsInfo1 h2{
+  margin-bottom: 10%;
+  
+}
+
+.statisticsInfo1 h1{
   text-align: center;
+}
+
+.statisticsRow .statisticsInfo1 p{
+  margin-top: 10%;
+  
+}
+
+
+
+.statisticsRow h2{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 17px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  letter-spacing: 0.396989px;
+  color: #363940;
+}
+
+.statisticsRow p{
+font-family: 'Avenir';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 19px;
+display: flex;
+align-items: center;
+text-align: center;
+color: #222222;
+}
+
+.statisticsFunFactHeader{
+  display: flex;
+  width: 100%;
+  height: 33px;
+  margin-bottom: 5%;
+  align-items: center;
+}
+
+.statisticsFunFactHeader div{
+  width: 130.02px;
+  height: 33.11px;
+  background: #E5EEFA;
+  border: 1px solid rgba(96, 96, 96, 0.51);
+  border-radius: 8px;
+  text-align: left;
+  
+}
+
+.statisticsFunFactHeader label{
+  width: 58px;
+  height: 20px;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: lighter;
+  font-size: 14px;
+  line-height: 20px;
+  color: #222222;
+  margin-left: 8px;
+}
+
+.SpeakerIcon{
+  width: 25px;
+  height: 17.61px;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
 .statisticsFunFact {
-  text-align: center;
-  margin: 40px 0;
+  width: 567px;
+  height: 78px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
 }
 
-.SaveOrRestartButtonsDiv {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-top: 50px;
-  margin-bottom: 2%;
-}
-
-/* CSS FÖR KNAPPAR */
-.start-button {
-  background-color: #4379b8;
-  background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
-  border-radius: 0.5rem;
-  box-sizing: border-box;
-  color: #ffffff;
-  display: flex;
+.statisticsFunFact h2{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 400;
   font-size: 16px;
-  justify-content: center;
-  padding: 0.5rem 1.75rem;
-  text-decoration: none;
-  width: 74%;
-  border: 0;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  transition: all 0.5s ease-in-out;
-  margin-bottom: 5%;
+  line-height: 26px;
+  color: #606060;
 }
 
-.start-button:hover {
-  transform: scale(1.1);
-  background-color: #46ec30;
+
+.restartButtonDiv{
+width: 564px;
+height: 48px;
+
 }
 
-.stop-button {
-  background-color: #4379b8;
-  background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
-  border-radius: 0.5rem;
-  box-sizing: border-box;
-  color: #ffffff;
-  display: flex;
-  font-size: 12px;
-  justify-content: center;
-  padding: 1rem 1.75rem;
-  text-decoration: none;
-  width: 15%;
-  border: 0;
-  margin: 5%;
-  cursor: pointer;
-}
-
-.stop-button:hover {
-  transform: scale(1.1);
-  background-color: #46ec30;
-}
-
-.restart-button {
-  background-color: #4379b8;
-  background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
-  border-radius: 0.5rem;
-  box-sizing: border-box;
-  color: #ffffff;
-  display: flex;
-  font-size: 16px;
-  justify-content: center;
-  padding: 1rem 1.75rem;
-  text-decoration: none;
-  width: fit-content;
-  border: 0;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
-  cursor: pointer;
-  transition: all 0.5s ease-in-out;
-  margin: auto;
-  }
-
-.restart-button:hover {
-  transform: scale(1.1);
-  background-color: #46ec30;
-}
-
-.question-form .submitQuestions {
-  background-color: #4379b8;
-  background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
-  border-radius: 0.5rem;
-  box-sizing: border-box;
-  color: #ffffff;
-  font-size: 14px;
-  padding: 1rem 1.75rem;
-  text-decoration: none;
-  border: 0;
-  cursor: pointer;
-  transition: all 0.5s ease-in-out;
-}
-
-.question-form .submitQuestions:hover {
-  transform: scale(1.1);
-  background-color: #46ec30;
-}
-
-.SaveOrRestartButtonsDiv {
+.restartTestButton{
+  background: #4679BC;
+  box-shadow: 1px 8px 16px rgba(70, 121, 188, 0.16);
+  border-radius: 50px;
+  padding: 8px 113px;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 26px;
+  color: #FFFFFF;
+  border: none;
 }
 
-.save-result-button {
-  width: 40%;
-  border-radius: 0.5rem;
-  box-sizing: border-box;
-  color: #ffffff;
-  padding: 1rem 1.75rem;
-  border: 0;
-  cursor: pointer;
-  transition: all 0.5s ease-in-out;
+.registerButtonDiv{
+  width: 564px;
+  height: 39px;
+  margin-top: 5%;
+  text-align: center;
 }
 
-.first-button {
-  font-size: 14px;
-  background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
+.registerButtonDiv button{
+  font-family: 'Avenir';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 24px;
+  text-decoration-line: underline;
+  color: #4679BC;
+  border: none;
 }
 
-.first-button:hover {
-  background-color: #46ec30;
+.registerButtonDiv button span{
+  color: #606060;
 }
-
-.second-button {
-  margin-left: 10%;
-  font-size: 14px;
-  background-image: linear-gradient(-180deg, #37aee2 0%, #4379b8 100%);
-}
-
-
 
 
 /* CSS FÖR SPARA DITT RESULTAT FORMULÄRET */
@@ -626,8 +938,6 @@ h2 {
     flex-direction: column;
     align-items: center;
     width: 90%;
-    animation: zoomIn;
-    animation-duration: 1s;
   }
 
   .intro-questions label {
@@ -691,8 +1001,6 @@ h2 {
     min-height: 80%;
     min-width: 50%;
     overflow: scroll;
-    animation: zoomIn;
-    animation-duration: 0.5s;
   }
 
   .question-form {
@@ -959,8 +1267,6 @@ h2 {
     min-height: 80%;
     min-width: 50%;
     overflow: scroll;
-    animation: zoomIn;
-    animation-duration: 0.5s;
   }
 
   .question-form {
@@ -1225,8 +1531,6 @@ h2 {
       min-height: 80%;
       min-width: 50%;
       overflow: scroll;
-      animation: zoomIn;
-      animation-duration: 0.5s;
     }
 
     .question-form {
@@ -1500,8 +1804,6 @@ h2 {
     min-height: 80%;
     min-width: 50%;
     overflow: scroll;
-    animation: zoomIn;
-    animation-duration: 0.5s;
   }
 
   .question-form {
@@ -1766,8 +2068,6 @@ h2 {
   min-height:80%;
   min-width:50%;
   overflow: scroll;
-  animation:  zoomIn; 
-  animation-duration: .5s; 
 }
 
 .question-form {
@@ -2046,8 +2346,6 @@ input[type="number"] {
   min-height:80%;
   min-width:50%;
   overflow: scroll;
-  animation:  zoomIn; 
-  animation-duration: .5s; 
 }
 
 .question-form {

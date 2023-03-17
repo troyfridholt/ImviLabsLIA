@@ -1,5 +1,30 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDoc, getDocs, addDoc, setDoc, doc, query, where, updateDoc } from "firebase/firestore";
+import drip from 'drip-nodejs';
+
+
+const client = drip({ token: "221168f29814a47812a2c1bdba8d6afc", accountId: "9427881" });
+
+
+
+const payload = {
+  email: "noahnemhed@hotmail.com",
+  first_name: "Noah",
+  time_zone: "America/Los_Angeles",
+  custom_fields: {
+    source: "ReadingTest"
+  }
+};
+
+client.createUpdateSubscriber(payload)
+  .then((response) => {
+    console.log(response)
+  })
+  .catch((error) => {
+    // Handle errors
+  });
+
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyC6m6ocr9bAgPP2Mp4Rm5cLxIiRhpKC9RE",
@@ -17,14 +42,6 @@ const app = initializeApp(firebaseConfig);
 // Get a reference to the Firestore database
 const db = getFirestore(app);
 
-const userDocRef = doc(db, "users", "noahnemhed@hotmail.com");
-
-// Check if the user document already exists in the "users" collection
-const userDocSnapshot = await getDoc(userDocRef);
-const resultsColRef = collection(userDocRef, "results");
-const resultsSnapshot = await getDocs(resultsColRef);
-const numTestDocs = resultsSnapshot.docs.length;
-console.log(numTestDocs)
 
 
 
