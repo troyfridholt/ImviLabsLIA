@@ -39,6 +39,9 @@ function Content() {
   
   //State för att se ifall användaren har blivit frågad om de vill bli kund
   const [askToBecomeCustomer, setAskToBecomeCustomer] = useState(false);
+
+  //State för att se om man är inloggad
+  const [signedIn, setSignedIn] = useState(false);
   
 
   //Fråga användare svarar på vid start
@@ -336,6 +339,7 @@ function Content() {
       const emailExists = await firebase.checkIfEmailIsInDB(email);
       if (emailExists) {
         document.cookie = `email=${email}; max-age=86400; path=/`;
+        setSignedIn(true)
         setAskToBecomeCustomer(true);
       } else {
         setIsEmailRegistered(false);
@@ -343,6 +347,7 @@ function Content() {
     } else {
       firebase.addUserToDB(email, name, age);
       document.cookie = `email=${email}; max-age=86400; path=/`;
+      setSignedIn(true)
       setAskToBecomeCustomer(true);
     }
   };
@@ -362,6 +367,7 @@ useEffect(() => {
         if (exists) {
           setCustomer(true);
           setAskToBecomeCustomer(true);
+          setSignedIn(true)
         } else {
         }
       })
@@ -385,7 +391,7 @@ return (
             </div>
           }
 
-          {languageSelected && !askToBecomeCustomer &&
+          {languageSelected && !askToBecomeCustomer && RegisterLogin == "Guest" &&
 
           <div className='welcomePageContainer'>
             <img src={readingIcon}  className="readingImg" alt="" />
@@ -428,7 +434,7 @@ return (
             
             <div className='welcomePageDiv3'>
             <p>
-              Regisrera dig med din e-post och följ dina framsteg över tid!
+              Registrera dig med din e-post och följ dina framsteg över tid!
             </p>
             </div>
             
@@ -451,56 +457,50 @@ return (
               </>
             ) :
              (
-          <form onSubmit={handleEmailSubmit} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-            <p className={isEmailRegistered ? "hidden" : ""} style={{ color: "red" }}>
-              Provided email is not registered
-            </p>
-            <input 
-              style={{
-                width: "100%",
-                height: "2rem",
-                padding: "0.5rem",
-                borderRadius: "0.5rem",
-                border: "1px solid #ccc",
-                margin: "1rem 0",
-                fontSize: "1rem",
-              }} 
-              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-              placeholder="Email" 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-            />
-            {RegisterLogin === "Register" && (
-              <>
-                <input 
-                  style={{
-                    width: "100%",
-                    height: "2rem",
-                    padding: "0.5rem",
-                    borderRadius: "0.5rem",
-                    border: "1px solid #ccc",
-                    margin: "1rem 0",
-                    fontSize: "1rem",
-                  }} 
+
+          null
+            )}
+            </div>
+          
+           }
+           
+           {RegisterLogin === "Register" && !signedIn && (
+
+            <div className='RegisterLoginContainer'> 
+              <h1 className='RegisterHeader'>Vad kul att du vill registrera dig!</h1>
+
+              <p className='RegisterParagraph1'>Nu kan du ha fler alternativ för testet och följa dina framsteg över tid!</p>
+              
+              <div className='RegisterForm'>
+              <form onSubmit={handleEmailSubmit}>
+
+                <div className='RegisterFormDiv'>
+                  <label htmlFor="">E-post <span>*</span></label>
+                  <input 
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
+                  placeholder="Email" 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                 />
+                </div>
+
+                <div className='RegisterFormDiv'>
+                  <label htmlFor="">Namn</label>
+                  <input 
                   pattern="[a-zA-Z]+" 
                   placeholder="Name" 
                   type="text" 
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
                   required 
-                />
-                <input 
-                  style={{
-                    width: "100%",
-                    height: "2rem",
-                    padding: "0.5rem",
-                    borderRadius: "0.5rem",
-                    border: "1px solid #ccc",
-                    margin: "1rem 0",
-                    fontSize: "1rem",
-                  }} 
+                   />
+                </div>
+                
+                <div className='RegisterFormDiv'>
+                  <label htmlFor="">Ålder</label>
+                  <input 
                   pattern="[0-9]*" 
                   min="1" 
                   max="99" 
@@ -509,54 +509,56 @@ return (
                   value={age || ''}
                   onChange={(e) => setAge(e.target.value)} 
                   required 
-                />
-              </>
+                   />
+                </div>
+
+                <div className='RegisterFormCheckBoxParagraph'>
+                  <input type="checkbox" name="" id="" />
+                  <p>Jag är minst 18 år och jag godkänner <a href=''>imvis vilkorn</a></p>
+                </div>
+
+                <button className='RegisterFormButton' type='submit'>Registrera</button>
+                
+                <p className='registerParagraph2'>Har du redan ett konto? <button value="Login" onClick={handleVersionClick} >Logga in</button></p>
+              </form>
+              </div>
+              
+
+
+              </div>
+           )}
+            {RegisterLogin === "Login" && !signedIn &&(
+
+              <div className='RegisterLoginContainer'> 
+              <div className='LoginContainer'>
+              <h1 className='RegisterHeader'>Logga in</h1>
+
+              <div className='RegisterForm'>
+              <form onSubmit={handleEmailSubmit}>
+
+                <div className='RegisterFormDiv'>
+                  <label htmlFor="">E-post <span>*</span></label>
+                  <input 
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
+                  placeholder="Email" 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                  />
+                </div>
+
+                <button className='LoginFormButton' type='submit'>Logga in</button>
+                
+                <p className='LoginParagraph2'>Inget konto? <button value="Register" onClick={handleVersionClick}>Registrera</button></p>
+              </form>
+              </div>
+              </div>
+
+
+              </div>
             )}
-            <button 
-              type="submit" 
-              style={{
-                width: "100%",
-                height: "2.5rem",
-                borderRadius: "0.5rem",
-                border: "none",
-                margin: "1rem 0",
-                fontSize: "1rem",
-                backgroundColor: "#4379b8",
-                backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
-                color: "#fff",
-                fontWeight: "bold",
-                cursor: "pointer",
-                transition: "all 0.3s ease-in-out",
-              }}
-            >
-              Submit
-            </button>
-            <button 
-              type="submit" 
-              onClick={handleCancelRegisterFormClick}
-              style={{
-                width: "100%",
-                height: "2.5rem",
-                borderRadius: "0.5rem",
-                border: "none",
-                margin: "1rem 0",
-                fontSize: "1rem",
-                backgroundColor: "#4379b8",
-                backgroundImage: "linear-gradient(-180deg, #37aee2 0%, #4379b8 100%)",
-                color: "#fff",
-                fontWeight: "bold",
-                cursor: "pointer",
-                transition: "all 0.3s ease-in-out",
-              }}
-            >
-              Cancel
-            </button>
-          </form>
-          
-            )}
-            </div>
-          
-           }
+      
 
           {!isStarted && !isStopped && !hasSubmitedQuestions && !introQuestionsDone && languageSelected && askToBecomeCustomer &&
             <div className="level-selector">
@@ -593,8 +595,6 @@ return (
               </div>
 
             </div>
-
-
 
               <div className='level-div'>
               <div className="age-container">
@@ -805,7 +805,7 @@ return (
                        
                     
                       <div className='registerButtonDiv'>
-                      <button className='RegisterButton' onClick={() => setShowForm(true)}>{language === "GB" ? "SAVE RESULT?" : "Registrera" } <span>dig för att få den fullständiga versionen</span></button>
+                      <button className={signedIn ? "hidden" : "RegisterButton"} onClick={() => setShowForm(true)}>{"Registrera"} <span>{"dig för att få den fullständiga versionen"}</span></button>
                       </div>
 
                 
