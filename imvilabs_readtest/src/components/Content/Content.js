@@ -121,6 +121,14 @@ function Content() {
     setCustomer(false)
   }
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 100,
+      left: 0,
+      behavior: "smooth",
+    });
+  }
+
 
   //Metod för att göra breaklines i funStatistics texten.
   const createMarkup = () => {
@@ -172,6 +180,7 @@ function Content() {
       }
       setIntroQuestionsDone(true)
       setIsStopped(false);
+      scrollToTop();
       setIsStarted(true);
     };
     
@@ -187,6 +196,7 @@ function Content() {
   const handleStopClick = async () => {
     setIsStopped(true);
     setIsStarted(false);
+    scrollToTop();
     handleStopTimer();
   };
 
@@ -223,6 +233,7 @@ function Content() {
     setAmountOfRightQuestions(Math.round(percentageCorrect));
     setIsStopped(false);
     setHasSubmitedQuestions(true)
+    scrollToTop();
     displayStatistics();
 };
 
@@ -238,23 +249,11 @@ function Content() {
         document.cookie = `email=${email}; max-age=86400; path=/`;
       }
       setCustomer(true)
+      setSignedIn(true)
       setFormSubmitted(true);
       handleRestartClick();
     };
 
-
-
-
-      //Hanterar när man ändrar level så kan level parametern skickas till servern
-      const infoChange = event => {
-        if(event.target.placeholder === "Email"){
-          setEmail(event.target.value)
-        }
-        if(event.target.placeholder === "Förnamn"){
-          setName(event.target.value)
-        }
-
-      };
 
       const handleLevelChange = (event) => {
         const value = parseInt(event.target.value);
@@ -385,8 +384,8 @@ return (
         <div className='reading-box'>
 
           {!languageSelected &&
-            <div>
-            <img src={SE} alt="Swedish flag" style={{ marginRight: '10rem' }} onClick={() => handleLanguageClick('SE')} />
+            <div style={{display: "flex"}}>
+            <img src={SE} alt="Swedish flag" style={{ marginRight: '10%' }} onClick={() => handleLanguageClick('SE')} />
             <img src={GB} alt="British flag" style={{ }} onClick={() => handleLanguageClick('GB')} />
             </div>
           }
@@ -400,7 +399,7 @@ return (
               <div className='welcomeTextHeader'>
               <h1 className='welcomeText1'>Välkommen till imvis</h1>
               <h1 className='welcomeText2'>Läshastighetstest</h1>
-            </div>
+              </div>
 
             <div className='welcomePageDiv2'>
             <p>
@@ -478,7 +477,7 @@ return (
                   <label htmlFor="">E-post <span>*</span></label>
                   <input 
                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                  placeholder="Email" 
+                  placeholder="E-post" 
                   type="email" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
@@ -490,7 +489,7 @@ return (
                   <label htmlFor="">Namn</label>
                   <input 
                   pattern="[a-zA-Z]+" 
-                  placeholder="Name" 
+                  placeholder="Namn" 
                   type="text" 
                   value={name} 
                   onChange={(e) => setName(e.target.value)} 
@@ -504,7 +503,7 @@ return (
                   pattern="[0-9]*" 
                   min="1" 
                   max="99" 
-                  placeholder="Age" 
+                  placeholder="Ålder" 
                   type="number" 
                   value={age || ''}
                   onChange={(e) => setAge(e.target.value)} 
@@ -514,7 +513,7 @@ return (
 
                 <div className='RegisterFormCheckBoxParagraph'>
                   <input type="checkbox" name="" id="" />
-                  <p>Jag är minst 18 år och jag godkänner <a href=''>imvis vilkorn</a></p>
+                  <p>Jag är minst 18 år och jag godkänner <a href='https://imvilabs.com/allmanna-villkor/'>imvis vilkorn</a></p>
                 </div>
 
                 <button className='RegisterFormButton' type='submit'>Registrera</button>
@@ -540,7 +539,7 @@ return (
                   <label htmlFor="">E-post <span>*</span></label>
                   <input 
                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                  placeholder="Email" 
+                  placeholder="E-post" 
                   type="email" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
@@ -633,7 +632,7 @@ return (
                   value="Agree"
                 />
               <label>
-              Jag samtycker till <a >Imvis vilkor</a>
+              Jag samtycker till <a href='https://imvilabs.com/allmanna-villkor/'>Imvis vilkor</a>
               </label>
               </div>
               <button className='start-button' onClick={handleStartClick}>Starta testet</button>
@@ -686,7 +685,6 @@ return (
                     <div className='statisticsContent'>
                       <div className='testStatistics'>
 
-
                       <div className='statisticsRow'>
                         <div className='statisticsInfo1'>
                         <h2>{language === "GB" ? "READING SPEED":"LÄSHASTIGHET"}</h2>
@@ -735,9 +733,7 @@ return (
                       <h2 className='statisticsValue' dangerouslySetInnerHTML={createMarkup()} />
                       </div>
 
-
                     </div>
-                    
                     <button className='restartTestButton' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM" }</button>
                     </div>
                 }
@@ -806,41 +802,69 @@ return (
                     
                       <div className='registerButtonDiv'>
                       <button className={signedIn ? "hidden" : "RegisterButton"} onClick={() => setShowForm(true)}>{"Registrera"} <span>{"dig för att få den fullständiga versionen"}</span></button>
-                      </div>
-
-                
-                       
+                      </div>       
                     
                     
                   </div>
                 }
 
                 {hasSubmitedQuestions && validToSaveContactInfo && showForm &&
-                <div className='form-container'>
-                  {!customer
-                  ?
-                  <form className='form' onSubmit={handleSaveInfoFormSubmit}>
-                  <div>
-                  <input type="email" onChange={infoChange} placeholder="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
-                  <input type="text" onChange={infoChange} placeholder="Förnamn" pattern="[a-zA-Z]+" required />
-                  </div>
-                <div>
-                <button className='SAVE-RESULT-BUTTON'type="submit">{language === "GB" ?"SAVE" : "SPARA" }</button>
-                <button className='CANCEL-FORM-BUTTON' onClick={handleRestartClick}>{language === "GB" ?"CANCEL" : "AVBRYT" }</button>
-                </div>
-                </form>
-                  :
-                  <form className='form' onSubmit={handleSaveInfoFormSubmit}>
-                  <div>
-                  <input type="email" onChange={infoChange} placeholder="Email" value={email} pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required />
-                  </div>
-                <div>
-                <button className='SAVE-RESULT-BUTTON'type="submit">{language === "GB" ?"SAVE" : "SPARA" }</button>
-                <button className='CANCEL-FORM-BUTTON' onClick={handleRestartClick}>{language === "GB" ?"CANCEL" : "AVBRYT" }</button>
-                </div>
-                </form>
-                  }
+                <div className='RegisterLoginContainer'>
+                <h1 className='RegisterHeader'>Vad kul att du vill registrera dig!</h1>
 
+                <p className='RegisterParagraph1'>Nu kan du ha fler alternativ för testet och följa dina framsteg över tid!</p>
+                  <div className='RegisterForm'>
+                  <form onSubmit={handleSaveInfoFormSubmit}>
+                  <div className='RegisterFormDiv'>
+                  <label htmlFor="">E-post <span>*</span></label>
+                  <input 
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
+                  placeholder="E-post" 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                 />
+                </div>
+
+                <div className='RegisterFormDiv'>
+                  <label htmlFor="">Namn</label>
+                  <input 
+                  pattern="[a-zA-Z]+" 
+                  placeholder="Namn" 
+                  type="text" 
+                  value={name } 
+                  onChange={(e) => setName(e.target.value)} 
+                  required 
+                   />
+                </div>
+                
+                <div className='RegisterFormDiv'>
+                  <label htmlFor="">Ålder</label>
+                  <input 
+                  pattern="[0-9]*" 
+                  min="1" 
+                  max="99" 
+                  placeholder="Ålder" 
+                  type="number" 
+                  value={age || ''}
+                  onChange={(e) => setAge(e.target.value)} 
+                  required 
+                   />
+                </div>
+
+                <div className='RegisterFormCheckBoxParagraph'>
+                  <input type="checkbox" name="" id="" />
+                  <p>Jag är minst 18 år och jag godkänner <a href='https://imvilabs.com/allmanna-villkor/'>imvis vilkorn</a></p>
+                </div>
+                
+                <div>
+                <button className='RegisterFormButton' type='submit'>Registrera</button>
+                <button className='restartTestButton' onClick={handleRestartClick}>STARTA OM</button>
+                </div>
+                
+                </form>
+                  </div>
                   
                   </div>
                 }
