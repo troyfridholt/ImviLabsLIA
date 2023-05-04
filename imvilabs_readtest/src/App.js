@@ -1,16 +1,21 @@
-import React from "react";
-import Header from "./components/Header/Header.js";
-import Footer from "./components/Footer/Footer.jsx";
-import Content from "./components/Content/Content.js";
-import NavbarR from "./components/NavbarR/NavbarR";
-
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Content from './components/Content/Content';
+import Profile from './components/Profile/Profile';
+import Settings from './components/Profile/Settings'
 
 function App() {
+
+  
+
   return (
-    <div className="App">
-      <NavbarR />
-      <Content />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Content />} />
+        <Route path="/profile/:email" element={<Profile/>} />
+        <Route path="/settings/:email" element={<Settings/>} />
+      </Routes>
+    </Router>
   );
 }
 

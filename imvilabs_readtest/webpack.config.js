@@ -2,17 +2,24 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
-    entry: ['./src/App.js', 
+    entry: [
+    './src/App.js', 
     './src/index.js', 
     './src/server.js', 
-    './src/components/Content/content.js', 
-    './src/components/Header/header.js', 
-    './src/components/Footer/footer.jsx', 
-    './src/components/NavbarR/NavbarR.js', 
-    './src/components/Navbar/navItems.js', 
-    './src/components/Link/link.js',  
-    './src/components/DropdownMenu/DropdownMenu.js', 
-    './src/firebase/Firebase.js'],
+    './src/components/Content/Content.js', 
+    './src/components/Content/Login.js',
+    './src/components/Content/Register.js',
+    './src/components/Content/LevelSelector.js',
+    './src/components/Content/QuestionsForm.js',
+    './src/components/Content/ReadingText.js',
+    './src/components/Content/Statistics.js',
+    './src/components/Content/WelcomePage.js',
+    './src/components/Header/Header.js', 
+    './src/components/NavbarR/NavbarR.js',  
+    './src/firebase/Firebase.js',
+    './src/components/Profile/LineChart.js',
+    './src/components/Profile/Profile.js',
+    './src/components/Profile/Settings.js'],
     output: {
       path: path.resolve(__dirname, 'build'),
       filename: 'bundle.js'
@@ -33,17 +40,17 @@ module.exports = {
     },
     module: {
       rules: [
-      // First Rule
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-react'],
+        // First Rule
+        {
+          test: /\.(js|jsx)$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-react'],
+            }
           }
-        }
-      },
+        },
   
         // Second Rule
         {
@@ -71,4 +78,5 @@ module.exports = {
         },
       ]
     },
+    stats: 'errors-only'
   };

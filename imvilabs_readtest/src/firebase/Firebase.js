@@ -1,6 +1,6 @@
 import { initializeApp, } from "firebase/app";
 import {getFirestore, collection, query, where, getDoc, getDocs, addDoc, setDoc, doc, updateDoc } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail  } from "firebase/auth";
 
 class Firebase {
   constructor() {
@@ -20,6 +20,49 @@ class Firebase {
     this.auth = getAuth(this.app);
   }
 
+  //Register
+  async registerUser(email, password) {
+    try {
+      const { user } = await createUserWithEmailAndPassword(this.auth, email, password);
+      return user;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  // Log in with email, password
+  async loginUser(email, password) {
+    try {
+      const { user } = await signInWithEmailAndPassword(this.auth, email, password);
+      return user;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+ // Method to signout
+async signOut() {
+  try {
+    await this.auth.signOut();
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+// Method to resetpassword.
+async resetPassword(resetEmail) {
+  try {
+    await sendPasswordResetEmail(this.auth, resetEmail)
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
 
   //Query för att hämta text från databas
   async getText(level, age, randomNr) {
@@ -50,59 +93,9 @@ class Firebase {
     return data[level]["text"+randomNr].questions;
   }
 
-  //Sparar ner resultat i /users
-  async saveResult(email, name, wpm, age, level, amountOfRightQuestions) {
-    signInWithEmailAndPassword(this.auth, "noahnemhed@hotmail.com", "asd123456.")
-    .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      console.log(user)
-    })
-    const date = new Date().toISOString().substring(0, 10);
-    const result = {
-      date,
-      wpm,
-      level,
-      amountOfRightQuestions,
-    };
-
-  // Create document for the user with the specified email
-  const userDocRef = doc(this.db, "users", email);
-
-  // Check if the user document already exists in the "users" collection
-  const userDocSnapshot = await getDoc(userDocRef);
-  if (!userDocSnapshot.exists()) {
-    // If user document does not exist, create a new document with email and userinfo subcollection
-    await setDoc(userDocRef, {});
-    const userinfoColRef = collection(userDocRef, "userinfo");
-    await setDoc(doc(userinfoColRef, "info"), {
-      email: email,
-      name: name,
-      age: age
-    });
-        // Create a results subcollection and add first test document
-        const resultsColRef = collection(userDocRef, "results");
-        await setDoc(doc(resultsColRef, "test1"), result);
-    // If the user exists, append the result to their document
-  } else {
-    // If user document already exists, find the number of existing test documents
-    const resultsColRef = collection(userDocRef, "results");
-    const resultsSnapshot = await getDocs(resultsColRef);
-    const numTestDocs = resultsSnapshot.docs.length;
-    // Add a new test document with the next available number (e.g. test2 if test1 already exists)
-    await setDoc(doc(resultsColRef, `test${numTestDocs + 1}`), result);
-  }
-  }
-  
   //Save results to an already customer
   async saveResultCustomer(email, level, wpm, amountOfRightQuestions){
 
-    signInWithEmailAndPassword(this.auth, "noahnemhed@hotmail.com", "asd123456.")
-    .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      console.log(user)
-    })
     const date = new Date().toISOString().substring(0, 10);
     const result = {
       date,
@@ -126,8 +119,6 @@ class Firebase {
       }
   }
 
-
-
   //Add a user to db with email, name, age
   async addUserToDB(email, name, age){
   // Create document for the user with the specified email
@@ -147,7 +138,6 @@ class Firebase {
   }
   }
 
-
   //Check if a user is already in db by email
     async checkIfEmailIsInDB(email) {
     // Create reference to the user document with the specified email
@@ -163,68 +153,93 @@ class Firebase {
     }
   }
 
-
+  async getUserDetails(email)
+  {
+    const docRef = doc(this.db, 'users', email, 'userinfo', 'info');
+    const userDocSnapshot = await getDoc(docRef);
+    if (userDocSnapshot.exists()) {
+      const data = userDocSnapshot.data();
+      return { name: data.name, age: data.age };
+    } else {
+      console.log('No such document!');
+      return null; // or throw an error
+    }
+  }
+  
   //Hårdkodat just nu skall implementeras i databas.
    getstatisticsInfo(age, wpm){
     let text = [];
-    let ordIText;
-    let timmarAttLäsaFärdigt;
-
+    let wordsInText;
+    let hoursToFinish;
+    let improvedHoursToFinish
     age = parseInt(age);
     wpm = parseInt(wpm)
 
+    // Ifall man ökar sitt WPM med 15%
+    let improvedWPM = (wpm * 1.15)
+
     switch(true){
         case(age > 0 && age <= 12):
-            ordIText = 76944;
-            timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
+            wordsInText = 76944;
+            hoursToFinish = Math.round((wordsInText / wpm) / 60);
+            improvedHoursToFinish = Math.round((wordsInText / improvedWPM) / 60);
             text.push("100-130.");
             text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
             Med din läshastighet ${wpm} ord per minut. \n
-            Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
+            Så tar det dig ${hoursToFinish} timmar att läsa boken!`);
+            text.push(`Ifall du ökar din läshastighet med 15% \n
+            Så tar det dig ${improvedHoursToFinish} timmar att läsa boken!`);
                 break;
 
         case(age > 12 && age < 15):
-            ordIText = 99750;
-            timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
+            wordsInText = 76944;
+            hoursToFinish = Math.round((wordsInText / wpm) / 60);
+            improvedHoursToFinish = Math.round((wordsInText / improvedWPM) / 60);
             text.push("130-150.");
             text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
             Med din läshastighet ${wpm} ord per minut. \n
-            Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);         
-                break; 
+            Så tar det dig ${hoursToFinish} timmar att läsa boken!`);
+            text.push(`Ifall du ökar din läshastighet med 15% \n
+            Så tar det dig ${improvedHoursToFinish} timmar att läsa boken!`);
+                break;
 
         case(age >= 15 && age <= 18):
-        ordIText = 99750;
-        timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
+        wordsInText = 76944;
+        hoursToFinish = Math.round((wordsInText / wpm) / 60);
+        improvedHoursToFinish = Math.round((wordsInText / improvedWPM) / 60);
         text.push("170-210.");
         text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
-          Med din läshastighet ${wpm} ord per minut. \n
-          Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
-            break;  
+        Med din läshastighet ${wpm} ord per minut. \n
+        Så tar det dig ${hoursToFinish} timmar att läsa boken!`);
+        text.push(`Ifall du ökar din läshastighet med 15% \n
+        Så tar det dig ${improvedHoursToFinish} timmar att läsa boken!`);
+            break;
 
         case(age > 18):
-        ordIText = 99750;
-        timmarAttLäsaFärdigt = Math.round((ordIText / wpm) / 60);
+        wordsInText = 76944;
+        hoursToFinish = Math.round((wordsInText / wpm) / 60);
+        improvedHoursToFinish = Math.round((wordsInText / improvedWPM) / 60);
         text.push("200-260.");
         text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
-          Med din läshastighet ${wpm} ord per minut. \n
-          Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
+        Med din läshastighet ${wpm} ord per minut. \n
+        Så tar det dig ${hoursToFinish} timmar att läsa boken!`);
+        text.push(`Ifall du ökar din läshastighet med 15% \n
+                   Så tar det dig ${improvedHoursToFinish} timmar att läsa boken!`);
             break;
         
         default:
             text.push("170-210.");
             text.push(`Boken Harry Potter och de vises sten innehåller 76,944 ord. \n
             Med din läshastighet ${wpm} ord per minut. \n
-            Så tar det dig ${timmarAttLäsaFärdigt} timmar att läsa boken!`);
-             break;
+            Så tar det dig ${hoursToFinish} timmar att läsa boken!`);
+            text.push(`Ifall du ökar din läshastighet med 15% \n
+            Så tar det dig ${improvedHoursToFinish} timmar att läsa boken!`);
+                break;
     }
     return text;
 }
 
 
 }
-
-
-
-  
   
 export default Firebase;

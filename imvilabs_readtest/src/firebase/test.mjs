@@ -1,29 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDoc, getDocs, addDoc, setDoc, doc, query, where, updateDoc } from "firebase/firestore";
-import drip from 'drip-nodejs';
-
-
-const client = drip({ token: "221168f29814a47812a2c1bdba8d6afc", accountId: "9427881" });
-
-
-
-const payload = {
-  email: "noahnemhed@hotmail.com",
-  first_name: "Noah",
-  time_zone: "America/Los_Angeles",
-  custom_fields: {
-    source: "ReadingTest"
-  }
-};
-
-client.createUpdateSubscriber(payload)
-  .then((response) => {
-    console.log(response)
-  })
-  .catch((error) => {
-    // Handle errors
-  });
-
 
 
 const firebaseConfig = {
@@ -41,6 +17,19 @@ const app = initializeApp(firebaseConfig);
 
 // Get a reference to the Firestore database
 const db = getFirestore(app);
+
+const docRef = doc(db, 'users', 'noahnemhed@hotmail.com', 'userinfo', 'info');
+const userDocSnapshot = await getDoc(docRef);
+if (userDocSnapshot.exists()) {
+  const data = userDocSnapshot.data();
+  console.log(data.name)
+} else {
+  console.log('No such document!');
+}
+
+
+
+
 
 
 

@@ -8,11 +8,27 @@ import GB from '../../Images/gb.png'
 import readingIcon from '../../Images/ReadingIMG.svg'
 import checkIcon from '../../Images/checkIcon.svg'
 import speakerIcon from '../../Images/speakerIcon.png'
+import NavbarR from '../NavbarR/NavbarR';
+import { useLocation, useNavigate  } from 'react-router-dom';
 
+//Importing Login and Register components
+import Login from './Login.js'
+import Register from './Register.js'
+
+//Importing Questions.js
+import QuestionsForm from './QuestionsForm.js'
+import { registerVersion } from 'firebase/app';
+import WelcomePage from './WelcomePage.js';
+import LevelSelector from './LevelSelector.js';
+import Statistics from './Statistics';
+import ReadingText from './ReadingText';
 
 function Content() {
   const firebase = new Firebase();
   const server = new Server();
+  const location = useLocation();
+  const navigate = useNavigate();
+
   //State för att se ifall vi kan fråga efter kundens kontakt uppgifter (Ifall kunden är över 16 år)
   const [validToSaveContactInfo, setValidToSaveContactInfo] = useState(false);
   //State för att visa ett formulär ifall användaren vill spara sitt resultat
@@ -30,7 +46,7 @@ function Content() {
   //State för namn,email
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [isEmailRegistered, setIsEmailRegistered] = useState(true);
+  const [password, setPassword] = useState('');
 
   //State för att se ifall man är kund.
   const [customer, setCustomer] = useState(false);
@@ -42,15 +58,17 @@ function Content() {
 
   //State för att se om man är inloggad
   const [signedIn, setSignedIn] = useState(false);
-  
 
+  //State för att se ifall användaren har godkänt imvis terms
+  const [agreement, setAgreement] = useState(false);
+  
   //Fråga användare svarar på vid start
   const [introQuestionsDone, setIntroQuestionsDone] = useState(false)
 
   //State för val av språk
   const [language, setLanguage] = useState('SE');
   //State för att se ifall användaren har valt ett språk
-  const [languageSelected, setLanguageSelected] = useState(false);
+  const [languageSelected, setLanguageSelected] = useState(true);
 
   //State för frågor där det skall komma in frågor som en array
   const [questions, setQuestions] = useState([]);
@@ -74,16 +92,17 @@ function Content() {
   //State för att visa info varför vi behöver åldern när man har musen på ålder input
   const [showInfo, setShowInfo] = useState(false);
 
-  //State för rolig faktiga efter testet
+  //State för rolig fakta efter testet
   const [funStatistics, setFunStatistics] = useState("");
+
+  //State för rolig fakta efter testet med ett ökat WPM i %
+  const [improvedFunStatistics, setImprovedFunStatistics] = useState("");
 
   //State för average wpm
   const [averageWpm, setAverageWpm] = useState("");
 
   //State för att visa hur många ord av det dem läser som de förstår
-  const [wpmComprehended, setwpmComprehended] = useState("")
-
-  const [resetTimer, setResetTimer] = useState(true);
+  const [wpmComprehended, setwpmComprehended] = useState("");
 
   //State för att visa en text om att användarens resultat har sparats!
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -91,36 +110,72 @@ function Content() {
   //State för att generera ett random nummer för att slumpa text mellan 1-5
   const [randomNr, setRandomNr] = useState(1);
 
+  //Login error if the password is incorrect
+  const [loginError, setLoginError] = useState(false);
+  const handleLoginError = () => {
+    setLoginError(true);
+  };
+
+  //Error if email exists when trying to register
+  const [emailExists, setEmailExists] = useState(false);
+
+  //State for resetting forgotten password 
+  const [resetEmail, setResetEmail] = useState("");
+
   //State för att reseta allting ifall användaren vill börja om testet
   const handleRestartClick = () => {
+    if(!customer){
+      setAgeRange(ageRange);
+      setAskToBecomeCustomer(false)
+      setIntroQuestionsDone(false)
+    }
+    if(customer){
+      setSignedIn(true)
+      setAskToBecomeCustomer(true);
+      setAge(age)
+      setAgeRange(ageRange);
+      setIntroQuestionsDone(true)
+      setRegisterLogin("Login")
+      setIntroQuestionsDone(false)
+      setHasSubmitedQuestions(false)
+      setLanguageSelected(true);
+    }
     setIsStarted(false);
+    setIsStopped(false);
     setHasSubmitedQuestions(false);
     setWpm(0);
     setLevel("level1")
     setAverageWpm("");
     setFunStatistics("");
-    setAgeRange(ageRange);
     setQuestions([]);
     setCorrectAnswers([]);
     setAmountOfRightQuestions(0);
-    setIntroQuestionsDone(false)
-    setValidToSaveContactInfo(false);
-    setShowForm(false);
-    setResetTimer(true);
-    setLanguageSelected(false);
-    setIsEmailRegistered(true)
-    if(!customer){
-      setAskToBecomeCustomer(false)
+    if(age > 18){
+      setValidToSaveContactInfo(true);
+    }else{
+      setValidToSaveContactInfo(false);
     }
+    setShowForm(false);
   }
 
+//Reset password method 
 
-  const handleCancelRegisterFormClick = () =>{
-    console.log(email)
-    setIsEmailRegistered(true)
-    setCustomer(false)
+//Fixa så att felmeddelande visas när man anigivt fel epost *************
+const handleResetPassword = (e) => {
+  e.preventDefault();
+  if (!resetEmail || !resetEmail.match("[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$")) {
+    alert("Ange en giltig e-postadress för att återställa lösenordet.");
+    return;
   }
-
+  firebase.resetPassword(resetEmail)
+  .then(() => {
+    return true;
+  })
+  .catch((error) => {
+    alert(error.message);
+  });
+};
+  
   const scrollToTop = () => {
     window.scrollTo({
       top: 100,
@@ -128,16 +183,6 @@ function Content() {
       behavior: "smooth",
     });
   }
-
-
-  //Metod för att göra breaklines i funStatistics texten.
-  const createMarkup = () => {
-    return {__html: funStatistics.replace(/\n+/g, "<br/>")};
-  };
-
-  const createMarkupText = () => {
-    return { __html: text.replace(/</g, "<br/> <br/>") };
-  };
 
     //skickar request till severn som startar tiden
     const handleStartTimer = () => {
@@ -150,11 +195,13 @@ function Content() {
       setWpm(wpm);
     };
 
+    //Metod för att generera ett nummer mellan 1-5 för att texten som användaren ska läsa ska vara slumpad.
     const generateRandomNumber = (callback) => {
       const randomNumber = Math.floor(Math.random() * 5) + 1;
       callback(randomNumber);
     };
 
+    //Metod för att hantera start av testet.
     const handleStartClick = async () => {
       if (level === null || level === 0 || age === null || age === 0) {
         alert("Please enter both level and age before starting.");
@@ -175,7 +222,7 @@ function Content() {
       setText(text);
       setQuestions(questionsValues);
       setCorrectAnswers(answerValues)
-      if(parseInt(age) >= 16){
+      if(parseInt(age) >= 16 && setAgreement){
         setValidToSaveContactInfo(true)
       }
       setIntroQuestionsDone(true)
@@ -183,91 +230,65 @@ function Content() {
       scrollToTop();
       setIsStarted(true);
     };
-    
 
-  
     const handleIntroAnswerClick = (e) => {
       setSelectedAnswer(e.target.value);
     };
 
-  //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
-  //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
-  //Sätter endTime till new Date så att vi kan räkna ut wpm med start och endTime. Sedan sätter vi variablen wpm med SetWpm till användaren wpm
-  const handleStopClick = async () => {
-    setIsStopped(true);
-    setIsStarted(false);
-    scrollToTop();
-    handleStopTimer();
-  };
+    //Sätter staten isStopped till true för att kunna veta att användaren har klickat på stopp så vi kan ändra deras html och rendera ny html kod som displayar frågor iställer för texten
+    //Sätter IsStarted till false för att ändra stoppknappen till en startknapp igen.
+    //Sätter endTime till new Date så att vi kan räkna ut wpm med start och endTime. Sedan sätter vi variablen wpm med SetWpm till användaren wpm
+    const handleStopClick = async () => {
+      setIsStopped(true);
+      setIsStarted(false);
+      scrollToTop();
+      handleStopTimer();
+    };
 
   //Metod för att visa rolig statistik beroende på ålder
   const displayStatistics = async () => {
     const response = await server.statistics(wpm,age)
-    console.log(response[1])
       setFunStatistics(response[1])
+      setImprovedFunStatistics(response[2])
       setAverageWpm(response[0])
   };
 
   //Metod för att hantera när användaren svarar på frågorna i formuläret den sparar ner svaren från användaren i en array sedan skickar den en post till servern som hämtar rättsvar
   //från databasen med "Level parametern" sedan returnerar servern de rätta svaren och vi jämnför användarens svar med de rätta svaren och räknar ut hur många % rätt användaren hade.  
-  const handleFormSubmit = async event => {
-    event.preventDefault();
-    const answers = [];
-    const questionsElements = event.target.elements;
-    for (let i = 0; i < questionsElements.length; i++) {
-      const question = questionsElements[i];
-      if (question.checked) {
-          answers.push(question.value);
-      }
-    }
-    let amountOfQuestions = Object.keys(correctAnswers).length;
+  const handleFormSubmit = async ( answers) => {
+    let amountOfQuestions = questions.length;
     let amountCorrect = 0;
     for (let i = 0; i < amountOfQuestions; i++) {
       if (correctAnswers.includes(answers[i])) {
-          amountCorrect++;
-      } else {
+        amountCorrect++;
       }
     }
     let percentageCorrect = (amountCorrect / amountOfQuestions) * 100;
     setwpmComprehended(wpm * (percentageCorrect / 100));
     setAmountOfRightQuestions(Math.round(percentageCorrect));
     setIsStopped(false);
-    setHasSubmitedQuestions(true)
+    setHasSubmitedQuestions(true);
     scrollToTop();
+    if (customer && signedIn) {
+      firebase.saveResultCustomer(email,level,wpm,Math.round(percentageCorrect))
+    }
     displayStatistics();
-};
+  };
+  
+//Metod för att se vilken nivå som är vald
+  const handleLevelChange = (event) => {
+    const value = parseInt(event.target.value);
+    if (value === 1) {
+      setLevel("level1");
+    } else if (value === 2) {
+      setLevel("level2");
+    } else if (value === 3) {
+      setLevel("level3");
+    }
+    setFormSubmitted(false);
+  };
 
-    //Funktion som sparar ner email, namn,  sedan skickar den med namn,email,ålder,wpm,antalrättfrågor,nivå till våran backend som sedan ska kunna hantera detta
-    //När vi fixat en databas.
-    function handleSaveInfoFormSubmit(e) {
-      e.preventDefault();
-      firebase.saveResult(email, name, wpm, age, level, amountOfRightQuestions);
-      const emailCookie = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('email='));
-      if (!emailCookie) {
-        document.cookie = `email=${email}; max-age=86400; path=/`;
-      }
-      setCustomer(true)
-      setSignedIn(true)
-      setFormSubmitted(true);
-      handleRestartClick();
-    };
-
-
-      const handleLevelChange = (event) => {
-        const value = parseInt(event.target.value);
-        console.log(value)
-        if (value === 1) {
-          setLevel("level1");
-        } else if (value === 2) {
-          setLevel("level2");
-        } else if (value === 3) {
-          setLevel("level3");
-        }
-        setFormSubmitted(false);
-      };
-
+  //Metod för att hantera användarens valda ålder
   const handleAgeChange = event => {
     const min = event.target.min;
     const max = event.target.max;
@@ -283,7 +304,6 @@ function Content() {
     } else {
       setValidToSaveContactInfo(false);
     }
-  
     let ageRange;
     switch (true) {
       case value >= 0 && value <= 12:
@@ -302,15 +322,15 @@ function Content() {
         ageRange = "22+";
         break;
     }
-  
     setAgeRange(ageRange);
     setAge(value);
   };
 
+
+  //Metod för att se vilket språk som är valt
   const handleLanguageClick = (language) => {
     setLanguage(language);
     setLanguageSelected(true)
-    console.log(language)
   };
 
 
@@ -318,559 +338,218 @@ function Content() {
   const handleVersionClick = (e) => {
     const value = e.target.value;
     if(value === 'Guest'){
+      setRegisterLogin("Guest")
       setCustomer(false)
       setAskToBecomeCustomer(true)
     }
     if(value === "Register"){
       setRegisterLogin("Register")
-      setCustomer(true)
     } 
     if(value === "Login"){
       setRegisterLogin("Login")
-      setCustomer(true)
     }
+  }
+
+  //See if the user has checked the terms of agreement when starting a test.
+  const handleAgreeChange = (event) => {
+    setAgreement(event.target.checked);
   }
 
   //If user chooses to continue with register it will add user to DB and create a cookie with users email.
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     if (RegisterLogin === "Login") {
-      const emailExists = await firebase.checkIfEmailIsInDB(email);
-      if (emailExists) {
-        document.cookie = `email=${email}; max-age=86400; path=/`;
-        setSignedIn(true)
-        setAskToBecomeCustomer(true);
-      } else {
-        setIsEmailRegistered(false);
+      try {
+        const user = await firebase.loginUser(email, password);
+        if (user) {
+          const { name, age } = await firebase.getUserDetails(email);
+          setName(name);
+          setAge(age);
+          document.cookie = `email=${email}; max-age=86400; path=/`;
+          setSignedIn(true);
+          setCustomer(true);
+          setAskToBecomeCustomer(true);
+          navigate(`/profile/${email}`);
+        } else {
+          handleLoginError();
+        }
+      } catch (error) {
+        console.error(error);
+        // handle login error
       }
     } else {
-      firebase.addUserToDB(email, name, age);
-      document.cookie = `email=${email}; max-age=86400; path=/`;
-      setSignedIn(true)
-      setAskToBecomeCustomer(true);
+      try {
+        const user = await firebase.registerUser(email, password);
+        if (user) {
+          firebase.addUserToDB(email, name, age);
+          document.cookie = `email=${email}; max-age=86400; path=/`;
+          setSignedIn(true);
+          setAskToBecomeCustomer(true);
+          setCustomer(true);
+          navigate(`/profile/${email}`);  
+        } else {
+          setEmailExists(true);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
+//This function checks the url for the query signout if its true it will try to sign them out and then navigate back to "/"
+async function handleSignout() {
+  const searchParams = new URLSearchParams(location.search);
+  const signout = searchParams.get("signout");
+  if (signout === "true") {
+    try {
+      const success = await firebase.signOut();
+      if (success) {
+        setEmail("")
+        document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        setCustomer(false);
+        setSignedIn(false);
+        setRegisterLogin("Guest")
+        setIsStarted(false);
+        setIsStopped(false);
+        setHasSubmitedQuestions(false);
+        setWpm(0);
+        setLevel("level1")
+        setAverageWpm("");
+        setFunStatistics("");
+        setAgeRange("7-12");
+        setQuestions([]);
+        setCorrectAnswers([]);
+        setAmountOfRightQuestions(0);
+        setAskToBecomeCustomer(false)
+        setIntroQuestionsDone(false)
+        navigate("/")
+        setTimeout(() => {
+          document.location.reload();
+        }, 100);   
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
+}
+
+//When user gets to "/" it will check if user has clicked on signout by calling the signout method.
+useEffect(() => {
+  handleSignout();
+}, [location]);
+
 //useEffect to check if the user is a customer and if their email exists in the database
 useEffect(() => {
-  const emailCookie = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('email='))
-  if (emailCookie) {
-    const email = emailCookie.split('=')[1];
-    setEmail(email);
-
-    // Check if the email exists in the database
-    firebase.checkIfEmailIsInDB(email)
-      .then(exists => {
+  async function getUserData() {
+    const emailCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('email='));
+    if (emailCookie && emailCookie.split('=')[1]) {
+      const email = emailCookie.split('=')[1];
+      try {
+        const exists = await firebase.checkIfEmailIsInDB(email);
         if (exists) {
+          const { name, age } = await firebase.getUserDetails(email);
+          setRegisterLogin("Login")
+          setName(name);
+          setAge(age);
           setCustomer(true);
           setAskToBecomeCustomer(true);
-          setSignedIn(true)
-        } else {
+          setSignedIn(true);
+          setEmail(email);
         }
-      })
-      .catch(error => {
+      } catch (error) {
         console.error(error);
-      });
+      }
+    }
   }
+  getUserData();
 }, []);
 
+
+//useEffect för att uppdatera åldersspannet när åldern uppdateras 
+useEffect(() => {
+  let ageRange;
+  switch (true) {
+    case age >= 0 && age <= 12:
+      ageRange = "7-12";
+      break;
+    case age >= 13 && age <= 16:
+      ageRange = "13-16";
+      break;
+    case age >= 17 && age <= 21:
+      ageRange = "17-21";
+      break;
+    case age >= 22:
+      ageRange = "22+";
+      break;
+    default:
+      ageRange = "22+";
+      break;
+  }
+  setAgeRange(ageRange);
+}, [handleRestartClick]);
 
 
   
 return (
+  <div >
+    {signedIn && customer &&(
+      <NavbarR email={email} />
+    )}
+
+    {!signedIn && !customer &&(
+      <NavbarR email={"Not provided"}/>
+    )}
+    
+  
   <div className='container'>
         <div className='reading-box'>
 
-          {!languageSelected &&
+        {!languageSelected &&
             <div style={{display: "flex"}}>
             <img src={SE} alt="Swedish flag" style={{ marginRight: '10%' }} onClick={() => handleLanguageClick('SE')} />
             <img src={GB} alt="British flag" style={{ }} onClick={() => handleLanguageClick('GB')} />
             </div>
           }
 
-          {languageSelected && !askToBecomeCustomer && RegisterLogin == "Guest" &&
-
-          <div className='welcomePageContainer'>
-            <img src={readingIcon}  className="readingImg" alt="" />
-            <div className='welcomePageDiv'>
-              <div>
-              <div className='welcomeTextHeader'>
-              <h1 className='welcomeText1'>Välkommen till imvis</h1>
-              <h1 className='welcomeText2'>Läshastighetstest</h1>
-              </div>
-
-            <div className='welcomePageDiv2'>
-            <p>
-              Testet utvärderar din läsförståelse och mäter din
-              lästhastighet i antal ord per minut. Du kommer att få
-              läsa en text och sen kommer du svara på frågor. Om
-              du testar gratis har du bara tillgång till den lätta nivån
-              </p>
-            <p >
-              Få den fullständiga testversionen som inkluderar:
-            </p>
-            </div>
-            <div className='checkBoxDiv'>
-              <div>
-              <img src={checkIcon} alt="" />
-              <p>Tre svårighetsgrader</p>
-              </div>
-
-              <div>
-              <img src={checkIcon} alt="" />
-              <p>Flera språkalternativ</p>
-              </div>
-
-              <div>
-              <img src={checkIcon} alt="" />
-              <p>Mängd olika läsinnehåll</p>
-              </div>
-            </div>
-            </div>
-              </div>
-            
-            <div className='welcomePageDiv3'>
-            <p>
-              Registrera dig med din e-post och följ dina framsteg över tid!
-            </p>
-            </div>
-            
-            {!customer ? (
-              <>
-              <div className='welcomePageButtonsDiv'>
-              <div className='RegisterGuestDiv'>
-                  <button onClick={handleVersionClick} className='registerButton' value="Register">
-                  Registrera
-                  </button>
-                  <button onClick={handleVersionClick} className='guestButton' value="Guest">
-                    Testa som gäst
-                    </button>
-                </div>
-              </div>     
-              <div className='AlreadyRegisterdDiv'>
-                <button onClick={handleVersionClick} class="alreadyRegisredButton" value="Login"><span style={{color: "#606060"}}>Redan Registrerad?</span> Logga in</button>
-                </div>  
-                
-              </>
-            ) :
-             (
-
-          null
-            )}
-            </div>
-          
-           }
+        {languageSelected && !askToBecomeCustomer && RegisterLogin == "Guest" &&
+         <WelcomePage handleVersionClick={handleVersionClick} customer={customer} checkIcon={checkIcon} readingIcon={readingIcon}/>
+        }
            
-           {RegisterLogin === "Register" && !signedIn && (
+        {RegisterLogin === "Register" && !signedIn &&(
+        <Register handleEmailSubmit={handleEmailSubmit} email={email} handleVersionClick={handleVersionClick} setEmail={setEmail} setName={setName} setAge={setAge} age={age} name={name} setPassword={setPassword} emailExists={emailExists}/>
+        )}
 
-            <div className='RegisterLoginContainer'> 
-              <h1 className='RegisterHeader'>Vad kul att du vill registrera dig!</h1>
+        {RegisterLogin === "Login" && !signedIn &&(
+          <Login handleEmailSubmit={handleEmailSubmit} email={email} handleVersionClick={handleVersionClick} setEmail={setEmail} setPassword={setPassword} password={password} loginError={loginError} handleResetPassword={handleResetPassword} setResetEmail={setResetEmail} resetEmail={resetEmail}/>
+        )}
+    
 
-              <p className='RegisterParagraph1'>Nu kan du ha fler alternativ för testet och följa dina framsteg över tid!</p>
-              
-              <div className='RegisterForm'>
-              <form onSubmit={handleEmailSubmit}>
-
-                <div className='RegisterFormDiv'>
-                  <label htmlFor="">E-post <span>*</span></label>
-                  <input 
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                  placeholder="E-post" 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
-                 />
-                </div>
-
-                <div className='RegisterFormDiv'>
-                  <label htmlFor="">Namn</label>
-                  <input 
-                  pattern="[a-zA-Z]+" 
-                  placeholder="Namn" 
-                  type="text" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
-                  required 
-                   />
-                </div>
-                
-                <div className='RegisterFormDiv'>
-                  <label htmlFor="">Ålder</label>
-                  <input 
-                  pattern="[0-9]*" 
-                  min="1" 
-                  max="99" 
-                  placeholder="Ålder" 
-                  type="number" 
-                  value={age || ''}
-                  onChange={(e) => setAge(e.target.value)} 
-                  required 
-                   />
-                </div>
-
-                <div className='RegisterFormCheckBoxParagraph'>
-                  <input type="checkbox" name="" id="" />
-                  <p>Jag är minst 18 år och jag godkänner <a href='https://imvilabs.com/allmanna-villkor/'>imvis vilkorn</a></p>
-                </div>
-
-                <button className='RegisterFormButton' type='submit'>Registrera</button>
-                
-                <p className='registerParagraph2'>Har du redan ett konto? <button value="Login" onClick={handleVersionClick} >Logga in</button></p>
-              </form>
-              </div>
-              
-
-
-              </div>
-           )}
-            {RegisterLogin === "Login" && !signedIn &&(
-
-              <div className='RegisterLoginContainer'> 
-              <div className='LoginContainer'>
-              <h1 className='RegisterHeader'>Logga in</h1>
-
-              <div className='RegisterForm'>
-              <form onSubmit={handleEmailSubmit}>
-
-                <div className='RegisterFormDiv'>
-                  <label htmlFor="">E-post <span>*</span></label>
-                  <input 
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                  placeholder="E-post" 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
-                  />
-                </div>
-
-                <button className='LoginFormButton' type='submit'>Logga in</button>
-                
-                <p className='LoginParagraph2'>Inget konto? <button value="Register" onClick={handleVersionClick}>Registrera</button></p>
-              </form>
-              </div>
-              </div>
-
-
-              </div>
-            )}
-      
-
-          {!isStarted && !isStopped && !hasSubmitedQuestions && !introQuestionsDone && languageSelected && askToBecomeCustomer &&
-            <div className="level-selector">
-            
-            <div className="panel">
-              <div className='panelLabelDiv'>
-              <label className='panelLabel'>Vem är det som gör testet?</label>
-              </div>
-            
-              <div className='panel1'>
-              <input
-                  type="radio"
-                  name="introAnswer"
-                  value="JAG GÖR TESTET SJÄLV"
-                  checked={selectedAnswer === 'JAG GÖR TESTET SJÄLV'}
-                  onChange={handleIntroAnswerClick}
-                />
-              <label>
-                Jag gör testet själv
-              </label>
-              </div>
-
-              <div className='panel2'>
-              <input
-                  type="radio"
-                  name="introAnswer2"
-                  value="JAG GÖR TESTET TILLSAMMANS MED MITT BARN"
-                  checked={selectedAnswer === 'JAG GÖR TESTET TILLSAMMANS MED MITT BARN'}
-                  onChange={handleIntroAnswerClick}
-                />
-              <label>
-              Jag gör testet tillsammans med mitt barn
-              </label>
-              </div>
-
-            </div>
-
-              <div className='level-div'>
-              <div className="age-container">
-                <label>Testtagarens ålder <span>*</span></label>
-                <input
-                  type="number"
-                  className='age'
-                  value={age}
-                  min="1"
-                  max="99"
-                  required
-                  pattern="[0-9]*"
-                  onChange={handleAgeChange}
-                />
-              </div>
-              <div className='level-container'>
-              <label>Svårighetsgrad</label>
-              {!customer ? (
-                  <select className='level' onChange={handleLevelChange} required>
-                    <option value="1">{language === "GB" ? "Easy" : "Lätt"}</option>
-                  </select>
-                ) : (
-                  <select className='level' onChange={handleLevelChange} required>
-                    <option value="1">{language === "GB" ? "Easy" : "Lätt"}</option>
-                    <option value="2">{language === "GB" ? "Medium" : "Medel"}</option>
-                    <option value="3">{language === "GB" ? "Hard" : "Svår"}</option>
-                  </select>
-                )}
-              </div>
-
-              </div>
-              <div className="AgreeDiv">
-              <input
-                  type="checkbox"
-                  name="AgreeBox"
-                  value="Agree"
-                />
-              <label>
-              Jag samtycker till <a href='https://imvilabs.com/allmanna-villkor/'>Imvis vilkor</a>
-              </label>
-              </div>
-              <button className='start-button' onClick={handleStartClick}>Starta testet</button>
-            </div>
-          }
+        {!isStarted && !isStopped && !hasSubmitedQuestions && !introQuestionsDone && languageSelected && askToBecomeCustomer &&
+          <LevelSelector selectedAnswer={selectedAnswer} handleIntroAnswerClick={handleIntroAnswerClick} age={age} handleAgeChange={handleAgeChange} customer={customer} handleLevelChange={handleLevelChange} handleAgreeChange={handleAgreeChange} handleStartClick={handleStartClick} />
+        }
              
        {isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions && 
-        <div className='test'>
-        <div class="parent-container">
-          <div className='readingTextDiv'>
-            <p className='readingText' dangerouslySetInnerHTML={createMarkupText()} />
-          </div>
-          <div className='stop-buttonDiv'>
-            <button className='stop-button' onClick={handleStopClick}>Stopp</button>
-          </div>
-          </div>
-        </div>
-       }
-       { isStopped && !hasSubmitedQuestions &&
-               <div className='questionsContainer'>
-                  <div className='questionsContainerHeader'>
-                    <h1>Frågor</h1>
-                    <p>Välj rätt svar på frågan.</p>
-                  </div>
-                  <form className='question-form' onSubmit={handleFormSubmit}>
-                {questions.map((question, index) => (
-                  <div key={index} className="questions">
-                    <p>{question.question_text}</p>
-                    <div className="questionsRadioAndLabel">
-                      <input required type="radio" id={`option-a`} name={`question-${index}`} value={question.a} />
-                      <label htmlFor={`option-a`}>{question.a}</label>
-                    </div>
-                    <div className="questionsRadioAndLabel">
-                      <input required type="radio" id={`option-b`} name={`question-${index}`} value={question.b} />
-                      <label htmlFor={`option-b`}>{question.b}</label>
-                    </div>
-                    <div className="questionsRadioAndLabel">
-                      <input required type="radio" id={`option-c`} name={`question-${index}`} value={question.c} />
-                      <label htmlFor={`option-c`}>{question.c}</label>
-                    </div>
-                  </div>
-                ))}
-                <button className='submitQuestions' type="submit">Svara och se resultat</button>
-              </form>
-               </div>
-                
-            }
-            { hasSubmitedQuestions && !validToSaveContactInfo &&
-          <div className='statisticsDiv'>
-                    <div className='statisticsContent'>
-                      <div className='testStatistics'>
-
-                      <div className='statisticsRow'>
-                        <div className='statisticsInfo1'>
-                        <h2>{language === "GB" ? "READING SPEED":"LÄSHASTIGHET"}</h2>
-                        <h1 className='statisticsValueWPM'>{wpm}</h1>
-                        <p>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</p>
-                        </div>
-
-                        <div className='statisticsInfo2'>
-                          <p className='statisticsValue'>
-                          {language === "GB"
-                            ? `Average words per minute` +  ` for your age is ${averageWpm}`
-                            : `Genomsnitt ord per minut` +  ` för din ålder är ${averageWpm}`}
-                        </p>
-                      </div>
-                      </div>
-
-                      <div className='statisticsRow'>
-                        <div className='statisticsInfo1'>
-                          <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
-                          <h1 className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</h1>
-                          <p>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</p>
-                        </div>
-
-                        <div className='statisticsInfo2'>
-                        <p className='statisticsValue'>
-                        {language === "GB"
-                          ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
-                          : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
-                        <br />
-                        {language === "GB"
-                          ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
-                          : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
-                      </p>
-                        </div>
-                      </div>
-                                        
-                      </div>
-                      <div className='statisticsFunFactHeader'>
-                        <div>
-                        <img src={speakerIcon} className='SpeakerIcon' alt="" />
-                        <label >Visste du</label>
-                        </div>
-                      </div>
-
-                      <div className='statisticsFunFact'>
-                      <h2 className='statisticsValue' dangerouslySetInnerHTML={createMarkup()} />
-                      </div>
-
-                    </div>
-                    <button className='restartTestButton' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM" }</button>
-                    </div>
-                }
-                {hasSubmitedQuestions && validToSaveContactInfo && !showForm &&
-                  <div className='statisticsDiv'>
-                      <div className='statisticsContent'>
-                      <div className='testStatistics'>
+        <ReadingText handleStopClick={handleStopClick} text={text}/>
+        }
 
 
-                      <div className='statisticsRow'>
-                        <div className='statisticsInfo1'>
-                        <h2>{language === "GB" ? "READING SPEED":"LÄSHASTIGHET"}</h2>
-                        <h1 className='statisticsValueWPM'>{wpm}</h1>
-                        <p>{language === "GB" ? "WORDS PER MINUT":"ORD PER MINUT"}</p>
-                        </div>
+        { isStopped && !hasSubmitedQuestions &&
+          <QuestionsForm handleFormSubmit={handleFormSubmit} questions={questions} />
+         } 
 
-                        <div className='statisticsInfo2'>
-                          <p className='statisticsValue'>
-                          {language === "GB"
-                            ? `Average words per minute` +  ` for your age is ${averageWpm}`
-                            : `Genomsnitt ord per minut` +  ` för din ålder är ${averageWpm}`}
-                        </p>
-                      </div>
-                      </div>
 
-                      <div className='statisticsRow'>
-                        <div className='statisticsInfo1'>
-                          <h2>{language === "GB" ? "COMPREHENSION":"LÄSFÖRSTÅELSE"}</h2>
-                          <h1 className='statisticsValueWPMCOMPREHENSION'>{`${Math.round(amountOfRightQuestions)}%`}</h1>
-                          <p>{language === "GB" ? "OF QUESTIONS ANSWERED CORRECTLY":"RÄTT PÅ FRÅGORNA"}</p>
-                        </div>
-
-                        <div className='statisticsInfo2'>
-                        <p className='statisticsValue'>
-                        {language === "GB"
-                          ? `You had ${Math.round(amountOfRightQuestions)}% correct answers`
-                          : `Du hade ${Math.round(amountOfRightQuestions)}% rätt på frågorna`}
-                        <br />
-                        {language === "GB"
-                          ? `Reading at ${wpm} words per minute, you comprehend ${Math.round(wpmComprehended)} of the words.`
-                          : `Läser du ${wpm} ord per minut, så förstår du ${Math.round(wpmComprehended)} av de orden.`}
-                      </p>
-                        </div>
-                      </div>
-                                        
-                      </div>
-                      <div className='statisticsFunFactHeader'>
-                        <div>
-                        <img src={speakerIcon} className='SpeakerIcon' alt="" />
-                        <label >Visste du</label>
-                        </div>
-                      </div>
-
-                      <div className='statisticsFunFact'>
-                      <h2 className='statisticsValue' dangerouslySetInnerHTML={createMarkup()} />
-                      </div>
+        { hasSubmitedQuestions  && 
+          <Statistics wpm={wpm} averageWpm={averageWpm} amountOfRightQuestions={amountOfRightQuestions} wpmComprehended={wpmComprehended} handleRestartClick={handleRestartClick} funStatistics={funStatistics} improvedFunStatistics={improvedFunStatistics} speakerIcon={speakerIcon} />
+        }
 
 
 
-
-                    </div>
-                      <div className='restartButtonDiv'>
-                      <button className='restartTestButton' onClick={handleRestartClick}>{language === "GB" ? "RESTART TEST" : "STARTA OM" }</button>
-                      </div>
-                       
-                    
-                      <div className='registerButtonDiv'>
-                      <button className={signedIn ? "hidden" : "RegisterButton"} onClick={() => setShowForm(true)}>{"Registrera"} <span>{"dig för att få den fullständiga versionen"}</span></button>
-                      </div>       
-                    
-                    
-                  </div>
-                }
-
-                {hasSubmitedQuestions && validToSaveContactInfo && showForm &&
-                <div className='RegisterLoginContainer'>
-                <h1 className='RegisterHeader'>Vad kul att du vill registrera dig!</h1>
-
-                <p className='RegisterParagraph1'>Nu kan du ha fler alternativ för testet och följa dina framsteg över tid!</p>
-                  <div className='RegisterForm'>
-                  <form onSubmit={handleSaveInfoFormSubmit}>
-                  <div className='RegisterFormDiv'>
-                  <label htmlFor="">E-post <span>*</span></label>
-                  <input 
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                  placeholder="E-post" 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
-                 />
-                </div>
-
-                <div className='RegisterFormDiv'>
-                  <label htmlFor="">Namn</label>
-                  <input 
-                  pattern="[a-zA-Z]+" 
-                  placeholder="Namn" 
-                  type="text" 
-                  value={name } 
-                  onChange={(e) => setName(e.target.value)} 
-                  required 
-                   />
-                </div>
-                
-                <div className='RegisterFormDiv'>
-                  <label htmlFor="">Ålder</label>
-                  <input 
-                  pattern="[0-9]*" 
-                  min="1" 
-                  max="99" 
-                  placeholder="Ålder" 
-                  type="number" 
-                  value={age || ''}
-                  onChange={(e) => setAge(e.target.value)} 
-                  required 
-                   />
-                </div>
-
-                <div className='RegisterFormCheckBoxParagraph'>
-                  <input type="checkbox" name="" id="" />
-                  <p>Jag är minst 18 år och jag godkänner <a href='https://imvilabs.com/allmanna-villkor/'>imvis vilkorn</a></p>
-                </div>
-                
-                <div>
-                <button className='RegisterFormButton' type='submit'>Registrera</button>
-                <button className='restartTestButton' onClick={handleRestartClick}>STARTA OM</button>
-                </div>
-                
-                </form>
-                  </div>
-                  
-                  </div>
-                }
-                </div>   
+                  </div>   
                 </div>      
-
+            </div>
             );
                     
   

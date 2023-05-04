@@ -1,55 +1,39 @@
-import { FaBars, FaTimes } from "react-icons/fa";
 import React from "react";
-import Link from "../Link/Link";
-import { useRef } from "react";
 import "./NavbarR.css";
-import DropdownMenu from "../DropdownMenu/DropdownMenu";
+import { Link } from "react-router-dom";
 import logo from "../../Images/IMVILOGOBLUE.png";
-import flagIcon from "../../Images/sweden.png";
-import cartIcon from "../../Images/shopping-cart.png";
 
-function NavbarR() {
-  const navRef = useRef();
 
-  const showNavbar = () => {
-    navRef.current.classList.toggle("responsive_nav");
-  };
+function NavbarR(props) {
+  const { email, signedIn } = props;
+
+
 
   return (
     <header>
-      <img className="headerLogo" src={logo} />
-      <nav ref={navRef}>
-        <DropdownMenu />
-        <a className="link" href="#">
-          Personer vi hjälpt
-        </a>
-        <a className="link" href="#">
-          Skola
-        </a>
-        <a className="link" href="#">
-          Forskning
-        </a>
-        <a className="link" href="#">
-          Kontakta oss
-        </a>
-        <a className="link" href="#">
-          Webbshop
-        </a>
-        <a href="https://imvilabs.com/sv/varukorg/">
-          <img className="nav--cartIcon" src={cartIcon} alt="Cart" />
-        </a>
-        <button className="nav--btn" type="button">
-          Testa dig gratis
-        </button>
-        <button className="nav-btn nav-close-btn" onClick={showNavbar}>
-          <FaTimes />
-        </button>
-      </nav>
-      <img className="nav--flagIcon" src={flagIcon} alt="Flag" />
-      <button className="nav-btn" onClick={showNavbar}>
-        <FaBars />
-      </button>
-    </header>
+      {email !== "Not provided" ? (
+        <div class="divContainer">
+        <img class="headerLogo" src={logo} alt="IMVI logo" />
+        {signedIn ? (
+            null
+        ) : (
+          <div class="dropdown">
+          <div class="roundcircle">{email.charAt(0).toUpperCase()}</div>
+          <div class="dropdown-content">
+            <Link to="/">Home</Link>
+            <Link to={`/profile/${email}`}>Dashboard</Link>
+            <Link to={`/settings/${email}`}>Settings</Link>
+            <Link to={{ pathname: "/", search: "?signout=true" }}>Sign out</Link>
+          </div>
+        </div>
+        )}
+
+      </div>
+    ) : (
+      <img className="headerLogo" src={logo} alt="IMVI logo" />
+    )}
+  </header>
   );
 }
+
 export default NavbarR;
