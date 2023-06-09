@@ -9,15 +9,15 @@ startTimer() {
 startTime = Date.now();
 }
 
-async stopTimer(level, age, randomNr) {
+async stopTimer(level, age, randomNr, language) {
 elapsedTime = Date.now() - startTime;
-const wpm = await this.calculateWPM(elapsedTime, level, age, randomNr);
+const wpm = await this.calculateWPM(elapsedTime, level, age, randomNr, language);
 return wpm;
 }
 
 
-async calculateWPM(elapsedTime, level, age, randomNr) {
-  const text = await firebase.getText(level, age, ""+randomNr);
+async calculateWPM(elapsedTime, level, age, randomNr, language) {
+  const text = await firebase.getText(level, age, ""+randomNr, language);
   const words = text.toString().split(' ').length;
   const minutes = elapsedTime / 60000;
   const wpm = Math.round(words / minutes);

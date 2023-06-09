@@ -3,11 +3,33 @@ import {  useParams } from 'react-router-dom';
 import NavbarR from '../NavbarR/NavbarR';
 import { Link } from "react-router-dom";
 import Firebase from '../../firebase/Firebase';
+import { getDoc, doc } from 'firebase/firestore';
 const Settings = () => {
     const firebase = new Firebase();
-    const { email } = useParams()
     const [activeButton, setActiveButton] = useState("Profil");
     const [successText, showSuccessText] = useState(false)
+    const { uid } = useParams()
+    const [name, setName] = useState('');
+    const [age, setAge] = useState(0);
+    const [email, setEmail] = useState("");
+    const db = firebase.db
+
+    useEffect(() => {
+      async function getUserInfo() {
+        const docRef = doc(db, 'users', uid, 'userinfo', 'info');
+        const userDocSnapshot = await getDoc(docRef);
+        if (userDocSnapshot.exists()) {
+          const data = userDocSnapshot.data();
+          setName(data.name);
+          setAge(data.age);
+          setEmail(data.email);
+        } else {
+        }
+      }
+
+  
+      getUserInfo();
+    }, [uid]);
 
     const resetPassword = () => {
         firebase.resetPassword(email)
@@ -18,7 +40,7 @@ const Settings = () => {
 
   return (
     <div>
-     <NavbarR email={email} />
+     <NavbarR email={email} uid={uid} name={name} age={age} />
      <div className='settings-container'>
         <div className='settings-container-header'>
         <h2>Kontoinformation</h2>
@@ -41,15 +63,15 @@ const Settings = () => {
             <div className='settings-div-content'>
                 <div className='content'>
                     <label htmlFor="">Namn</label>
-                    <h3>{"Noah"}</h3>       
+                    <h3>{name}</h3>       
                 </div>
                 <div className='content'>
                     <label htmlFor="">E-post</label>
-                    <h3>{"noahnemhed@hotmail.com"}</h3>       
+                    <h3>{email}</h3>       
                 </div>
                 <div className='content'>
                     <label htmlFor="">Ålder</label>
-                    <h3>{23}</h3>       
+                    <h3>{age}</h3>       
                 </div>
             </div>
             ) : (
@@ -73,7 +95,7 @@ const Settings = () => {
             </div>
             )}
             <div className='settings-buttons-div'>
-            <Link className='settings-button2' to={`/profile/${email}`}>Spara</Link>
+            <Link className='settings-button2' to={`/profile/${uid}`}>Spara</Link>
             </div>
             
         

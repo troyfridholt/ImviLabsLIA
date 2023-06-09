@@ -8,20 +8,18 @@ import GB from '../../Images/gb.png'
 import readingIcon from '../../Images/ReadingIMG.svg'
 import checkIcon from '../../Images/checkIcon.svg'
 import speakerIcon from '../../Images/speakerIcon.png'
-import NavbarR from '../NavbarR/NavbarR';
 import { useLocation, useNavigate  } from 'react-router-dom';
+import useVerifyEmailRedirect from './useVerifyEmailRedirect';
 
-//Importing Login and Register components
+//Importing components
 import Login from './Login.js'
 import Register from './Register.js'
-
-//Importing Questions.js
 import QuestionsForm from './QuestionsForm.js'
-import { registerVersion } from 'firebase/app';
 import WelcomePage from './WelcomePage.js';
 import LevelSelector from './LevelSelector.js';
 import Statistics from './Statistics';
 import ReadingText from './ReadingText';
+import NavbarR from '../NavbarR/NavbarR';
 
 function Content() {
   const firebase = new Firebase();
@@ -47,6 +45,7 @@ function Content() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [uid, setUid] = useState('Not Provided');
 
   //State för att se ifall man är kund.
   const [customer, setCustomer] = useState(false);
@@ -66,9 +65,9 @@ function Content() {
   const [introQuestionsDone, setIntroQuestionsDone] = useState(false)
 
   //State för val av språk
-  const [language, setLanguage] = useState('SE');
+  const [language, setLanguage] = useState('SV');
   //State för att se ifall användaren har valt ett språk
-  const [languageSelected, setLanguageSelected] = useState(true);
+  const [languageSelected, setLanguageSelected] = useState(false);
 
   //State för frågor där det skall komma in frågor som en array
   const [questions, setQuestions] = useState([]);
@@ -89,8 +88,6 @@ function Content() {
 
   //State för att kunna lagra användarens alternativ vid intro frågorna för testet
   const [selectedAnswer, setSelectedAnswer] = useState('JAG GÖR TESTET SJÄLV');
-  //State för att visa info varför vi behöver åldern när man har musen på ålder input
-  const [showInfo, setShowInfo] = useState(false);
 
   //State för rolig fakta efter testet
   const [funStatistics, setFunStatistics] = useState("");
@@ -116,8 +113,14 @@ function Content() {
     setLoginError(true);
   };
 
+  
+
   //Error if email exists when trying to register
   const [emailExists, setEmailExists] = useState(false);
+
+  //
+  const[resetSuccessMessage,setResetSuccessMessage] = useState("");
+  const[resetErrorMessage,setResetErrorMessage] = useState("");
 
   //State for resetting forgotten password 
   const [resetEmail, setResetEmail] = useState("");
@@ -138,7 +141,7 @@ function Content() {
       setRegisterLogin("Login")
       setIntroQuestionsDone(false)
       setHasSubmitedQuestions(false)
-      setLanguageSelected(true);
+      setLanguageSelected(false);
     }
     setIsStarted(false);
     setIsStopped(false);
@@ -159,21 +162,28 @@ function Content() {
   }
 
 //Reset password method 
-
-//Fixa så att felmeddelande visas när man anigivt fel epost *************
-const handleResetPassword = (e) => {
+const handleResetPassword = async (e) => {
   e.preventDefault();
   if (!resetEmail || !resetEmail.match("[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$")) {
     alert("Ange en giltig e-postadress för att återställa lösenordet.");
     return;
   }
-  firebase.resetPassword(resetEmail)
-  .then(() => {
-    return true;
-  })
-  .catch((error) => {
-    alert(error.message);
-  });
+  try {
+    const exists = await firebase.checkIfEmailExists(resetEmail);
+    
+    if (exists) {
+      await firebase.resetPassword(resetEmail);
+      setResetSuccessMessage("En återställning länk har skickats till din e-postadress! Kontrollera skräppost.");
+      setResetErrorMessage(null);
+    } else {
+      setResetErrorMessage("E-postadressen finns inte i vår databas!");
+      setResetSuccessMessage(null);
+    }
+  } catch (error) {
+    console.error(error);
+    setResetErrorMessage("Ett fel uppstod vid återställning av lösenordet!");
+    setResetSuccessMessage(null);
+  }
 };
   
   const scrollToTop = () => {
@@ -184,14 +194,14 @@ const handleResetPassword = (e) => {
     });
   }
 
-    //skickar request till severn som startar tiden
+    //skickar request till severn.js som startar tiden
     const handleStartTimer = () => {
       server.startTimer();
     }
     
-    //skickar request till servern som stoppar tiden och räknar ut wpm samt return wpm
+    //skickar request till server.js som stoppar tiden och räknar ut wpm samt returnerar wpm
     const handleStopTimer = async () => {
-      const wpm = await server.stopTimer(level, ageRange, randomNr);
+      const wpm = await server.stopTimer(level, ageRange, randomNr, language);
       setWpm(wpm);
     };
 
@@ -216,9 +226,9 @@ const handleResetPassword = (e) => {
         setRandomNr(1);
       }
       
-      const text = await firebase.getText(level, ageRange, ""+randomNr);
-      const [answerValues] = [Object.values(await firebase.getCorrectAnswers(level, ageRange, ""+randomNr))];
-      const [questionsValues] = [Object.values(await firebase.getQuestions(level, ageRange, ""+randomNr))];
+      const text = await firebase.getText(level, ageRange, ""+randomNr, language);
+      const [answerValues] = [Object.values(await firebase.getCorrectAnswers(level, ageRange, ""+randomNr, language))];
+      const [questionsValues] = [Object.values(await firebase.getQuestions(level, ageRange, ""+randomNr, language))];
       setText(text);
       setQuestions(questionsValues);
       setCorrectAnswers(answerValues)
@@ -270,7 +280,7 @@ const handleResetPassword = (e) => {
     setHasSubmitedQuestions(true);
     scrollToTop();
     if (customer && signedIn) {
-      firebase.saveResultCustomer(email,level,wpm,Math.round(percentageCorrect))
+      firebase.saveResultCustomer(uid,level,wpm,Math.round(percentageCorrect))
     }
     displayStatistics();
   };
@@ -362,14 +372,20 @@ const handleResetPassword = (e) => {
       try {
         const user = await firebase.loginUser(email, password);
         if (user) {
-          const { name, age } = await firebase.getUserDetails(email);
+          setUid(user.uid);
+          const { name, age, email } = await firebase.getUserDetails(user.uid);
           setName(name);
           setAge(age);
+          setEmail(email)
           document.cookie = `email=${email}; max-age=86400; path=/`;
+          document.cookie = `id=${user.uid}; max-age=86400; path=/`;
+          document.cookie = `name=${name}; max-age=86400; path=/`;
+          document.cookie = `age=${age}; max-age=86400; path=/`;
+          document.cookie = `language=${language}; max-age=86400; path=/`;
           setSignedIn(true);
           setCustomer(true);
           setAskToBecomeCustomer(true);
-          navigate(`/profile/${email}`);
+          navigate(`/profile/${user.uid}`);
         } else {
           handleLoginError();
         }
@@ -381,12 +397,20 @@ const handleResetPassword = (e) => {
       try {
         const user = await firebase.registerUser(email, password);
         if (user) {
-          firebase.addUserToDB(email, name, age);
+          firebase.sendEmailVerification(user)
+          setEmail(email)
+          setName(name)
+          setAge(age)
+          setUid(user.uid);
           document.cookie = `email=${email}; max-age=86400; path=/`;
+          document.cookie = `id=${user.uid}; max-age=86400; path=/`;
+          document.cookie = `name=${name}; max-age=86400; path=/`;
+          document.cookie = `age=${age}; max-age=86400; path=/`;
+          document.cookie = `language=${language}; max-age=86400; path=/`;
           setSignedIn(true);
           setAskToBecomeCustomer(true);
           setCustomer(true);
-          navigate(`/profile/${email}`);  
+          redirectToVerify(name,email,user.uid, age, language)
         } else {
           setEmailExists(true);
         }
@@ -394,6 +418,13 @@ const handleResetPassword = (e) => {
         console.error(error);
       }
     }
+  };
+
+  //Metod för att skicka vidare användaren till att verifiera sin email vid registrering
+  const redirectToVerify = (name, email, uid, age, language) => {
+    navigate('/verify?redirected=true', {
+      state: { name, email, uid, age, language }
+    });
   };
 
 //This function checks the url for the query signout if its true it will try to sign them out and then navigate back to "/"
@@ -406,6 +437,9 @@ async function handleSignout() {
       if (success) {
         setEmail("")
         document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "age=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         setCustomer(false);
         setSignedIn(false);
         setRegisterLogin("Guest")
@@ -439,33 +473,70 @@ useEffect(() => {
   handleSignout();
 }, [location]);
 
+    //Method that checks if the user has a cookie called "verifyEmail" set to false if then it will redirect back the user to /verify
+    useVerifyEmailRedirect();
+
+
 //useEffect to check if the user is a customer and if their email exists in the database
 useEffect(() => {
-  async function getUserData() {
-    const emailCookie = document.cookie
+async function getUserData() {
+  //If all theese cookies exists it will set the states according to the cookies values.
+  const ageCookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('age='));
+  const emailCookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('email='));
+  const idCookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('id='));
+  const nameCookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('name='));
+  if (ageCookie && emailCookie && idCookie && nameCookie) {
+    const age = ageCookie.split('=')[1];
+    const email = emailCookie.split('=')[1];
+    const id = idCookie.split('=')[1];
+    const name = nameCookie.split('=')[1];
+    setRegisterLogin("Login");
+    setEmail(email);
+    setName(name);
+    setAge(age);
+    setUid(id);
+    setCustomer(true);
+    setAskToBecomeCustomer(true);
+    setSignedIn(true);
+    
+  } else {
+    //If only the uid cookie exists it will get the userinfo from DB
+    const uidCookie = document.cookie
       .split('; ')
-      .find(row => row.startsWith('email='));
-    if (emailCookie && emailCookie.split('=')[1]) {
-      const email = emailCookie.split('=')[1];
+      .find(row => row.startsWith('id='));
+    if (uidCookie && uidCookie.split('=')[1]) {
+      const uid = uidCookie.split('=')[1];
       try {
-        const exists = await firebase.checkIfEmailIsInDB(email);
+        const exists = await firebase.checkIfUserExists(uid);
         if (exists) {
-          const { name, age } = await firebase.getUserDetails(email);
+          const { name, age, email, id } = await firebase.getUserDetails(uid);
           setRegisterLogin("Login")
+          setEmail(email)
           setName(name);
           setAge(age);
+          setUid(id);
           setCustomer(true);
           setAskToBecomeCustomer(true);
           setSignedIn(true);
-          setEmail(email);
         }
       } catch (error) {
         console.error(error);
       }
     }
   }
+}
+
   getUserData();
 }, []);
+
 
 
 //useEffect för att uppdatera åldersspannet när åldern uppdateras 
@@ -496,11 +567,11 @@ useEffect(() => {
 return (
   <div >
     {signedIn && customer &&(
-      <NavbarR email={email} />
+      <NavbarR uid={uid} email={email} name={name} />
     )}
 
     {!signedIn && !customer &&(
-      <NavbarR email={"Not provided"}/>
+      <NavbarR uid={"Not provided"} email={"Not provided"}/>
     )}
     
   
@@ -508,41 +579,44 @@ return (
         <div className='reading-box'>
 
         {!languageSelected &&
-            <div style={{display: "flex"}}>
-            <img src={SE} alt="Swedish flag" style={{ marginRight: '10%' }} onClick={() => handleLanguageClick('SE')} />
-            <img src={GB} alt="British flag" style={{ }} onClick={() => handleLanguageClick('GB')} />
+            <div >              
+              <div style={{display: "flex"}}>
+              <img src={SE} alt="Swedish flag" style={{ marginRight: '10%' }} onClick={() => handleLanguageClick('SV')} />
+              <img src={GB} alt="British flag" style={{ }} onClick={() => handleLanguageClick('ENG')} />
+              </div>
+
             </div>
           }
 
         {languageSelected && !askToBecomeCustomer && RegisterLogin == "Guest" &&
-         <WelcomePage handleVersionClick={handleVersionClick} customer={customer} checkIcon={checkIcon} readingIcon={readingIcon}/>
+         <WelcomePage handleVersionClick={handleVersionClick} customer={customer} checkIcon={checkIcon} readingIcon={readingIcon} language={language}/>
         }
            
         {RegisterLogin === "Register" && !signedIn &&(
-        <Register handleEmailSubmit={handleEmailSubmit} email={email} handleVersionClick={handleVersionClick} setEmail={setEmail} setName={setName} setAge={setAge} age={age} name={name} setPassword={setPassword} emailExists={emailExists}/>
+        <Register handleEmailSubmit={handleEmailSubmit} email={email} handleVersionClick={handleVersionClick} setEmail={setEmail} setName={setName} setAge={setAge} age={age} name={name} setPassword={setPassword} emailExists={emailExists} language={language}/>
         )}
 
         {RegisterLogin === "Login" && !signedIn &&(
-          <Login handleEmailSubmit={handleEmailSubmit} email={email} handleVersionClick={handleVersionClick} setEmail={setEmail} setPassword={setPassword} password={password} loginError={loginError} handleResetPassword={handleResetPassword} setResetEmail={setResetEmail} resetEmail={resetEmail}/>
+          <Login handleEmailSubmit={handleEmailSubmit} email={email} handleVersionClick={handleVersionClick} setEmail={setEmail} setPassword={setPassword} password={password} loginError={loginError} handleResetPassword={handleResetPassword} setResetEmail={setResetEmail} resetEmail={resetEmail} resetErrorMessage={resetErrorMessage} resetSuccessMessage={resetSuccessMessage} language={language}/>
         )}
     
 
         {!isStarted && !isStopped && !hasSubmitedQuestions && !introQuestionsDone && languageSelected && askToBecomeCustomer &&
-          <LevelSelector selectedAnswer={selectedAnswer} handleIntroAnswerClick={handleIntroAnswerClick} age={age} handleAgeChange={handleAgeChange} customer={customer} handleLevelChange={handleLevelChange} handleAgreeChange={handleAgreeChange} handleStartClick={handleStartClick} />
+          <LevelSelector selectedAnswer={selectedAnswer} handleIntroAnswerClick={handleIntroAnswerClick} age={age} handleAgeChange={handleAgeChange} customer={customer} handleLevelChange={handleLevelChange} handleAgreeChange={handleAgreeChange} handleStartClick={handleStartClick} language={language} />
         }
              
        {isStarted && !isStopped && introQuestionsDone && !hasSubmitedQuestions && 
-        <ReadingText handleStopClick={handleStopClick} text={text}/>
+        <ReadingText handleStopClick={handleStopClick} text={text} language={language}/>
         }
 
 
         { isStopped && !hasSubmitedQuestions &&
-          <QuestionsForm handleFormSubmit={handleFormSubmit} questions={questions} />
+          <QuestionsForm handleFormSubmit={handleFormSubmit} questions={questions} language={language} />
          } 
 
 
         { hasSubmitedQuestions  && 
-          <Statistics wpm={wpm} averageWpm={averageWpm} amountOfRightQuestions={amountOfRightQuestions} wpmComprehended={wpmComprehended} handleRestartClick={handleRestartClick} funStatistics={funStatistics} improvedFunStatistics={improvedFunStatistics} speakerIcon={speakerIcon} />
+          <Statistics wpm={wpm} averageWpm={averageWpm} amountOfRightQuestions={amountOfRightQuestions} wpmComprehended={wpmComprehended} handleRestartClick={handleRestartClick} funStatistics={funStatistics} improvedFunStatistics={improvedFunStatistics} speakerIcon={speakerIcon} language={language} />
         }
 
 

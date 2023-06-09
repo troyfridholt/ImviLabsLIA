@@ -1,6 +1,8 @@
 import { initializeApp, } from "firebase/app";
-import {getFirestore, collection, query, where, getDoc, getDocs, addDoc, setDoc, doc, updateDoc } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail  } from "firebase/auth";
+import {getFirestore, collection, query, where, getDoc, getDocs, addDoc, setDoc, doc, updateDoc, docs, onSnapshot } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification   } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+
 
 class Firebase {
   constructor() {
@@ -20,16 +22,96 @@ class Firebase {
     this.auth = getAuth(this.app);
   }
 
-  //Register
-  async registerUser(email, password) {
-    try {
-      const { user } = await createUserWithEmailAndPassword(this.auth, email, password);
+async getCurrentUser(){
+  var user = this.auth.currentUser;
+
+if (user) {
+return user;
+} else {
+  // No user is signed in
+}
+}  
+
+//Register
+async registerUser(email, password) {
+  try {
+    const { user } = await createUserWithEmailAndPassword(this.auth, email, password);
+    if (user) {
+      // Send the email verification
+      
+
       return user;
-    } catch (error) {
-      console.error(error);
-      return null;
     }
+    return null;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
+}
+
+//Get current user
+ getCurrentUser(){
+  var user = this.auth.currentUser;
+
+if (user) {
+return user;
+} else {
+  // No user is signed in
+}
+}  
+
+
+//Send email
+async sendEmailVerification(user) {
+  try {
+    // Send email verification
+    await sendEmailVerification(user);
+    return true;
+  } catch (error) {
+    console.error('Error sending email verification:', error);
+    return false;
+  }
+}
+
+// Function to check if email is verified and update the database
+async checkIfEmailIsVerified(user) {
+  await user.reload();
+  user = await this.auth.currentUser;
+  // Check if the user's email is verified
+  if (user.emailVerified) {
+    try {
+      return true;
+    } catch (error) {
+      console.error('Error updating verified status in the database:', error);
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
+
+    //Add a user to db with email, name, age
+    async addUserToDB(email, name, age, id, language){
+      // Create document for the user with the specified ID
+      const userDocRef = doc(this.db, "users", id);
+    
+      // Check if the user document already exists in the "users" collection
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (!userDocSnapshot.exists()) {
+        // If user document does not exist, create a new document with userinfo subcollection
+        await setDoc(userDocRef, {});
+        const userinfoColRef = collection(userDocRef, "userinfo");
+        await setDoc(doc(userinfoColRef, "info"), {
+          email: email,
+          name: name,
+          age: age,
+          id: id,
+          language: language
+        });
+      }
+    }
+
+
 
   // Log in with email, password
   async loginUser(email, password) {
@@ -65,16 +147,16 @@ async resetPassword(resetEmail) {
 }
 
   //Query för att hämta text från databas
-  async getText(level, age, randomNr) {
-    const docRef = doc(this.db, "texts", age);
+  async getText(level, age, randomNr, language) {
+    const docRef = doc(this.db, "TEXT"+language, age);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data().levels
     return data[level]["text"+randomNr].text;
  }
 
   //Query för att hämta svar från databas
-  async getCorrectAnswers(level, age, randomNr) {
-    const docRef = doc(this.db, "texts", age);
+  async getCorrectAnswers(level, age, randomNr, language) {
+    const docRef = doc(this.db, "TEXT"+language, age);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data().levels
     const amountOfAnswers = Object.values(data[level]["text" + randomNr].answers).length
@@ -86,16 +168,15 @@ async resetPassword(resetEmail) {
   }
 
   //Query för att hämta frågor från databas
-  async getQuestions(level, age, randomNr) {
-    const docRef = doc(this.db, "texts", age);
+  async getQuestions(level, age, randomNr, language) {
+    const docRef = doc(this.db, "TEXT"+language, age);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data().levels
     return data[level]["text"+randomNr].questions;
   }
 
   //Save results to an already customer
-  async saveResultCustomer(email, level, wpm, amountOfRightQuestions){
-
+  async saveResultCustomer(id, level, wpm, amountOfRightQuestions) {
     const date = new Date().toISOString().substring(0, 10);
     const result = {
       date,
@@ -103,45 +184,35 @@ async resetPassword(resetEmail) {
       level,
       amountOfRightQuestions,
     };
-      // Create document for the user with the specified email
-      const userDocRef = doc(this.db, "users", email);
-
-      // Check if the user document already exists in the "users" collection
-      const userDocSnapshot = await getDoc(userDocRef);
-      const resultsColRef = collection(userDocRef, "results");
-      const resultsSnapshot = await getDocs(resultsColRef);
-      const numTestDocs = resultsSnapshot.docs.length;
-      if(numTestDocs === 0){
+  
+    // Create reference to the user document with the specified ID
+    const userDocRef = doc(this.db, "users", id);
+    
+    // Check if the user document already exists in the "users" collection
+    const userDocSnapshot = await getDoc(userDocRef);
+    if(result.wpm < 500){
+      if (userDocSnapshot.exists()) {
         const resultsColRef = collection(userDocRef, "results");
-        await setDoc(doc(resultsColRef, "test1"), result);
-      }else{
-        await setDoc(doc(resultsColRef, `test${numTestDocs + 1}`), result);
+        const resultsSnapshot = await getDocs(resultsColRef);
+        const numTestDocs = resultsSnapshot.docs.length;
+        if (numTestDocs === 0) {
+          await setDoc(doc(resultsColRef, "test1"), result);
+        } else {
+          await setDoc(doc(resultsColRef, `test${numTestDocs + 1}`), result);
+        }
       }
+    }
+
   }
 
-  //Add a user to db with email, name, age
-  async addUserToDB(email, name, age){
-  // Create document for the user with the specified email
-  const userDocRef = doc(this.db, "users", email);
 
-  // Check if the user document already exists in the "users" collection
-  const userDocSnapshot = await getDoc(userDocRef);
-  if (!userDocSnapshot.exists()) {
-    // If user document does not exist, create a new document with email and userinfo subcollection
-    await setDoc(userDocRef, {});
-    const userinfoColRef = collection(userDocRef, "userinfo");
-    await setDoc(doc(userinfoColRef, "info"), {
-      email: email,
-      name: name,
-      age: age
-    });
-  }
-  }
-
-  //Check if a user is already in db by email
-    async checkIfEmailIsInDB(email) {
-    // Create reference to the user document with the specified email
-    const userDocRef = doc(this.db, "users", email);
+  //Kollar ifall användaren finns i databasen med ID som parameter
+  async checkIfUserExists(id) {
+    // Get a reference to the "users" collection
+    const usersColRef = collection(this.db, "users");
+  
+    // Get the document with the specified id
+    const userDocRef = doc(usersColRef, id);
   
     // Check if the user document already exists in the "users" collection
     const userDocSnapshot = await getDoc(userDocRef);
@@ -153,15 +224,36 @@ async resetPassword(resetEmail) {
     }
   }
 
-  async getUserDetails(email)
+
+//Kolla ifall email finns i databas med email som parameter
+async checkIfEmailExists(email) {
+  const usersColRef = collection(this.db, "users");
+  const querySnapshot = await getDocs(usersColRef);
+
+  for (const document of querySnapshot.docs) {
+    const docRef = doc(this.db, `users/${document.id}/userinfo/info`);
+    const docSnapshot = await getDoc(docRef);
+
+    if (docSnapshot.data().email === email) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+  
+  //Hämtar namn, ålder, email med UID
+  async getUserDetails(id)
   {
-    const docRef = doc(this.db, 'users', email, 'userinfo', 'info');
+    const docRef = doc(this.db, 'users', id, 'userinfo', 'info');
     const userDocSnapshot = await getDoc(docRef);
     if (userDocSnapshot.exists()) {
       const data = userDocSnapshot.data();
-      return { name: data.name, age: data.age };
+      return { name: data.name, age: data.age, email: data.email, id: data.id };
     } else {
-      console.log('No such document!');
       return null; // or throw an error
     }
   }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-
-const QuestionsForm = ({ questions, handleFormSubmit  }) => {
+import useVerifyEmailRedirect from './useVerifyEmailRedirect';
+const QuestionsForm = ({ questions, handleFormSubmit, language  }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
   const [answers, setAnswers] = useState([]);
@@ -24,6 +24,9 @@ const QuestionsForm = ({ questions, handleFormSubmit  }) => {
     setSelectedOption(e.target.value);
   };
 
+    //Method that checks if the user has a cookie called "verifyEmail" set to false if then it will redirect back the user to /verify
+    useVerifyEmailRedirect();
+
   useEffect(() => {
     if (answers.length === questions.length) {
       handleFormSubmit(answers);
@@ -34,9 +37,9 @@ const QuestionsForm = ({ questions, handleFormSubmit  }) => {
     <div className="questionsContainer">
       <div className="questionsContainerHeader">
         <h1>
-          Fråga {currentQuestion + 1} av {questions.length}
+        {language === "SV" ? "Fråga" : "Question"} {currentQuestion + 1} {language === "SV" ? "Av" : "Of"} {questions.length}
         </h1>
-        <p>Välj rätt svar baserat på din läsning.</p>
+        <p>{language === "SV" ? "Välj rätt svar baserat på din läsning." : "Choose the correct answer based on your reading."}</p>
       </div>
       <form className="question-form" >
         <div key={currentQuestion} className="questions">
@@ -82,7 +85,7 @@ const QuestionsForm = ({ questions, handleFormSubmit  }) => {
             className="submitQuestions"
             onClick={handleNextQuestion}
             disabled={selectedOption === ""}
-          > {currentQuestion === questions.length-1 ? "Svara och se resultat" : "Nästa"}</button>
+          > {currentQuestion === questions.length-1 ? language === "SV" ? "Svara och se resultat" : "Answer and see results" : language === "SV" ? "Nästa" : "Next"}</button>
 
       </form>
     </div>

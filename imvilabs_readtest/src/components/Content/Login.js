@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import useVerifyEmailRedirect from './useVerifyEmailRedirect';
 const Login = ({ 
   handleEmailSubmit, 
   handleVersionClick, 
@@ -11,29 +11,33 @@ const Login = ({
   handleResetPassword, 
   resetEmail ,
   setResetEmail,
+  resetErrorMessage,
+  resetSuccessMessage,
+  language
 }) => {
   const [resetPassword, setResetPassword] = useState(false);
-  const [successText, showSuccessText] = useState(false)
-  const [failText, showFailText] = useState(false)
 
   const showResetPassword = () => {
     setResetPassword(true);
   };
 
-  //Fixa så att felmeddelande visas när man anigivt fel epost
+    //Method that checks if the user has a cookie called "verifyEmail" set to false if then it will redirect back the user to /verify
+    useVerifyEmailRedirect();
+
+  //Fixa så att felmeddelande visas när man anigivt fel
 
   return (
     <div className='RegisterLoginContainer'> 
       <div className='LoginContainer'>
         <div className='RegisterForm'>
         <h1 className='RegisterHeader'>{resetPassword ? "Återställ lösenord" : "Logga in"}</h1>
-        <h2 className={successText ? "" : "hidden"} style={{color: "green", marginBottom: "2%", fontSize: "14px"}}>Ett mail med instruktioner för att återställa lösenord har skickats.</h2>
-        <h2 className={failText ? "" : "hidden"} style={{color: "red", marginBottom: "2%", fontSize: "14px"}}>Den angivna mailadressen finns inte registerad i våran databas</h2>
+        <h2 className={resetSuccessMessage ? "" : "hidden"} style={{color: "green", marginBottom: "2%", fontSize: "14px", textAlign: "center"}}>{resetSuccessMessage}</h2>
+        <h2 className={resetErrorMessage ? "" : "hidden"} style={{color: "red", marginBottom: "2%", fontSize: "14px", textAlign: "center"}}>{resetErrorMessage}</h2>
           {resetPassword ? (
             <div className="RegisterFormDiv2">
               <input
                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                placeholder="Ange din e-postadress"
+                placeholder={language === "SV" ? "Ange din e-postadress" : "Enter your e-mail"}
                 required
                 type="email"
                 value={resetEmail || ''}
@@ -42,15 +46,14 @@ const Login = ({
               <button className="LoginFormButton2" type="button" onClick={handleResetPassword}>
                 Skicka
               </button>
-              <p className='LoginParagraph2'>Tillbaka till <button onClick={() => setResetPassword(false)}>Logga in</button></p>
+              <p className='LoginParagraph2'>{language === "SV" ? "Tillbaka till" : "Back to"} <button onClick={() => setResetPassword(false)}>{language === "SV" ? "Logga in" : "Sign in"}</button></p>
             </div>
           ) : (
-            <form onSubmit={handleEmailSubmit}>
+            <form onSubmit={handleEmailSubmit} autoComplete='off'>
               <div className='RegisterFormDiv'>
-                <label htmlFor="">E-post <span>*</span></label>
+                <label htmlFor="">{language === "SV" ? "E-post" : "Email"}<span>*</span></label>
                 <input 
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" 
-                  placeholder="E-post" 
+                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"  
                   type="email" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
@@ -58,9 +61,8 @@ const Login = ({
                 />
               </div>
               <div className='RegisterFormDiv'>
-                <label htmlFor="">Lösenord <span>*</span></label>
-                <input 
-                  placeholder="Lösenord" 
+                <label htmlFor="">{language === "SV" ? "Lösenord" : "Password"} <span>*</span></label>
+                <input  
                   type="password" 
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)} 
@@ -68,11 +70,11 @@ const Login = ({
                   className={loginError ? "error" : ""}
                 />
               </div>
-              {loginError && <div className="error-message">Felaktigt användarnamn eller lösenord</div>}
-              <button className='LoginFormButton' type='submit'>Logga in</button>
+              {loginError && <div className="error-message">{language === "SV" ? "Felaktigt användarnamn eller lösenord" : "Wrong username or password"}</div>}
+              <button className='LoginFormButton' type='submit'>{language === "SV" ? "Logga in" : "Sign in"}</button>
               <div className='LoginParagraph2Div'>
-                <p className='LoginParagraph2'>Inget konto? <button value="Register" onClick={handleVersionClick}>Registrera</button></p>
-                <p className='LoginParagraph2'>Glömt lösenord? <button onClick={showResetPassword}>Återställ</button></p>
+                <p className='LoginParagraph2'>{language === "SV" ? "Inget konto?" : "No account?"} <button value="Register" onClick={handleVersionClick}>{language === "SV" ? "Registrera" : "Register"}</button></p>
+                <p className='LoginParagraph2'>{language === "SV" ? "Glömt lösenord?" : "Forgot password?"} <button onClick={showResetPassword}>{language === "SV" ? "Återställ" : "Reset"}</button></p>
               </div>
             </form>
           )}

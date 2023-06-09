@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, query, where, getDoc, getDocs, addDoc, setDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDoc, getDocs, doc, } from 'firebase/firestore';
 import Firebase from '../../firebase/Firebase'; 
 import { useParams } from 'react-router-dom';
 import './Profile.css';
@@ -7,19 +7,25 @@ import NavbarR from '../NavbarR/NavbarR';
 import sortIcon from '../../Images/sort-solid.svg'
 import { useNavigate } from 'react-router-dom';
 import MyLineChart from './LineChart.js'
-
+import useVerifyEmailRedirect from '../Content/useVerifyEmailRedirect';
 const firebase = new Firebase();
 const db = firebase.db
 
 function Profile() {
   const navigate = useNavigate();
-  const { email } = useParams()
+  const { uid } = useParams()
   const [name, setName] = useState('');
   const [age, setAge] = useState(0);
   const [results, setResults] = useState([]);
   const [level,setLevel] = useState("level1")
   const [ageRange, setAgeRange] = useState("7-12")
+  const [email, setEmail] = useState("");
+  const [emailSent, setEmailSent] = useState(false)
+  const [language, setLanguage] = useState("SV")
+  const [showContent, setShowContent] = useState(false);
 
+    //Method that checks if the user has a cookie called "verifyEmail" set to false if then it will redirect back the user to /verify
+    useVerifyEmailRedirect();
 
   //State to sort by date
   const [sortDirectionDate, setSortDirectionDate] = useState("desc");
@@ -33,8 +39,6 @@ function Profile() {
   //State to sort by level'
   const [levelFilter, setLevelFilter] = useState("All");
   
-
-
 
     //Sort by date function
     const handleSortByDate = () => {
@@ -87,7 +91,7 @@ function Profile() {
                 choosenLevel = "level3"
                 break; 
           }
-          const userDocRef = doc(db, "users", email);
+          const userDocRef = doc(db, "users", uid);
           const resultsColRef = collection(userDocRef, "results");
           const resultsSnapshot = await getDocs(resultsColRef);
           const results = [];
@@ -119,47 +123,47 @@ function Profile() {
       }, [levelFilter]);
 
 
-
-
-  useEffect(() => {
-    async function getUserInfo() {
-      const docRef = doc(db, 'users', email, 'userinfo', 'info');
-      const userDocSnapshot = await getDoc(docRef);
-      if (userDocSnapshot.exists()) {
-        const data = userDocSnapshot.data();
-        setName(data.name)
-        setAge(data.age)
-        let ageRange;
-        switch (true) {
-          case data.age >= 0 && data.age <= 12:
-            ageRange = "7-12";
-            break;
-          case data.age >= 13 && data.age <= 16:
-            ageRange = "13-16";
-            break;
-          case data.age >= 17 && data.age <= 21:
-            ageRange = "17-21";
-            break;
-          case data.age >= 22:
-            ageRange = "22+";
-            break;
-          default:
-            ageRange = "22+";
-            break;
+      useEffect(() => {
+        async function getUserInfo() {
+          try {
+            const { name, age, email, id } = await firebase.getUserDetails(uid);
+            setName(name);
+            setAge(age);
+            setEmail(email)
+            let ageRange;
+            switch (true) {
+              case age >= 0 && age <= 12:
+                ageRange = "7-12";
+                break;
+              case age >= 13 && age <= 16:
+                ageRange = "13-16";
+                break;
+              case age >= 17 && age <= 21:
+                ageRange = "17-21";
+                break;
+              case age >= 22:
+                ageRange = "22+";
+                break;
+              default:
+                ageRange = "22+";
+                break;
+            }
+            setAgeRange(ageRange)
+          } catch (error) {
+            console.error("Error getting user info:", error);
+          }
         }
-        setAgeRange(ageRange)
-      } else {
-        console.log('No such document!');
-      }
-    }
-
-    getUserInfo();
-  }, [db, email]);
+      
+        if (db && uid) {
+          getUserInfo();
+        }
+      }, [db, uid]);
+      
 
   useEffect(() => {
     async function getResults() {
       // Create document for the user with the specified email
-      const userDocRef = doc(db, "users", email);
+      const userDocRef = doc(db, "users", uid);
   
       // Check if the user document already exists in the "users" collection
       const userDocSnapshot = await getDoc(userDocRef);
@@ -189,7 +193,19 @@ function Profile() {
     }
   
     getResults();
-  }, [db, email]);
+  }, [db, uid]);
+
+
+  useEffect(() => {
+    // Introduce a delay of 0.5 seconds before showing the content
+    const delay = 300; // milliseconds
+    const timeout = setTimeout(() => {
+      setShowContent(true);
+    }, delay);
+  
+    // Clean up the timeout on component unmount
+    return () => clearTimeout(timeout);
+  }, []);
 
 
   const handleStartClick = () => {
@@ -198,60 +214,57 @@ function Profile() {
   };
 
 
-
   return (
     <div>
-    <NavbarR email={email} />
-    <div className="profile-container">
-
-      <div className='profile-child-container'>
-        <div className="profile-info-container">
-      <h2 className="profile-header">Hej {name}!👋</h2>
-      <p className='profile-message'>Välkommen! Är du redo att testa din läsförståelse?</p>
-      <button className='start-button2' onClick={() => handleStartClick()}>Ta ett test!</button>
-      </div>
-
-        <div className='chart-container'>
-            <MyLineChart results={results}/>
-        </div>
-
-
-
-      <div className='profile-results-container'>
-      <div className="profile-subheaders">
-      <h2 className='subheader' onClick={handleSortByDate}>Datum <img className='sortIcon' src={sortIcon} alt="" /></h2>
-      <h2 className='subheader' onClick={handleSortByWpm}>Läshastighet <img className='sortIcon' src={sortIcon} alt="" /></h2>
-      <h2 className='subheader' onClick={handleSortByComprehension}>Läsförståelse  <img className='sortIcon' src={sortIcon} alt="" /></h2>
-        <select className='select-subheader' value={levelFilter} onChange={handleLevelFilterChange}>
-        <option value="Alla">Alla</option>
-        <option value="Lätt">Lätt</option>
-        <option value="Medel">Medel</option>
-        <option value="Svår">Svår</option>
-      </select>
-      </div>
-      <div className="profile-results-div">
-      {results.length > 0 ? (
-        results.map((result, index) => (
-        <div key={index} className="profile-result">
-            <h3 style={{fontWeight: 500}} className="profile-result-info">{result.date}</h3>
-            <h3 className="profile-result-info wpm">{result.wpm} <span>wpm</span></h3>
-            <h3 className="profile-result-info amountOfRightQuestions">{result.amountOfRightQuestions}% <span>rätt</span></h3>
-            <h3 style={{fontWeight: 500, backgroundColor: result.level === 'Lätt' ? '#DFF7E8' : result.level === 'Medel' ? '#FFF7DD' : '#ECDADA'}} className="profile-result-info">{result.level}</h3>
-        </div>
-        ))
-    ) : (
-        <h1 className='emptyText'>Här var det tomt.</h1>
-    )}
-      </div>
-      </div>
-      
+      <NavbarR email={email} uid={uid} name={name} age={age} />
+  
+      {showContent && (
+          <div className="profile-container">
+            <div className='profile-child-container'>
+              <div className="profile-info-container">
+                <h2 className="profile-header">{language === "SV" ? `Hej ${name}!👋` : `Hello ${name}!👋`}</h2>
+                <p className='profile-message'>{language === "SV" ? `Välkommen! Är du redo att testa din läsförståelse?` : `Welcome! Are you ready to test your reading comprehension?`}</p>
+                <button className='start-button2' onClick={() => handleStartClick()}>{language === "SV" ? `Ta ett test!` : `Take a test!`}</button>
+              </div>
+  
+              <div className='chart-container'>
+                <MyLineChart results={results}/>
+              </div>
+  
+              <div className='profile-results-container'>
+                <div className="profile-subheaders">
+                  <h2 className='subheader' onClick={handleSortByDate}>{language === "SV" ? "Datum" : "Date"}<img className='sortIcon' src={sortIcon} alt="" /></h2>
+                  <h2 className='subheader' onClick={handleSortByWpm}>{language === "SV" ? "Läshastighet" : "Readingspeed"}<img className='sortIcon' src={sortIcon} alt="" /></h2>
+                  <h2 className='subheader' onClick={handleSortByComprehension}>{language === "SV" ? "Läsförståelse" : "Reading comprehension"}<img className='sortIcon' src={sortIcon} alt="" /></h2>
+                  <select className='select-subheader' title='testSelect' value={levelFilter} onChange={handleLevelFilterChange}>
+                    <option value="Alla">{language === "SV" ? "Alla" : "All"}</option>
+                    <option value="Lätt">{language === "SV" ? "Lätt" : "Easy"}</option>
+                    <option value="Medel">{language === "SV" ? "Medel" : "Medium"}</option>
+                    <option value="Svår">{language === "SV" ? "Svår" : "Hard"}</option>
+                  </select>
+                </div>
+  
+                <div className="profile-results-div">
+                  {results.length > 0 ? (
+                    results.map((result, index) => (
+                      <div key={index} className="profile-result">
+                        <h3 style={{fontWeight: 500}} className="profile-result-info">{result.date}</h3>
+                        <h3 className="profile-result-info wpm">{result.wpm} <span>wpm</span></h3>
+                        <h3 className="profile-result-info amountOfRightQuestions">{result.amountOfRightQuestions}% <span>{language === "SV" ? "rätt" : "correct"}</span></h3>
+                        <h3 style={{fontWeight: 500, backgroundColor: result.level === 'Lätt' ? '#DFF7E8' : result.level === 'Medel' ? '#FFF7DD' : '#ECDADA'}} className="profile-result-info">{result.level}</h3>
+                      </div>
+                    ))
+                  ) : (
+                    <h1 className='emptyText'>{language === "SV" ? "Här var det tomt." : "Here it was empty"}</h1>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+      )}
     </div>
-    
-    
-     </div> 
-    </div>
-    
   );
+  
 }
 
 export default Profile

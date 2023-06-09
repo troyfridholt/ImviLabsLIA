@@ -19,7 +19,9 @@ module.exports = {
     './src/firebase/Firebase.js',
     './src/components/Profile/LineChart.js',
     './src/components/Profile/Profile.js',
-    './src/components/Profile/Settings.js'],
+    './src/components/Profile/Settings.js',
+    './src/components/Content/Verify.js',
+    './src/components/Content/useVerifyEmailRedirect.js'],
     output: {
       path: path.resolve(__dirname, 'build'),
       filename: 'bundle.js'

@@ -14,7 +14,7 @@ import {
 
 const MyLineChart = ({ results }) => {
   const data = results.sort((a, b) => a.wpm - b.wpm)
-    .filter((doc) => doc.wpm > 0 && doc.wpm < 250)
+    .filter((doc) => doc.wpm > 0 && doc.wpm < 300)
     .slice(0, 10)
     .map((doc, index) => {
       const { level, wpm, amountOfRightQuestions } = doc;
@@ -29,20 +29,20 @@ const MyLineChart = ({ results }) => {
 
 
     return (
-        <ResponsiveContainer width={1173} height={619}>
+        <ResponsiveContainer width={"100%"} height={"100%"}>
           <LineChart
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 30 }}
           >
             <CartesianGrid stroke="#f5f5f5" />
             <XAxis
-              label={{ value: 'Testnummer', position: 'insideBottomRight', dy: 20, dx: -220, fontSize: 16, fill: '#000000' }}
+              label={{ value: 'Testnummer', position: 'insideBottomRight', dy: 20, dx: -485, fontSize: 16, fill: '#000000' }}
               tick={{ fontSize: 14 }}
               tickLine={{ stroke: "#555" }}
             />
             <YAxis
               dataKey="wpm"
-              domain={[50, 250]}
+              domain={[50, 300]}
               tickCount={10}
               label={{
                 value: 'Läshastighet',

@@ -1,5 +1,5 @@
 import React from 'react'
-
+import useVerifyEmailRedirect from './useVerifyEmailRedirect';
 const LevelSelector = ({
     selectedAnswer,
     handleIntroAnswerClick,
@@ -8,14 +8,20 @@ const LevelSelector = ({
     customer, 
     handleLevelChange, 
     handleAgreeChange, 
-    handleStartClick 
+    handleStartClick,
+    language,
+    verified
   }) => {
+
+    //Method that checks if the user has a cookie called "verifyEmail" set to false if then it will redirect back the user to /verify
+    useVerifyEmailRedirect();
+
   return (
       <div className="level-selector">
             
             <div className="panel">
               <div className='panelLabelDiv'>
-              <label className='panelLabel'>Vem är det som gör testet?</label>
+              <label className='panelLabel'>{language === "SV" ? "Vem är det som gör testet?" : "Who does the test?"}</label>
               </div>
             
               <div className='panel1'>
@@ -27,7 +33,7 @@ const LevelSelector = ({
                   onChange={handleIntroAnswerClick}
                 />
               <label>
-                Jag gör testet själv
+              {language === "SV" ? "Jag gör testet själv" : "I do the test myself"}
               </label>
               </div>
 
@@ -40,7 +46,7 @@ const LevelSelector = ({
                   onChange={handleIntroAnswerClick}
                 />
               <label>
-              Jag gör testet tillsammans med mitt barn
+              {language === "SV" ? "Jag gör testet tillsammans med mitt barn" : "I take the test together with my child"}
               </label>
               </div>
 
@@ -48,7 +54,7 @@ const LevelSelector = ({
 
               <div className='level-div'>
               <div className="age-container">
-                <label>Testtagarens ålder <span>*</span></label>
+                <label>{language === "SV" ? "Testtagarens ålder" : "Age of the test taker"} <span>*</span></label>
                 <input
                   type="number"
                   className='age'
@@ -62,8 +68,8 @@ const LevelSelector = ({
                 />
               </div>
               <div className='level-container'>
-              <label>Svårighetsgrad</label>
-              {!customer ? (
+              <label>{language === "SV" ? "Svårighetsgrad" : "Level of difficulty"}</label>
+              {!customer && verified === "true" ?(
                   <select className='level' onChange={handleLevelChange} required>
                     <option value="1">{"Lätt"}</option>
                   </select>
@@ -86,10 +92,10 @@ const LevelSelector = ({
                   onChange={handleAgreeChange}
                 />
               <label>
-              Jag samtycker till <a href='https://imvilabs.com/allmanna-villkor/'>Imvis vilkor</a>
+              {language === "SV" ? "Jag samtycker till" : "I agree to"} <a href='https://imvilabs.com/allmanna-villkor/'>{language === "SV" ? "Imvis vilkor" : "Imvis terms and conditions"}</a>
               </label>
               </div>
-              <button className='start-button' onClick={handleStartClick}>Starta testet</button>
+              <button className='start-button' onClick={handleStartClick}>{language === "SV" ? "Starta testet" : "Start the test"}</button>
             </div>
   )
 }
