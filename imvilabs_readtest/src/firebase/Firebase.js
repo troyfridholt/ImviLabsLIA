@@ -190,7 +190,7 @@ async resetPassword(resetEmail) {
     
     // Check if the user document already exists in the "users" collection
     const userDocSnapshot = await getDoc(userDocRef);
-    if(result.wpm < 500){
+    if(result.wpm < 1001){
       if (userDocSnapshot.exists()) {
         const resultsColRef = collection(userDocRef, "results");
         const resultsSnapshot = await getDocs(resultsColRef);
