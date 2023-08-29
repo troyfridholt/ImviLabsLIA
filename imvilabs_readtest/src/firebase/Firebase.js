@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 class Firebase {
   constructor() {
     this.firebaseConfig = {
-      apiKey: "AIzaSyC6m6ocr9bAgPP2Mp4Rm5cLxIiRhpKC9RE",
+      apiKey: "api",
       authDomain: "readingtest-85a9e.firebaseapp.com",
       databaseURL: "https://readingtest-85a9e-default-rtdb.europe-west1.firebasedatabase.app",
       projectId: "readingtest-85a9e",
